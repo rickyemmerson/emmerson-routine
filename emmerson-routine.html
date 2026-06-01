@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Emmerson HQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --abby: #FF6B9D;
+    --abby-light: #FFE0EE;
+    --abby-dark: #d94f82;
+    --olivia: #6B9DFF;
+    --olivia-light: #E0EAFF;
+    --olivia-dark: #4f7cd9;
+    --gold: #FFD700;
+    --green: #4CAF50;
+    --orange: #FF9800;
+    --red: #F44336;
+    --bg: #F7F3EE;
+    --card: #FFFFFF;
+    --text: #2D2D2D;
+    --muted: #888;
+    --radius: 20px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #2D2D2D 0%, #1a1a2e 100%);
+    padding: 20px 20px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    color: white;
+    letter-spacing: 1px;
+  }
+  header .subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .date-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .date-nav button {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .date-nav button:hover { background: rgba(255,255,255,0.25); }
+  .date-display {
+    font-size: 14px;
+    color: white;
+    font-weight: 700;
+    min-width: 160px;
+    text-align: center;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    background: white;
+    border-bottom: 2px solid #eee;
+    position: sticky;
+    top: 101px;
+    z-index: 99;
+  }
+  .tab {
+    flex: 1;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tab.active-abby { color: var(--abby); border-bottom-color: var(--abby); }
+  .tab.active-olivia { color: var(--olivia); border-bottom-color: var(--olivia); }
+  .tab.active-summary { color: var(--text); border-bottom-color: var(--text); }
+
+  /* ── MAIN ── */
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+
+  /* ── SCORE HERO ── */
+  .score-hero {
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .score-hero.abby { background: linear-gradient(135deg, var(--abby) 0%, var(--abby-dark) 100%); }
+  .score-hero.olivia { background: linear-gradient(135deg, var(--olivia) 0%, var(--olivia-dark) 100%); }
+  .score-hero::after {
+    content: '';
+    position: absolute;
+    right: -20px; top: -20px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .hero-left h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 26px;
+    color: white;
+  }
+  .hero-left .today-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .hero-score {
+    font-family: 'Fredoka One', cursive;
+    font-size: 52px;
+    color: white;
+    line-height: 1;
+  }
+  .hero-pts {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    text-align: right;
+    font-weight: 700;
+  }
+  .weekly-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: white;
+    font-weight: 700;
+  }
+
+  /* ── DESSERT BANNER ── */
+  .dessert-banner {
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 14px;
+  }
+  .dessert-banner .icon { font-size: 24px; }
+  .dessert-0 { background: #FFEAEA; color: #c0392b; }
+  .dessert-1 { background: #FFF3E0; color: #e67e22; }
+  .dessert-2 { background: #E8F5E9; color: #27ae60; }
+  .dessert-3 { background: linear-gradient(135deg, #FFF9C4, #FFF3E0); color: #f39c12; border: 2px solid #FFD700; }
+
+  /* ── SECTION ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0 10px;
+  }
+  .section-header .tag {
+    background: var(--text);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .section-header .time-range {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  /* ── TASK CARD ── */
+  .task-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid transparent;
+  }
+  .task-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .task-name {
+    font-weight: 800;
+    font-size: 15px;
+    flex: 1;
+  }
+  .task-pts-badge {
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    min-width: 40px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .task-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+    font-weight: 600;
+  }
+
+  /* ── SCORING BUTTONS ── */
+  .score-buttons {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .score-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 4px;
+    border-radius: 10px;
+    border: 2px solid #eee;
+    background: white;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    color: var(--muted);
+    line-height: 1.2;
+  }
+  .score-btn:hover { transform: translateY(-1px); }
+  .score-btn.selected-fast { background: #4CAF50; border-color: #4CAF50; color: white; }
+  .score-btn.selected-ontime { background: #8BC34A; border-color: #8BC34A; color: white; }
+  .score-btn.selected-asked { background: #FF9800; border-color: #FF9800; color: white; }
+  .score-btn.selected-nagged { background: #9E9E9E; border-color: #9E9E9E; color: white; }
+  .score-btn.selected-na { background: #eee; border-color: #ddd; color: #aaa; }
+
+  /* penalty-btn colours */
+  .score-btn.selected-penalty { background: #F44336; border-color: #F44336; color: white; }
+
+  /* ── PENALTY SECTION ── */
+  .penalty-card {
+    background: #FFF5F5;
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 2px dashed #FFCDD2;
+  }
+  .penalty-card h4 {
+    font-size: 13px;
+    font-weight: 800;
+    color: #c0392b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .penalty-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #FFEBEE;
+  }
+  .penalty-row:last-child { border-bottom: none; }
+  .penalty-name { font-size: 14px; font-weight: 700; flex: 1; }
+  .penalty-pts { font-size: 13px; color: #c0392b; font-weight: 800; margin-right: 10px; }
+  .penalty-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pen-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid #FFCDD2;
+    background: white;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    color: #c0392b;
+    transition: all 0.15s;
+  }
+  .pen-btn:hover { background: #FFCDD2; }
+  .pen-count {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    min-width: 24px;
+    text-align: center;
+    color: #c0392b;
+  }
+
+  /* ── KITCHEN ROSTER ── */
+  .kitchen-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .kitchen-card h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+  .kitchen-roles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .role-box {
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+  }
+  .role-box.abby-role { background: var(--abby-light); }
+  .role-box.olivia-role { background: var(--olivia-light); }
+  .role-box .girl-name {
+    font-weight: 800;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .role-box.abby-role .girl-name { color: var(--abby-dark); }
+  .role-box.olivia-role .girl-name { color: var(--olivia-dark); }
+  .role-box .role-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .role-box ul {
+    list-style: none;
+    margin-top: 6px;
+  }
+  .role-box ul li {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 1px 0;
+  }
+  .role-box ul li::before { content: '✓ '; color: var(--green); }
+  .roster-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .roster-week-badge {
+    background: var(--text);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .roster-btn {
+    background: #eee;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Nunito', sans-serif;
+  }
+  .roster-btn:hover { background: #ddd; }
+
+  /* ── SUMMARY PAGE ── */
+  .summary-week-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .summary-week-card h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .week-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .week-girl-box {
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+  }
+  .week-girl-box.abby { background: var(--abby-light); }
+  .week-girl-box.olivia { background: var(--olivia-light); }
+  .week-girl-box .g-name {
+    font-weight: 800;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .week-girl-box.abby .g-name { color: var(--abby-dark); }
+  .week-girl-box.olivia .g-name { color: var(--olivia-dark); }
+  .week-pts {
+    font-family: 'Fredoka One', cursive;
+    font-size: 40px;
+    line-height: 1;
+  }
+  .week-girl-box.abby .week-pts { color: var(--abby); }
+  .week-girl-box.olivia .week-pts { color: var(--olivia); }
+  .week-pts-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+
+  /* dessert result */
+  .dessert-result {
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    margin-top: 8px;
+  }
+  .dessert-result .d-icon { font-size: 32px; margin-bottom: 4px; }
+  .dessert-result .d-text { font-size: 15px; font-weight: 800; }
+  .dessert-result .d-sub { font-size: 12px; font-weight: 600; margin-top: 2px; }
+
+  /* ── DAILY BREAKDOWN TABLE ── */
+  .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .breakdown-table th {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    font-weight: 800;
+    padding: 6px 4px;
+    text-align: center;
+    border-bottom: 2px solid #eee;
+  }
+  .breakdown-table th:first-child { text-align: left; }
+  .breakdown-table td {
+    padding: 8px 4px;
+    text-align: center;
+    border-bottom: 1px solid #f5f5f5;
+    font-weight: 700;
+  }
+  .breakdown-table td:first-child { text-align: left; color: var(--text); font-size: 11px; }
+  .day-pts { font-family: 'Fredoka One', cursive; font-size: 16px; }
+  .day-pts.abby-col { color: var(--abby); }
+  .day-pts.olivia-col { color: var(--olivia); }
+
+  /* ── SAVE BUTTON ── */
+  .save-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    padding: 12px 16px;
+    border-top: 2px solid #eee;
+    z-index: 200;
+  }
+  .save-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .save-btn.abby { background: var(--abby); color: white; }
+  .save-btn.olivia { background: var(--olivia); color: white; }
+  .save-btn.summary-save { background: var(--text); color: white; }
+  .save-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .save-btn:active { transform: translateY(0); }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #333;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 300;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* dog walk badge */
+  .dog-walk-label {
+    font-size: 11px;
+    background: #FFF3E0;
+    color: #E65100;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-weight: 800;
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  /* NA overlay */
+  .task-card.na-task { opacity: 0.5; }
+
+  /* progress bar */
+  .progress-wrap { margin-top: 8px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+  .progress-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+  .progress-fill.abby { background: var(--abby); }
+  .progress-fill.olivia { background: var(--olivia); }
+
+  .info-note {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    padding: 8px;
+    font-weight: 600;
+  }
+
+  /* ── BONUS CARD ── */
+  .bonus-card {
+    background: #F5F0FF;
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 2px dashed #C9B8E8;
+  }
+  .bonus-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .bonus-title { font-size: 14px; font-weight: 800; color: #5a3e8a; }
+  .bonus-desc  { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+  .bonus-total {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    line-height: 1;
+    min-width: 48px;
+    text-align: right;
+  }
+  .bonus-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .bonus-btn {
+    padding: 10px 6px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .bonus-btn:hover { transform: translateY(-1px); opacity: 0.9; }
+  .bonus-btn:active { transform: translateY(0); }
+  .bonus-btn.reward      { background: #E8F5E9; color: #2e7d32; }
+  .bonus-btn.reward.big  { background: #4CAF50; color: white; }
+  .bonus-btn.deduct      { background: #FFEBEE; color: #c0392b; }
+  .bonus-btn.deduct.big  { background: #F44336; color: white; }
+  .bonus-reset-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .bonus-reset {
+    background: white;
+    border: 2px solid #C9B8E8;
+    color: #7B5EA7;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+  }
+  .bonus-reset:hover { background: #ede8f8; }
+  .bonus-hint {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏠 Emmerson HQ</h1>
+  <div class="subtitle">Evening Routine Tracker</div>
+  <div class="date-nav">
+    <button onclick="changeDay(-1)">‹</button>
+    <div class="date-display" id="dateDisplay"></div>
+    <button onclick="changeDay(1)">›</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active-abby" id="tab-abby" onclick="showPage('abby')">🩷 Abby</div>
+  <div class="tab" id="tab-olivia" onclick="showPage('olivia')">💙 Olivia</div>
+  <div class="tab" id="tab-summary" onclick="showPage('summary')">📊 Week</div>
+</div>
+
+<!-- ═══════════════ ABBY PAGE ═══════════════ -->
+<div class="page active" id="page-abby">
+  <div id="abby-content"></div>
+  <div class="save-bar">
+    <button class="save-btn abby" onclick="saveDay('abby')">💾 Save Abby's Day</button>
+  </div>
+</div>
+
+<!-- ═══════════════ OLIVIA PAGE ═══════════════ -->
+<div class="page" id="page-olivia">
+  <div id="olivia-content"></div>
+  <div class="save-bar">
+    <button class="save-btn olivia" onclick="saveDay('olivia')">💾 Save Olivia's Day</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SUMMARY PAGE ═══════════════ -->
+<div class="page" id="page-summary">
+  <div id="summary-content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  DATA DEFINITIONS
+// ══════════════════════════════════════════
+
+const TASKS = {
+  beforeSchool: {
+    label: 'Before School',
+    time: 'Morning',
+    tasks: [
+      { id: 'bs_breakfast', name: 'Breakfast eaten', desc: 'Must be eaten before leaving — not in the car', pts: [2, 2, 1, 0] },
+      { id: 'bs_teeth',     name: 'Teeth brushed',  desc: 'Morning brush before school', pts: [2, 2, 1, 0] },
+      { id: 'bs_dogfed',    name: 'Dog fed (AM)',    desc: 'Morning feed — penalty if missed', pts: [2, 2, 1, 0], penalty: true },
+    ]
+  },
+  afterSchool: {
+    label: 'After School',
+    time: '4:10pm – 5:50pm',
+    tasks: [
+      { id: 'as_dogwalk',   name: 'Dog walk',        desc: '~30 mins — check whose turn it is below', pts: [3, 2, 1, 0], dogwalk: true, penalty: true },
+      { id: 'as_homework',  name: 'Homework',        desc: 'Up to 30 mins — N/A if none tonight', pts: [2, 2, 1, 0], hasNA: true },
+      { id: 'as_music',     name: 'Music practice',  desc: '10 mins minimum', pts: [2, 2, 1, 0] },
+      { id: 'as_bedroom',   name: 'Bedroom floor tidy', desc: 'Clothes off floor, room walkable', pts: [2, 2, 1, 0] },
+      { id: 'as_dogfed',    name: 'Dog fed (PM)',    desc: 'Afternoon / evening feed', pts: [2, 2, 1, 0], penalty: true },
+    ]
+  },
+  afterDinner: {
+    label: 'After Dinner',
+    time: '6:30pm – 7:30pm',
+    tasks: [
+      { id: 'ad_lunch',     name: 'School lunch packed', desc: 'Under 5 min = 3pts, under 10 min = 2pts', pts: [3, 2, 1, 0], timed: true },
+      { id: 'ad_kitchen',   name: 'Kitchen duty',   desc: 'See roster below — full job list', pts: [3, 2, 1, 0] },
+      { id: 'ad_shower',    name: 'Shower',          desc: 'Under 7 minutes', pts: [3, 2, 1, 0] },
+      { id: 'ad_clothes',   name: 'Dirty clothes away', desc: 'In laundry or hamper — not the floor', pts: [2, 2, 1, 0] },
+      { id: 'ad_pjs',       name: 'PJs on',          desc: 'Changed and ready', pts: [1, 1, 0, 0] },
+      { id: 'ad_washing',   name: 'Clean washing put away', desc: 'If there is clean washing out', pts: [2, 2, 1, 0], hasNA: true },
+      { id: 'ad_bag',       name: 'School bag packed', desc: 'Everything in, ready to go', pts: [2, 2, 1, 0] },
+      { id: 'ad_teeth',     name: 'Teeth brushed',   desc: 'Night brush — penalty if missed', pts: [2, 2, 1, 0], penalty: true },
+    ]
+  },
+  bedtime: {
+    label: 'Bedtime',
+    time: '8:00pm – 8:15pm',
+    tasks: [
+      { id: 'bt_bed',       name: 'In bed, lights off', desc: '8:00pm = fast (3pts), 8:15pm = on time (2pts), after = 0', pts: [3, 2, 0, 0] },
+    ]
+  }
+};
+
+const PENALTIES = [
+  { id: 'pen_screens',   name: 'Screen time (weekday)',  pts: -1 },
+  { id: 'pen_fighting',  name: 'Fighting with each other', pts: -2 },
+];
+
+// Kitchen roster roles
+const KITCHEN_ROLES = {
+  A: {
+    abby:   { title: 'Role A — Dishes Side', items: ['Unpack dishwasher', 'Load dirty dishes', 'Wash pots & pans', 'Put pots away'] },
+    olivia: { title: 'Role B — Surfaces Side', items: ['Clear & wipe bench', 'Clear & wipe table', 'Sweep floor', 'Stovetop (×2/week)'] }
+  },
+  B: {
+    abby:   { title: 'Role B — Surfaces Side', items: ['Clear & wipe bench', 'Clear & wipe table', 'Sweep floor', 'Stovetop (×2/week)'] },
+    olivia: { title: 'Role A — Dishes Side', items: ['Unpack dishwasher', 'Load dirty dishes', 'Wash pots & pans', 'Put pots away'] }
+  }
+};
+
+// Dog walk roster — Abby: Mon/Wed/Fri/Sun, Olivia: Tue/Thu/Sat
+const DOG_WALK_ROSTER = { 0: 'Abby', 1: 'Olivia', 2: 'Abby', 3: 'Olivia', 4: 'Abby', 5: 'Olivia', 6: 'Abby' };
+// 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat  → corrected:
+// Abby: Mon(1),Wed(3),Fri(5),Sun(0)  Olivia: Tue(2),Thu(4),Sat(6)
+const DOG_WALK = { 0: 'Abby', 1: 'Abby', 2: 'Olivia', 3: 'Abby', 4: 'Olivia', 5: 'Abby', 6: 'Olivia' };
+
+// Dessert thresholds
+const DESSERT = [
+  { min: 65, count: 3, label: '3 Desserts 🎉', sub: 'Incredible week!', cls: 'dessert-3', icon: '🍰🍰🍰' },
+  { min: 50, count: 2, label: '2 Desserts 😊', sub: 'Great effort!',    cls: 'dessert-2', icon: '🍨🍨' },
+  { min: 35, count: 1, label: '1 Dessert 😐',  sub: 'Room to improve', cls: 'dessert-1', icon: '🍦' },
+  { min: 0,  count: 0, label: 'No Dessert 😔', sub: 'Better luck next week', cls: 'dessert-0', icon: '❌' },
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+
+let currentDate = new Date();
+currentDate.setHours(0,0,0,0);
+
+// data[dateKey][girl][taskId] = score key
+// score: 'fast'|'ontime'|'asked'|'nagged'|'na'|null
+// penalties[dateKey][girl][penId] = count
+
+function getDateKey(d) {
+  return d.toISOString().split('T')[0];
+}
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem('emmersonHQ') || '{}'); } catch(e) { return {}; }
+}
+function saveData(data) {
+  localStorage.setItem('emmersonHQ', JSON.stringify(data));
+}
+function getData() { return loadData(); }
+
+function getKitchenWeek() {
+  // Week A/B based on ISO week number parity
+  const d = new Date(currentDate);
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  const weekNo = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  return weekNo % 2 === 0 ? 'B' : 'A';
+}
+
+// ══════════════════════════════════════════
+//  SCORING HELPERS
+// ══════════════════════════════════════════
+
+const SCORE_LABELS = {
+  fast:   { label: '⚡ Fast',    short: 'Fast' },
+  ontime: { label: '✅ On Time', short: 'On Time' },
+  asked:  { label: '🙋 Asked',   short: 'Asked' },
+  nagged: { label: '😤 Nagged',  short: 'Nagged' },
+  na:     { label: '— N/A',      short: 'N/A' },
+};
+
+function getPts(task, scoreKey) {
+  if (!scoreKey || scoreKey === 'na') return 0;
+  const map = { fast: 0, ontime: 1, asked: 2, nagged: 3 };
+  return task.pts[map[scoreKey]] ?? 0;
+}
+
+function calcDayScore(girl, dateKey) {
+  const data = getData();
+  const dayData = data[dateKey]?.[girl] || {};
+  const penData = data[dateKey]?.penalties?.[girl] || {};
+
+  let pts = 0;
+  // tasks
+  for (const section of Object.values(TASKS)) {
+    for (const task of section.tasks) {
+      const score = dayData[task.id];
+      if (score && score !== 'na') {
+        const p = getPts(task, score);
+        pts += p;
+        // penalty if task.penalty and score === 'nagged'
+        if (task.penalty && score === 'nagged') pts -= 1;
+      }
+    }
+  }
+  // penalties
+  for (const pen of PENALTIES) {
+    const count = penData[pen.id] || 0;
+    pts += pen.pts * count;
+  }
+  // bonus / custom
+  pts += data[dateKey]?.bonus?.[girl] || 0;
+
+  return pts;
+}
+
+function calcWeekScore(girl) {
+  const data = getData();
+  const mon = getMondayOfWeek(currentDate);
+  let total = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(mon);
+    d.setDate(d.getDate() + i);
+    total += calcDayScore(girl, getDateKey(d));
+  }
+  return total;
+}
+
+function getMondayOfWeek(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = (day === 0) ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function getDessert(pts) {
+  for (const d of DESSERT) {
+    if (pts >= d.min) return d;
+  }
+  return DESSERT[3];
+}
+
+// ══════════════════════════════════════════
+//  RENDERING
+// ══════════════════════════════════════════
+
+function renderGirlPage(girl) {
+  const dateKey = getDateKey(currentDate);
+  const data = getData();
+  const dayData = data[dateKey]?.[girl] || {};
+  const penData = data[dateKey]?.penalties?.[girl] || {};
+
+  const dayPts  = calcDayScore(girl, dateKey);
+  const weekPts = calcWeekScore(girl);
+  const color   = girl === 'abby' ? 'abby' : 'olivia';
+  const name    = girl === 'abby' ? 'Abby' : 'Olivia';
+  const weekDessert = getDessert(weekPts);
+  const kitchenWeek = getKitchenWeek();
+  const dogWalkDay  = DOG_WALK[currentDate.getDay()];
+  const maxDay = 34; // rough max per day
+
+  let html = '';
+
+  // Score hero
+  html += `
+  <div class="score-hero ${color}">
+    <div class="hero-left">
+      <div class="today-label">Today's Score</div>
+      <h2>${name}</h2>
+      <div class="weekly-pill">📅 Week total: ${weekPts} pts</div>
+    </div>
+    <div>
+      <div class="hero-score">${dayPts}</div>
+      <div class="hero-pts">pts today</div>
+    </div>
+  </div>`;
+
+  // Progress bar
+  const pct = Math.min(100, Math.round((dayPts / maxDay) * 100));
+  html += `
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Today's progress</span><span>${dayPts} / ~${maxDay}</span></div>
+    <div class="progress-bar"><div class="progress-fill ${color}" style="width:${pct}%"></div></div>
+  </div>`;
+
+  // Dessert banner
+  html += `
+  <div class="dessert-banner ${weekDessert.cls}" style="margin-top:14px">
+    <div class="icon">${weekDessert.icon}</div>
+    <div>
+      <div>${weekDessert.label} this week</div>
+      <div style="font-size:11px;opacity:0.8;font-weight:600">${weekDessert.sub} — ${weekPts} pts total</div>
+    </div>
+  </div>`;
+
+  // Dog walk notice
+  html += `<div style="background:white;border-radius:14px;padding:12px 14px;margin-bottom:4px;box-shadow:var(--shadow)">
+    <span style="font-size:13px;font-weight:800">🐕 Dog Walk Today: </span>
+    <span style="font-size:13px;font-weight:700;color:${dogWalkDay === 'Abby' ? 'var(--abby-dark)' : 'var(--olivia-dark)'}">${dogWalkDay}'s turn</span>
+    <span style="font-size:11px;color:var(--muted);font-weight:600"> — ${dogWalkDay !== name ? 'Not your turn today' : 'Your turn!'}</span>
+  </div>`;
+
+  // Kitchen roster
+  const role = KITCHEN_ROLES[kitchenWeek][girl];
+  html += `
+  <div class="kitchen-card" style="margin-top:12px">
+    <h3>🍽️ Kitchen This Week (Week ${kitchenWeek})</h3>
+    <div class="role-box ${color}-role" style="border-radius:12px;padding:12px">
+      <div class="girl-name">${name} — ${role.title}</div>
+      <ul>${role.items.map(i => `<li>${i}</li>`).join('')}</ul>
+    </div>
+    <p class="info-note" style="margin-top:8px">Roles swap every week. Toggle in the Week tab.</p>
+  </div>`;
+
+  // Task sections
+  for (const [sectionKey, section] of Object.entries(TASKS)) {
+    html += `
+    <div class="section-header">
+      <div class="tag">${section.label}</div>
+      <div class="time-range">${section.time}</div>
+    </div>`;
+
+    for (const task of section.tasks) {
+      const currentScore = dayData[task.id] || null;
+      const earnedPts = currentScore ? getPts(task, currentScore) : null;
+
+      // Skip dog walk if not your turn (but still show grayed out)
+      const notYourWalk = task.dogwalk && dogWalkDay !== name;
+
+      let ptsBadgeHtml = '';
+      if (earnedPts !== null && currentScore !== 'na') {
+        ptsBadgeHtml = `<div class="task-pts-badge" style="color:${earnedPts > 0 ? 'var(--green)' : 'var(--muted)'}">${earnedPts > 0 ? '+' : ''}${earnedPts}pts</div>`;
+      } else {
+        ptsBadgeHtml = `<div class="task-pts-badge" style="color:var(--muted);font-size:12px">up to +${task.pts[0]}pts</div>`;
+      }
+
+      html += `<div class="task-card${currentScore === 'na' ? ' na-task' : ''}" id="card-${girl}-${task.id}">
+        <div class="task-header">
+          <div>
+            <div class="task-name">${task.name}</div>
+            <div class="task-desc">${task.desc}</div>
+            ${task.dogwalk ? `<div class="dog-walk-label">Today: ${dogWalkDay}'s turn</div>` : ''}
+            ${task.penalty ? `<div style="font-size:11px;color:#c0392b;font-weight:700;margin-top:2px">⚠️ Nagged = 0pts + −1 penalty</div>` : ''}
+          </div>
+          ${ptsBadgeHtml}
+        </div>
+        <div class="score-buttons">
+          <button class="score-btn ${currentScore === 'fast' ? 'selected-fast' : ''}" onclick="setScore('${girl}','${task.id}','fast')">⚡ Fast<br><small>+${task.pts[0]}pts</small></button>
+          <button class="score-btn ${currentScore === 'ontime' ? 'selected-ontime' : ''}" onclick="setScore('${girl}','${task.id}','ontime')">✅ On Time<br><small>+${task.pts[1]}pts</small></button>
+          <button class="score-btn ${currentScore === 'asked' ? 'selected-asked' : ''}" onclick="setScore('${girl}','${task.id}','asked')">🙋 Asked<br><small>+${task.pts[2]}pts</small></button>
+          <button class="score-btn ${currentScore === 'nagged' ? 'selected-nagged' : ''}" onclick="setScore('${girl}','${task.id}','nagged')">😤 Nagged<br><small>+${task.pts[3]}pts</small></button>
+          ${task.hasNA ? `<button class="score-btn ${currentScore === 'na' ? 'selected-na' : ''}" onclick="setScore('${girl}','${task.id}','na')">— N/A</button>` : ''}
+        </div>
+      </div>`;
+    }
+  }
+
+  // Penalties
+  html += `
+  <div class="section-header">
+    <div class="tag" style="background:#c0392b">Penalties</div>
+    <div class="time-range">Deducted from total</div>
+  </div>
+  <div class="penalty-card">
+    <h4>⚠️ Point Deductions</h4>`;
+
+  for (const pen of PENALTIES) {
+    const count = penData[pen.id] || 0;
+    html += `
+    <div class="penalty-row">
+      <div class="penalty-name">${pen.name}</div>
+      <div class="penalty-pts">${pen.pts} pts each</div>
+      <div class="penalty-counter">
+        <button class="pen-btn" onclick="changePenalty('${girl}','${pen.id}',-1)">−</button>
+        <div class="pen-count">${count}</div>
+        <button class="pen-btn" onclick="changePenalty('${girl}','${pen.id}',1)">+</button>
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+
+  // Bonus / Custom adjust
+  const bonus = (getData()[dateKey]?.bonus?.[girl]) || 0;
+  html += `
+  <div class="section-header">
+    <div class="tag" style="background:#7B5EA7">Bonus / Custom</div>
+    <div class="time-range">One-off rewards & extras</div>
+  </div>
+  <div class="bonus-card">
+    <div class="bonus-top">
+      <div>
+        <div class="bonus-title">⭐ Custom Points</div>
+        <div class="bonus-desc">For anything not on the list — good or bad</div>
+      </div>
+      <div class="bonus-total" style="color:${bonus >= 0 ? '#7B5EA7' : '#c0392b'}">${bonus >= 0 ? '+' : ''}${bonus}</div>
+    </div>
+    <div class="bonus-buttons">
+      <button class="bonus-btn reward" onclick="changeBonus('${girl}', 1)">＋1 Bonus Point</button>
+      <button class="bonus-btn reward big" onclick="changeBonus('${girl}', 3)">＋3 Big Reward</button>
+      <button class="bonus-btn deduct" onclick="changeBonus('${girl}', -1)">−1 Deduct Point</button>
+      <button class="bonus-btn deduct big" onclick="changeBonus('${girl}', -3)">−3 Big Penalty</button>
+    </div>
+    <div class="bonus-reset-row">
+      <button class="bonus-reset" onclick="resetBonus('${girl}')">↺ Reset to 0</button>
+      <div class="bonus-hint">Running total for today</div>
+    </div>
+  </div>`;
+
+  html += '<div style="height:80px"></div>';
+
+  document.getElementById(`${girl}-content`).innerHTML = html;
+}
+
+function renderSummary() {
+  const mon = getMondayOfWeek(currentDate);
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const kitchenWeek = getKitchenWeek();
+
+  let abbyWeek = 0, oliviaWeek = 0;
+  let tableRows = '';
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(mon);
+    d.setDate(d.getDate() + i);
+    const dk = getDateKey(d);
+    const ap = calcDayScore('abby', dk);
+    const op = calcDayScore('olivia', dk);
+    abbyWeek += ap;
+    oliviaWeek += op;
+    const isToday = dk === getDateKey(currentDate);
+    tableRows += `<tr style="${isToday ? 'background:#f9f9f9;' : ''}">
+      <td>${isToday ? '<strong>' : ''}${days[i]}${isToday ? '</strong>' : ''}<br><small style="color:var(--muted)">${d.toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</small></td>
+      <td><span class="day-pts abby-col">${ap || '—'}</span></td>
+      <td><span class="day-pts olivia-col">${op || '—'}</span></td>
+    </tr>`;
+  }
+
+  const abbyDessert   = getDessert(abbyWeek);
+  const oliviaDessert = getDessert(oliviaWeek);
+
+  const weekStart = mon.toLocaleDateString('en-AU', { day:'numeric', month:'short' });
+  const weekEnd   = new Date(mon.getTime() + 6*86400000).toLocaleDateString('en-AU', { day:'numeric', month:'short' });
+
+  let html = `
+  <div class="summary-week-card">
+    <h3>Week of ${weekStart} – ${weekEnd}</h3>
+    <div class="week-grid">
+      <div class="week-girl-box abby">
+        <div class="g-name">Abby</div>
+        <div class="week-pts">${abbyWeek}</div>
+        <div class="week-pts-label">points</div>
+        <div class="dessert-result ${abbyDessert.cls}" style="margin-top:8px">
+          <div class="d-icon">${abbyDessert.icon}</div>
+          <div class="d-text">${abbyDessert.label}</div>
+        </div>
+      </div>
+      <div class="week-girl-box olivia">
+        <div class="g-name">Olivia</div>
+        <div class="week-pts">${oliviaWeek}</div>
+        <div class="week-pts-label">points</div>
+        <div class="dessert-result ${oliviaDessert.cls}" style="margin-top:8px">
+          <div class="d-icon">${oliviaDessert.icon}</div>
+          <div class="d-text">${oliviaDessert.label}</div>
+        </div>
+      </div>
+    </div>
+
+    <table class="breakdown-table">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th style="color:var(--abby)">Abby</th>
+          <th style="color:var(--olivia)">Olivia</th>
+        </tr>
+      </thead>
+      <tbody>${tableRows}</tbody>
+      <tfoot>
+        <tr style="border-top:2px solid #eee">
+          <td><strong>Total</strong></td>
+          <td><span class="day-pts abby-col">${abbyWeek}</span></td>
+          <td><span class="day-pts olivia-col">${oliviaWeek}</span></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="summary-week-card">
+    <h3>🍽️ Kitchen Roster — Week ${kitchenWeek}</h3>
+    <div class="kitchen-roles">
+      <div class="role-box abby-role">
+        <div class="girl-name">Abby</div>
+        <div class="role-title">${KITCHEN_ROLES[kitchenWeek].abby.title}</div>
+        <ul>${KITCHEN_ROLES[kitchenWeek].abby.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+      </div>
+      <div class="role-box olivia-role">
+        <div class="girl-name">Olivia</div>
+        <div class="role-title">${KITCHEN_ROLES[kitchenWeek].olivia.title}</div>
+        <ul>${KITCHEN_ROLES[kitchenWeek].olivia.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+      </div>
+    </div>
+    <div class="roster-toggle">
+      <span class="roster-week-badge">Week ${kitchenWeek}</span>
+      <button class="roster-btn" onclick="overrideKitchenWeek()">↔ Swap roles manually</button>
+    </div>
+  </div>
+
+  <div class="summary-week-card">
+    <h3>🐕 Dog Walk Roster</h3>
+    <table class="breakdown-table">
+      <thead><tr><th>Day</th><th colspan="2">Who walks</th></tr></thead>
+      <tbody>
+        ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((d,i) => `
+          <tr><td>${d}</td><td colspan="2" style="text-align:left;color:${DOG_WALK[i]==='Abby'?'var(--abby-dark)':'var(--olivia-dark)'};font-weight:800">${DOG_WALK[i]}</td></tr>
+        `).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary-week-card">
+    <h3>📋 Dessert Key</h3>
+    ${DESSERT.map(d => `<div class="dessert-banner ${d.cls}" style="margin-bottom:8px">
+      <div class="icon">${d.icon}</div>
+      <div><div>${d.label}</div><div style="font-size:11px;opacity:0.8">${d.count === 3 ? '65+' : d.count === 2 ? '50–64' : d.count === 1 ? '35–49' : '0–34'} pts/week</div></div>
+    </div>`).join('')}
+  </div>
+
+  <div style="height:20px"></div>`;
+
+  document.getElementById('summary-content').innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+//  INTERACTIONS
+// ══════════════════════════════════════════
+
+function setScore(girl, taskId, scoreKey) {
+  const dateKey = getDateKey(currentDate);
+  const data = getData();
+  if (!data[dateKey]) data[dateKey] = {};
+  if (!data[dateKey][girl]) data[dateKey][girl] = {};
+
+  // Toggle off if same
+  if (data[dateKey][girl][taskId] === scoreKey) {
+    delete data[dateKey][girl][taskId];
+  } else {
+    data[dateKey][girl][taskId] = scoreKey;
+  }
+  saveData(data);
+  renderGirlPage(girl);
+}
+
+function changePenalty(girl, penId, delta) {
+  const dateKey = getDateKey(currentDate);
+  const data = getData();
+  if (!data[dateKey]) data[dateKey] = {};
+  if (!data[dateKey].penalties) data[dateKey].penalties = {};
+  if (!data[dateKey].penalties[girl]) data[dateKey].penalties[girl] = {};
+  const current = data[dateKey].penalties[girl][penId] || 0;
+  data[dateKey].penalties[girl][penId] = Math.max(0, current + delta);
+  saveData(data);
+  renderGirlPage(girl);
+}
+
+function changeBonus(girl, delta) {
+  const dateKey = getDateKey(currentDate);
+  const data = getData();
+  if (!data[dateKey]) data[dateKey] = {};
+  if (!data[dateKey].bonus) data[dateKey].bonus = {};
+  data[dateKey].bonus[girl] = (data[dateKey].bonus[girl] || 0) + delta;
+  saveData(data);
+  renderGirlPage(girl);
+  const val = data[dateKey].bonus[girl];
+  showToast(`${delta > 0 ? '⭐ +' + delta + ' bonus' : '⚠️ ' + delta + ' deducted'} — custom total: ${val >= 0 ? '+' : ''}${val}`);
+}
+
+function resetBonus(girl) {
+  const dateKey = getDateKey(currentDate);
+  const data = getData();
+  if (data[dateKey]?.bonus) data[dateKey].bonus[girl] = 0;
+  saveData(data);
+  renderGirlPage(girl);
+  showToast('Custom points reset to 0');
+}
+
+function saveDay(girl) {
+  const dateKey = getDateKey(currentDate);
+  const pts = calcDayScore(girl, dateKey);
+  showToast(`✅ ${girl === 'abby' ? 'Abby' : 'Olivia'}'s day saved — ${pts} points`);
+}
+
+let kitchenOverride = null;
+function overrideKitchenWeek() {
+  const current = getKitchenWeek();
+  kitchenOverride = current === 'A' ? 'B' : 'A';
+  renderSummary();
+  showToast('Kitchen roles swapped for this view');
+}
+// Override getKitchenWeek to use manual override if set
+const _origGetKitchenWeek = getKitchenWeek;
+
+function changeDay(delta) {
+  currentDate.setDate(currentDate.getDate() + delta);
+  kitchenOverride = null;
+  updateDateDisplay();
+  const active = document.querySelector('.page.active').id;
+  if (active === 'page-abby') renderGirlPage('abby');
+  else if (active === 'page-olivia') renderGirlPage('olivia');
+  else renderSummary();
+}
+
+function updateDateDisplay() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const isToday = currentDate.getTime() === today.getTime();
+  const fmt = currentDate.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+  document.getElementById('dateDisplay').textContent = isToday ? `Today — ${fmt}` : fmt;
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => { t.className = 'tab'; });
+  document.getElementById(`page-${page}`).classList.add('active');
+  const tab = document.getElementById(`tab-${page}`);
+  tab.classList.add(`active-${page}`);
+  if (page === 'abby') renderGirlPage('abby');
+  else if (page === 'olivia') renderGirlPage('olivia');
+  else renderSummary();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+updateDateDisplay();
+renderGirlPage('abby');
+</script>
+</body>
+</html>
