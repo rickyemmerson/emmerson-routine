@@ -20,7 +20,7 @@
   --shadow-hero:0 16px 48px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.25) inset;
   --radius-sm:12px; --radius-md:16px; --radius-lg:22px; --radius-xl:28px;
   --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --blue:#0A84FF;
-  --bar-h:73px; --date-h:50px; --bottom-total:123px;
+  --bar-h:58px; --date-h:48px; --bottom-total:106px;
   --morning-blob:rgba(255,200,100,0.18);
   --school-blob:rgba(100,160,255,0.15);
   --dinner-blob:rgba(160,100,255,0.15);
@@ -34,7 +34,7 @@ body {
   font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   color:var(--text);
   min-height:100vh;
-  padding-bottom:var(--bottom-total);
+  padding-bottom:calc(var(--bottom-total) + 20px);
   background: #0f0f1a;
   position:relative;
   overflow-x:hidden;
@@ -112,10 +112,10 @@ body {
   z-index:200;
   padding-bottom:env(safe-area-inset-bottom,0);
 }
-.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:10px 4px;border:none;background:none;font-family:'Inter',sans-serif;transition:all 0.15s;}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:7px 4px;border:none;background:none;font-family:'Inter',sans-serif;transition:all 0.15s;}
 .nav-tab:active{transform:scale(0.92);}
-.nav-icon{font-size:26px;line-height:1;}
-.nav-label{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0.2px;}
+.nav-icon{font-size:21px;line-height:1;}
+.nav-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.2px;}
 .nav-tab.active-abby    .nav-label,.nav-tab.active-abby    .nav-icon{color:var(--abby);}
 .nav-tab.active-olivia  .nav-label,.nav-tab.active-olivia  .nav-icon{color:var(--olivia);}
 .nav-tab.active-week    .nav-label,.nav-tab.active-week    .nav-icon{color:var(--text);}
