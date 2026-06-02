@@ -20,7 +20,7 @@
   --shadow-hero:0 16px 48px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.25) inset;
   --radius-sm:12px; --radius-md:16px; --radius-lg:22px; --radius-xl:28px;
   --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --blue:#0A84FF;
-  --bar-h:54px; --date-h:56px; --bottom-total:110px;
+  --bar-h:68px; --date-h:52px; --bottom-total:120px;
   --morning-blob:rgba(255,200,100,0.18);
   --school-blob:rgba(100,160,255,0.15);
   --dinner-blob:rgba(160,100,255,0.15);
@@ -79,7 +79,7 @@ body {
 
 /* ── DATE BAR ── */
 .date-bar {
-  position:fixed;bottom:calc(var(--bar-h) + env(safe-area-inset-bottom, 16px) + 8px);left:0;right:0;
+  position:fixed;bottom:var(--bar-h);left:0;right:0;
   height:var(--date-h);
   background:rgba(38,38,50,0.95);
   backdrop-filter:blur(40px) saturate(200%);
@@ -116,8 +116,8 @@ body {
 }
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:10px 4px;border:none;background:none;font-family:'Inter',sans-serif;transition:all 0.15s;}
 .nav-tab:active{transform:scale(0.92);}
-.nav-icon{font-size:21px;line-height:1;}
-.nav-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.2px;}
+.nav-icon{font-size:24px;line-height:1;}
+.nav-label{font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.2px;}
 .nav-tab.active-abby    .nav-label,.nav-tab.active-abby    .nav-icon{color:var(--abby);}
 .nav-tab.active-olivia  .nav-label,.nav-tab.active-olivia  .nav-icon{color:var(--olivia);}
 .nav-tab.active-week    .nav-label,.nav-tab.active-week    .nav-icon{color:var(--text);}
