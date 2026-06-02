@@ -20,7 +20,7 @@
   --shadow-hero:0 16px 48px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.25) inset;
   --radius-sm:12px; --radius-md:16px; --radius-lg:22px; --radius-xl:28px;
   --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --blue:#0A84FF;
-  --bar-h:54px; --date-h:48px; --bottom-total:102px;
+  --bar-h:54px; --date-h:56px; --bottom-total:110px;
   --morning-blob:rgba(255,200,100,0.18);
   --school-blob:rgba(100,160,255,0.15);
   --dinner-blob:rgba(160,100,255,0.15);
@@ -87,7 +87,7 @@ body {
   border-top:1px solid rgba(255,255,255,0.06);
   border-bottom:1px solid rgba(255,255,255,0.06);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 8px 6px;z-index:200;
+  padding:6px 8px 10px;z-index:200;
 }
 .date-arrow{width:42px;height:42px;border-radius:50%;border:none;background:none;font-size:24px;color:rgba(255,255,255,0.7);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;transition:background 0.12s;flex-shrink:0;}
 .date-arrow:active{background:rgba(0,0,0,0.07);}
@@ -710,7 +710,7 @@ function changeChar(girl,delta){const data=load(),dkey=dk();if(!data[dkey])data[
 function resetChar(girl){const data=load(),dkey=dk();if(data[dkey]?.char)data[dkey].char[girl]=0;save(data);renderGirl(girl);showToast('Character points reset');}
 function changeDay(d){currentDate.setDate(currentDate.getDate()+d);updateDateDisplay();refresh();}
 function goToday(){currentDate=new Date();currentDate.setHours(0,0,0,0);updateDateDisplay();refresh();}
-function updateDateDisplay(){const today=new Date();today.setHours(0,0,0,0);const isToday=currentDate.getTime()===today.getTime();const fmt=currentDate.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});document.getElementById('dateDisplayBtn').textContent=isToday?`Today, ${fmt}`:fmt;}
+function updateDateDisplay(){const today=new Date();today.setHours(0,0,0,0);const isToday=currentDate.getTime()===today.getTime();const fmt=currentDate.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});document.getElementById('dateDisplayBtn').textContent=fmt;}
 function refresh(){const active=document.querySelector('.page.active').id.replace('page-','');if(active==='abby'||active==='olivia')renderGirl(active);else if(active==='week')renderWeek();else renderRosters();}
 function openCal(){calViewDate=new Date(currentDate);renderCalGrid();document.getElementById('calOverlay').classList.add('open');}
 function closeCal(e){if(!e||e.target===document.getElementById('calOverlay'))document.getElementById('calOverlay').classList.remove('open');}
