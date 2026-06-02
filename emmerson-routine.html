@@ -20,7 +20,7 @@
   --shadow-hero:0 16px 48px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.25) inset;
   --radius-sm:12px; --radius-md:16px; --radius-lg:22px; --radius-xl:28px;
   --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --blue:#0A84FF;
-  --bar-h:66px; --date-h:48px; --bottom-total:114px;
+  --bar-h:54px; --date-h:48px; --bottom-total:102px;
   --morning-blob:rgba(255,200,100,0.18);
   --school-blob:rgba(100,160,255,0.15);
   --dinner-blob:rgba(160,100,255,0.15);
@@ -34,7 +34,7 @@ body {
   font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   color:var(--text);
   min-height:100vh;
-  padding-bottom:calc(var(--bottom-total) + 20px);
+  padding-bottom:calc(var(--bottom-total) + env(safe-area-inset-bottom, 16px) + 40px);
   background: #0f0f1a;
   position:relative;
   overflow-x:hidden;
@@ -79,7 +79,7 @@ body {
 
 /* ── DATE BAR ── */
 .date-bar {
-  position:fixed;bottom:var(--bar-h);left:0;right:0;
+  position:fixed;bottom:calc(var(--bar-h) + env(safe-area-inset-bottom, 16px) + 8px);left:0;right:0;
   height:var(--date-h);
   background:rgba(38,38,50,0.95);
   backdrop-filter:blur(40px) saturate(200%);
@@ -102,16 +102,16 @@ body {
 /* ── NAV BAR ── */
 .nav-bar {
   position:fixed;bottom:0;left:0;right:0;
-  height:var(--bar-h);
   background:rgba(20,20,28,0.88);
   backdrop-filter:blur(40px) saturate(200%);
   -webkit-backdrop-filter:blur(40px) saturate(200%);
   border-top:1px solid rgba(255,255,255,0.12);
   box-shadow:0 -1px 0 rgba(0,0,0,0.3);
-  display:flex;align-items:center;
+  display:flex;align-items:flex-start;
   z-index:200;
   overflow:hidden;
-  padding-bottom:env(safe-area-inset-bottom,0);
+  padding-top:8px;
+  padding-bottom:calc(env(safe-area-inset-bottom, 16px) + 8px);
 }
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:10px 4px;border:none;background:none;font-family:'Inter',sans-serif;transition:all 0.15s;}
 .nav-tab:active{transform:scale(0.92);}
@@ -403,6 +403,7 @@ const BONUS=[
   {id:'b_hangwash', name:'Hang Out Washing', pts:2},
   {id:'b_bringwash',name:'Bring In Washing', pts:2},
   {id:'b_yard',     name:'Yard Work',        pts:2},
+  {id:'b_washdog',  name:'Wash & Dry Dog',   pts:2},
 ];
 const KITCHEN={
   A:{abby:{cls:'role-a',title:'Role A \u2014 Dishes Side',items:['Unpack dishwasher','Load dirty dishes','Wash pots & pans','Put pots away']},olivia:{cls:'role-b',title:'Role B \u2014 Surfaces Side',items:['Clear & wipe bench','Clear & wipe table','Sweep floor','Stovetop (\u00D72/week)']}},
