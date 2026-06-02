@@ -488,7 +488,7 @@ async function pushToCloud(data) {
 
 // Manual refresh button \u2014 pull latest from cloud right now
 async function forceSync() {
-  if (!USE_CLOUD) { showToast('Set your Sheet URL first'); return; }
+  if (!SHEET_URL || SHEET_URL === 'PASTE_YOUR_SCRIPT_URL_HERE') { showToast('Set your Sheet URL first'); return; }
   showSyncIndicator(true);
   await syncFromCloud();
   showSyncIndicator(false);
