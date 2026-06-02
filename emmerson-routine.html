@@ -474,11 +474,10 @@ async function syncFromCloud() {
 // Push to cloud \u2014 fire and forget
 async function pushToCloud(data) {
   try {
-    await fetch(SHEET_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type':'text/plain'},
-      body: JSON.stringify({action:'set', data})
+    const encoded = encodeURIComponent(JSON.stringify(data));
+    await fetch(SHEET_URL + '?action=set&data=' + encoded, {
+      method: 'GET',
+      mode: 'no-cors'
     });
   } catch(e) {
     // Will sync next time app is opened with internet
