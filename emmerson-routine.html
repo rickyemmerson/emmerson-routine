@@ -20,7 +20,7 @@
   --shadow-hero:0 16px 48px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.25) inset;
   --radius-sm:12px; --radius-md:16px; --radius-lg:22px; --radius-xl:28px;
   --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --blue:#0A84FF;
-  --bar-h:58px; --date-h:48px; --bottom-total:106px;
+  --bar-h:66px; --date-h:48px; --bottom-total:114px;
   --morning-blob:rgba(255,200,100,0.18);
   --school-blob:rgba(100,160,255,0.15);
   --dinner-blob:rgba(160,100,255,0.15);
@@ -113,7 +113,7 @@ body {
   overflow:hidden;
   padding-bottom:env(safe-area-inset-bottom,0);
 }
-.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:7px 4px;border:none;background:none;font-family:'Inter',sans-serif;transition:all 0.15s;}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:10px 4px;border:none;background:none;font-family:'Inter',sans-serif;transition:all 0.15s;}
 .nav-tab:active{transform:scale(0.92);}
 .nav-icon{font-size:21px;line-height:1;}
 .nav-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.2px;}
@@ -567,7 +567,7 @@ function renderGirl(girl){
   </div>`;
 
   h+=`<div class="section-label"><div class="sl-text">Morning</div><div class="sl-time">Before you leave</div></div>`;
-  for(const t of MORNING) h+=taskCard(girl,t,d[t.id],false,'morning-card');
+  for(const t of MORNING) h+=taskCard(girl,t,d[t.id],t.dogwalk&&!isMyWalk,'morning-card');
 
   h+=`<div class="section-label big" style="margin-top:8px"><div class="sl-text">After School</div><div class="sl-time">Complete by 5:50 pm</div></div><div class="section-divider"></div>`;
   h+=`<div class="dog-walk-banner"><div class="dwb-left">Dog Walk Today</div><div class="dwb-right" style="color:${dogToday==='Abby'?'var(--abby)':'var(--olivia)'}">${dogToday}${isMyWalk?' \u2014 your turn \uD83D\uDC48':''}</div></div>`;
