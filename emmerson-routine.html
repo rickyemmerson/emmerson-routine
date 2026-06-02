@@ -564,9 +564,13 @@ function renderGirl(girl){
   h+=`<div class="dinner-break"><div class="dinner-break-title">Dinner Time</div><div class="dinner-break-time">6:00 \u2013 6:30 pm</div></div>`;
 
   h+=`<div class="section-label big"><div class="sl-text">After Dinner</div><div class="sl-time">Complete by 7:30 pm</div></div><div class="section-divider"></div>`;
-  for(const t of AFTERDINNER){const isNA=(t.noLunch||t.noBag)&&skipLB;h+=taskCard(girl,t,d[t.id],isNA,'dinner-card');}
-
-  h+=`<div class="kitchen-mini"><div class="kitchen-mini-wk">Kitchen \u2014 Week ${kw}</div><div class="kitchen-mini-title">${name}'s Role: ${role.title}</div><div class="krc ${role.cls}"><div class="krc-title">${role.title}</div><ul>${role.items.map(i=>`<li>${i}</li>`).join('')}</ul></div></div>`;
+  for(const t of AFTERDINNER){
+    const isNA=(t.noLunch||t.noBag)&&skipLB;
+    h+=taskCard(girl,t,d[t.id],isNA,'dinner-card');
+    if(t.id==='ad_kitchen'){
+      h+=`<div class="kitchen-mini"><div class="kitchen-mini-wk">Kitchen — Week ${kw}</div><div class="kitchen-mini-title">${name}'s Role: ${role.title}</div><div class="krc ${role.cls}"><div class="krc-title">${role.title}</div><ul>${role.items.map(i=>`<li>${i}</li>`).join('')}</ul></div></div>`;
+    }
+  }
 
   h+=`<div class="section-label" style="margin-top:8px"><div class="sl-text">Bonus Tasks</div><div class="sl-time">Extra points</div></div>`;
   let bonTotal=0;
