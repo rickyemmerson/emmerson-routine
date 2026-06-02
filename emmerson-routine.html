@@ -20,7 +20,7 @@
   --shadow-hero:0 16px 48px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.25) inset;
   --radius-sm:12px; --radius-md:16px; --radius-lg:22px; --radius-xl:28px;
   --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --blue:#0A84FF;
-  --bar-h:68px; --date-h:52px; --bottom-total:120px;
+  --bar-h:70px; --date-h:50px; --bottom-total:120px;
   --morning-blob:rgba(255,200,100,0.18);
   --school-blob:rgba(100,160,255,0.15);
   --dinner-blob:rgba(160,100,255,0.15);
@@ -34,7 +34,7 @@ body {
   font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   color:var(--text);
   min-height:100vh;
-  padding-bottom:calc(var(--bottom-total) + env(safe-area-inset-bottom, 16px) + 40px);
+  padding-bottom:calc(var(--bottom-total) + env(safe-area-inset-bottom, 0px) + 24px);
   background: #0f0f1a;
   position:relative;
   overflow-x:hidden;
@@ -79,16 +79,17 @@ body {
 
 /* ── DATE BAR ── */
 .date-bar {
-  position:fixed;bottom:var(--bar-h);left:0;right:0;
+  position:fixed;
+  bottom:calc(var(--bar-h) + env(safe-area-inset-bottom, 0px));
+  left:0;right:0;
   height:var(--date-h);
   background:rgba(38,38,50,0.95);
   backdrop-filter:blur(40px) saturate(200%);
   -webkit-backdrop-filter:blur(40px) saturate(200%);
-  border-top:1px solid rgba(255,255,255,0.06);
-  border-bottom:1px solid rgba(255,255,255,0.06);
+  border-top:1px solid rgba(255,255,255,0.08);
+  border-bottom:1px solid rgba(255,255,255,0.04);
   display:flex;align-items:center;justify-content:space-between;
   padding:0 8px;
-  padding-bottom:env(safe-area-inset-bottom, 0px);
   z-index:200;
 }
 .date-arrow{width:42px;height:42px;border-radius:50%;border:none;background:none;font-size:24px;color:rgba(255,255,255,0.7);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;transition:background 0.12s;flex-shrink:0;}
@@ -104,15 +105,15 @@ body {
 /* ── NAV BAR ── */
 .nav-bar {
   position:fixed;bottom:0;left:0;right:0;
+  height:calc(var(--bar-h) + env(safe-area-inset-bottom, 0px));
   background:rgba(20,20,28,0.88);
   backdrop-filter:blur(40px) saturate(200%);
   -webkit-backdrop-filter:blur(40px) saturate(200%);
   border-top:1px solid rgba(255,255,255,0.12);
-  box-shadow:0 -1px 0 rgba(0,0,0,0.3);
-  display:flex;align-items:center;
+  display:flex;align-items:flex-start;
+  padding-top:10px;
   z-index:200;
   overflow:hidden;
-  padding-bottom:env(safe-area-inset-bottom, 0px);
 }
 .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:10px 4px;border:none;background:none;font-family:'Inter',sans-serif;transition:all 0.15s;}
 .nav-tab:active{transform:scale(0.92);}
