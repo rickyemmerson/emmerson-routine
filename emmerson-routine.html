@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Emmerson HQ</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -27,7 +27,8 @@
   --bonus-blob:rgba(50,200,120,0.15);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{font-size:15px;}
+html{font-size:15px;height:100%;overflow:hidden;}
+body{overflow-y:auto;-webkit-overflow-scrolling:touch;height:100%;}
 
 body {
   font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
@@ -370,7 +371,7 @@ const STD3=[{key:'complete',label:'Complete',pts:3},{key:'reminded',label:'Remin
 const MORNING=[
   {id:'m_breakfast',name:'Breakfast Eaten',  desc:'At the table \u2014 not in the car',btns:STD2},
   {id:'m_teeth',    name:'Teeth Brushed',    desc:'Morning brush before leaving', btns:STD2},
-  {id:'m_dogfed',   name:'Dog Fed',          desc:'Morning feed',                 btns:STD2},
+  {id:'m_dogfed',   name:'Dog Fed',          desc:'Morning feed',                 dogwalk:true, btns:STD2},
   {id:'m_bed',      name:'Bed Made',         desc:'Sheets straight, pillows on',  btns:STD2},
 ];
 const AFTERSCHOOL=[
@@ -378,7 +379,7 @@ const AFTERSCHOOL=[
   {id:'as_homework',name:'Homework',             desc:'Up to 30 mins (N/A if none)',hasNA:true,  btns:STD2},
   {id:'as_music',   name:'Music Practice',       desc:'10 minutes minimum',          btns:STD2},
   {id:'as_bedroom', name:'Bedroom Tidy',         desc:'Floor clear, clothes away',   btns:STD2},
-  {id:'as_dogfed',  name:'Dog Fed',              desc:'Afternoon / evening feed',    btns:STD2},
+  {id:'as_dogfed',  name:'Dog Fed',              desc:'Afternoon / evening feed',    dogwalk:true, btns:STD2},
 ];
 const AFTERDINNER=[
   {id:'ad_lunch',  name:'School Lunch Packed',desc:'Done by 7:00 pm',             noLunch:true,btns:STD2},
@@ -424,8 +425,9 @@ const dk=()=>currentDate.toISOString().split('T')[0];
 
 // \u2500\u2500 CLOUD CONFIG \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 // Paste your Google Apps Script Web App URL below after deployment
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbydxjzpbLLW6HJgCxkEY7nFxMz8571_349aeX6pVC20AZahi0-Z4Cf9frhe5o1SvyDF4Q/exec';
-const USE_CLOUD = SHEET_URL !== 'https://script.google.com/macros/s/AKfycbydxjzpbLLW6HJgCxkEY7nFxMz8571_349aeX6pVC20AZahi0-Z4Cf9frhe5o1SvyDF4Q/exec';
+const SUPA_URL = 'https://lfwxbxrsureqdlxjlfgf.supabase.co';
+const SUPA_KEY = 'sb_publishable_UVxQWE2KErQpNx_V1TYxbw_MsxaohKA';
+const USE_CLOUD = true;
 
 // In-memory cache so UI stays snappy
 let _cache = null;
@@ -452,37 +454,44 @@ function save(data) {
 // Pull latest from cloud, merge into local, re-render
 async function syncFromCloud() {
   try {
-    const res = await fetch(`${SHEET_URL}?action=get`, {method:'GET'});
+    const res = await fetch(SUPA_URL + '/rest/v1/data?select=value&order=id.desc&limit=1', {
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY
+      }
+    });
     if (!res.ok) return;
-    const text = await res.text();
-    const cloud = JSON.parse(text);
-    // Merge: cloud wins per key, but keep any local keys not in cloud
+    const rows = await res.json();
+    if (!rows.length || !rows[0].value) return;
+    const cloud = JSON.parse(rows[0].value);
     const local = loadLocal();
     const merged = Object.assign({}, local, cloud);
     _cache = merged;
     saveLocal(merged);
-    // Re-render current page silently
     const active = document.querySelector('.page.active')?.id?.replace('page-','');
     if (active==='abby'||active==='olivia') renderGirl(active);
     else if (active==='week') renderWeek();
   } catch(e) {
-    // Cloud unavailable \u2014 local data still works fine
-    console.log('Cloud sync skipped (offline or URL not set)');
+    console.log('Sync error:', e);
   }
 }
 
 // Push to cloud \u2014 fire and forget
 async function pushToCloud(data) {
   try {
-    // Only send today's data to keep URL short
-    const todayKey = dk();
-    const todayData = {};
-    if (data[todayKey]) todayData[todayKey] = data[todayKey];
-    const encoded = encodeURIComponent(JSON.stringify(todayData));
-    const url = SHEET_URL + '?action=set&data=' + encoded;
-    await fetch(url, { method: 'GET', mode: 'no-cors' });
+    // Upsert entire data object to row id=1
+    await fetch(SUPA_URL + '/rest/v1/data', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({id: 1, value: JSON.stringify(data)})
+    });
   } catch(e) {
-    // Will sync next time app is opened with internet
+    console.log('Push error:', e);
   }
 }
 
