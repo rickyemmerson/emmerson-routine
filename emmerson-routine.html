@@ -87,7 +87,7 @@ body {
   border-top:1px solid rgba(255,255,255,0.06);
   border-bottom:1px solid rgba(255,255,255,0.06);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 8px;z-index:200;
+  padding:0 8px 6px;z-index:200;
 }
 .date-arrow{width:42px;height:42px;border-radius:50%;border:none;background:none;font-size:24px;color:rgba(255,255,255,0.7);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;transition:background 0.12s;flex-shrink:0;}
 .date-arrow:active{background:rgba(0,0,0,0.07);}
@@ -334,7 +334,6 @@ body {
     <button class="today-btn" onclick="goToday()">Today</button>
   </div>
   <button class="cal-icon-btn" onclick="openCal()">📅</button>
-  <button class="cal-icon-btn" id="syncBtn" onclick="forceSync()" title="Sync with cloud">☁️</button>
   <button class="date-arrow" onclick="changeDay(1)">›</button>
 </div>
 
@@ -497,19 +496,7 @@ async function pushToCloud(data) {
   }
 }
 
-// Manual refresh button \u2014 pull latest from cloud right now
-async function forceSync() {
-  if (!SHEET_URL || SHEET_URL === 'PASTE_YOUR_SCRIPT_URL_HERE') { showToast('Set your Sheet URL first'); return; }
-  showSyncIndicator(true);
-  await syncFromCloud();
-  showSyncIndicator(false);
-  showToast('\u2705 Synced with cloud');
-}
 
-function showSyncIndicator(loading) {
-  const btn = document.getElementById('syncBtn');
-  if (btn) btn.textContent = loading ? '\u23F3' : '\u2601\uFE0F';
-}
 const getMon=d=>{const c=new Date(d),day=c.getDay();c.setDate(c.getDate()+(day===0?-6:1-day));c.setHours(0,0,0,0);return c;};
 const kitWk=()=>{const j=new Date(currentDate.getFullYear(),0,1),w=Math.ceil(((currentDate-j)/86400000+j.getDay()+1)/7);return w%2===0?'B':'A';};
 const getAward=pts=>{for(const a of AWARDS)if(pts>=a.min)return a;return AWARDS[AWARDS.length-1];};
