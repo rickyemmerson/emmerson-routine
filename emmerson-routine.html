@@ -424,8 +424,184 @@ const dk=()=>currentDate.toISOString().split('T')[0];
 
 // &#9472;&#9472; CLOUD CONFIG &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
 // Paste your Google Apps Script Web App URL below after deployment
-const SHEET_URL = 'PASTE_YOUR_SCRIPT_URL_HERE';
-const USE_CLOUD = SHEET_URL !== 'PASTE_YOUR_SCRIPT_URL_HERE';
+const SHEET_URL = '// ══════════════════════════════════════════════════════
+//  EMMERSON HQ — Google Apps Script Backend
+//  Paste this entire file into your Apps Script editor
+//  Then deploy as a Web App (instructions below)
+// ══════════════════════════════════════════════════════
+
+const SHEET_NAME = 'EmmersonHQ';
+const DATA_CELL  = 'A1';  // All data stored as JSON in one cell
+
+// ── GET: return all data as JSON ──────────────────────
+function doGet(e) {
+  const data = readData();
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ── POST: receive updated data and save it ────────────
+function doPost(e) {
+  try {
+    const payload = JSON.parse(e.postData.contents);
+    if (payload.action === 'set' && payload.data) {
+      // Merge incoming data with existing (don't overwrite everything,
+      // merge per date key so two phones don't clobber each other)
+      const existing = readData();
+      const incoming = payload.data;
+      const merged = mergeDeep(existing, incoming);
+      writeData(merged);
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'ok'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'error', message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// ── Read data from sheet ──────────────────────────────
+function readData() {
+  const sheet = getOrCreateSheet();
+  const cell  = sheet.getRange(DATA_CELL).getValue();
+  if (!cell || cell === '') return {};
+  try { return JSON.parse(cell); } catch(e) { return {}; }
+}
+
+// ── Write data to sheet ───────────────────────────────
+function writeData(data) {
+  const sheet = getOrCreateSheet();
+  sheet.getRange(DATA_CELL).setValue(JSON.stringify(data));
+}
+
+// ── Get or create the sheet ───────────────────────────
+function getOrCreateSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+    sheet.getRange(DATA_CELL).setWrap(false);
+  }
+  return sheet;
+}
+
+// ── Deep merge two objects ────────────────────────────
+// Per-date-key merge means Ricky entering morning scores
+// and Nina entering evening scores both survive
+function mergeDeep(target, source) {
+  const output = Object.assign({}, target);
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (isObject(source[key])) {
+        if (!(key in target)) {
+          Object.assign(output, { [key]: source[key] });
+        } else {
+          output[key] = mergeDeep(target[key], source[key]);
+        }
+      } else {
+        // Source wins for primitive values (most recent write wins)
+        Object.assign(output, { [key]: source[key] });
+      }
+    });
+  }
+  return output;
+}
+
+function isObject(item) {
+  return (item && typeof item === 'object' && !Array.isArray(item));
+}';
+const USE_CLOUD = SHEET_URL !== '// ══════════════════════════════════════════════════════
+//  EMMERSON HQ — Google Apps Script Backend
+//  Paste this entire file into your Apps Script editor
+//  Then deploy as a Web App (instructions below)
+// ══════════════════════════════════════════════════════
+
+const SHEET_NAME = 'EmmersonHQ';
+const DATA_CELL  = 'A1';  // All data stored as JSON in one cell
+
+// ── GET: return all data as JSON ──────────────────────
+function doGet(e) {
+  const data = readData();
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ── POST: receive updated data and save it ────────────
+function doPost(e) {
+  try {
+    const payload = JSON.parse(e.postData.contents);
+    if (payload.action === 'set' && payload.data) {
+      // Merge incoming data with existing (don't overwrite everything,
+      // merge per date key so two phones don't clobber each other)
+      const existing = readData();
+      const incoming = payload.data;
+      const merged = mergeDeep(existing, incoming);
+      writeData(merged);
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'ok'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'error', message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// ── Read data from sheet ──────────────────────────────
+function readData() {
+  const sheet = getOrCreateSheet();
+  const cell  = sheet.getRange(DATA_CELL).getValue();
+  if (!cell || cell === '') return {};
+  try { return JSON.parse(cell); } catch(e) { return {}; }
+}
+
+// ── Write data to sheet ───────────────────────────────
+function writeData(data) {
+  const sheet = getOrCreateSheet();
+  sheet.getRange(DATA_CELL).setValue(JSON.stringify(data));
+}
+
+// ── Get or create the sheet ───────────────────────────
+function getOrCreateSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+    sheet.getRange(DATA_CELL).setWrap(false);
+  }
+  return sheet;
+}
+
+// ── Deep merge two objects ────────────────────────────
+// Per-date-key merge means Ricky entering morning scores
+// and Nina entering evening scores both survive
+function mergeDeep(target, source) {
+  const output = Object.assign({}, target);
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (isObject(source[key])) {
+        if (!(key in target)) {
+          Object.assign(output, { [key]: source[key] });
+        } else {
+          output[key] = mergeDeep(target[key], source[key]);
+        }
+      } else {
+        // Source wins for primitive values (most recent write wins)
+        Object.assign(output, { [key]: source[key] });
+      }
+    });
+  }
+  return output;
+}
+
+function isObject(item) {
+  return (item && typeof item === 'object' && !Array.isArray(item));
+}';
 
 // In-memory cache so UI stays snappy
 let _cache = null;
