@@ -474,11 +474,13 @@ async function syncFromCloud() {
 // Push to cloud \u2014 fire and forget
 async function pushToCloud(data) {
   try {
-    const encoded = encodeURIComponent(JSON.stringify(data));
-    await fetch(SHEET_URL + '?action=set&data=' + encoded, {
-      method: 'GET',
-      mode: 'no-cors'
-    });
+    // Only send today's data to keep URL short
+    const todayKey = dk();
+    const todayData = {};
+    if (data[todayKey]) todayData[todayKey] = data[todayKey];
+    const encoded = encodeURIComponent(JSON.stringify(todayData));
+    const url = SHEET_URL + '?action=set&data=' + encoded;
+    await fetch(url, { method: 'GET', mode: 'no-cors' });
   } catch(e) {
     // Will sync next time app is opened with internet
   }
