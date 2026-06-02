@@ -4,1269 +4,734 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Emmerson HQ</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --abby: #FF6B9D;
-    --abby-light: #FFE0EE;
-    --abby-dark: #d94f82;
-    --olivia: #6B9DFF;
-    --olivia-light: #E0EAFF;
-    --olivia-dark: #4f7cd9;
-    --gold: #FFD700;
-    --green: #4CAF50;
-    --orange: #FF9800;
-    --red: #F44336;
-    --bg: #F7F3EE;
-    --card: #FFFFFF;
-    --text: #2D2D2D;
-    --muted: #888;
-    --radius: 20px;
-    --shadow: 0 4px 24px rgba(0,0,0,0.08);
-  }
+:root {
+  --abby:#B5245E; --abby-light:rgba(181,36,94,0.08); --abby-glass:rgba(181,36,94,0.12);
+  --olivia:#6A1B9A; --olivia-light:rgba(106,27,154,0.08); --olivia-glass:rgba(106,27,154,0.12);
+  --text:#1D1D1F; --text2:#48484A; --muted:#8E8E93;
+  --border:rgba(255,255,255,0.55);
+  --border-dark:rgba(0,0,0,0.08);
+  --glass:rgba(255,255,255,0.72);
+  --glass-strong:rgba(255,255,255,0.88);
+  --glass-dark:rgba(20,20,28,0.78);
+  --shadow-glass:0 8px 32px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.6) inset;
+  --shadow-card:0 4px 24px rgba(0,0,0,0.08), 0 1px 0 rgba(255,255,255,0.8) inset;
+  --shadow-hero:0 16px 48px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.25) inset;
+  --radius-sm:12px; --radius-md:16px; --radius-lg:22px; --radius-xl:28px;
+  --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --blue:#0A84FF;
+  --bar-h:73px; --date-h:50px; --bottom-total:123px;
+  --morning-blob:rgba(255,200,100,0.18);
+  --school-blob:rgba(100,160,255,0.15);
+  --dinner-blob:rgba(160,100,255,0.15);
+  --bonus-blob:rgba(50,200,120,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{font-size:15px;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  padding-bottom:var(--bottom-total);
+  background: #0f0f1a;
+  position:relative;
+  overflow-x:hidden;
+}
 
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 0 0 80px 0;
-  }
+/* &#9472;&#9472; BACKGROUND &#9472;&#9472; */
+.bg-scene {
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.bg-blob {
+  position:absolute;border-radius:50%;filter:blur(80px);opacity:0.7;
+}
+.blob1{width:500px;height:500px;top:-100px;left:-150px;background:radial-gradient(circle,rgba(181,36,94,0.5),transparent 70%);}
+.blob2{width:600px;height:600px;bottom:-200px;right:-200px;background:radial-gradient(circle,rgba(106,27,154,0.45),transparent 70%);}
+.blob3{width:400px;height:400px;top:40%;left:30%;background:radial-gradient(circle,rgba(80,120,255,0.3),transparent 70%);}
+.bg-noise {
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:0.4;
+}
 
-  /* ── HEADER ── */
-  header {
-    background: linear-gradient(135deg, #2D2D2D 0%, #1a1a2e 100%);
-    padding: 20px 20px 16px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-  }
-  header h1 {
-    font-family: 'Fredoka One', cursive;
-    font-size: 28px;
-    color: white;
-    letter-spacing: 1px;
-  }
-  header .subtitle {
-    font-size: 12px;
-    color: rgba(255,255,255,0.5);
-    margin-top: 2px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-  .date-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 12px;
-  }
-  .date-nav button {
-    background: rgba(255,255,255,0.15);
-    border: none;
-    color: white;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .date-nav button:hover { background: rgba(255,255,255,0.25); }
-  .date-display {
-    font-size: 14px;
-    color: white;
-    font-weight: 700;
-    min-width: 160px;
-    text-align: center;
-  }
+/* &#9472;&#9472; PAGES &#9472;&#9472; */
+.page{display:none;position:relative;z-index:2;}
+.page.active{display:block;}
+.page-pad{padding:16px 16px 0;}
 
-  /* ── TABS ── */
-  .tabs {
-    display: flex;
-    background: white;
-    border-bottom: 2px solid #eee;
-    position: sticky;
-    top: 101px;
-    z-index: 99;
-  }
-  .tab {
-    flex: 1;
-    padding: 12px 8px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 13px;
-    cursor: pointer;
-    color: var(--muted);
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .tab.active-abby { color: var(--abby); border-bottom-color: var(--abby); }
-  .tab.active-olivia { color: var(--olivia); border-bottom-color: var(--olivia); }
-  .tab.active-summary { color: var(--text); border-bottom-color: var(--text); }
+/* &#9472;&#9472; GLASS MIXIN &#9472;&#9472; */
+.glass {
+  background:var(--glass);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-card);
+}
+.glass-strong {
+  background:var(--glass-strong);
+  backdrop-filter:blur(32px) saturate(200%);
+  -webkit-backdrop-filter:blur(32px) saturate(200%);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-card);
+}
 
-  /* ── MAIN ── */
-  .page { display: none; padding: 16px; }
-  .page.active { display: block; }
+/* &#9472;&#9472; DATE BAR &#9472;&#9472; */
+.date-bar {
+  position:fixed;bottom:var(--bar-h);left:0;right:0;
+  height:var(--date-h);
+  background:rgba(255,255,255,0.75);
+  backdrop-filter:blur(40px) saturate(200%);
+  -webkit-backdrop-filter:blur(40px) saturate(200%);
+  border-top:1px solid rgba(255,255,255,0.6);
+  box-shadow:0 -1px 0 rgba(0,0,0,0.06);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 8px;z-index:200;
+}
+.date-arrow{width:42px;height:42px;border-radius:50%;border:none;background:none;font-size:24px;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;transition:background 0.12s;flex-shrink:0;}
+.date-arrow:active{background:rgba(0,0,0,0.07);}
+.date-center{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;}
+.date-display-btn{font-size:14px;font-weight:700;color:var(--text);cursor:pointer;padding:6px 10px;border-radius:10px;border:none;background:none;font-family:'Inter',sans-serif;transition:background 0.12s;letter-spacing:-0.2px;}
+.date-display-btn:active{background:rgba(0,0,0,0.07);}
+.today-btn{font-size:11px;font-weight:700;color:var(--abby);cursor:pointer;padding:5px 10px;border-radius:8px;border:none;background:var(--abby-light);font-family:'Inter',sans-serif;transition:all 0.12s;}
+.today-btn:active{opacity:0.7;}
+.cal-icon-btn{width:36px;height:36px;border-radius:10px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:background 0.12s;}
+.cal-icon-btn:active{background:rgba(0,0,0,0.07);}
 
-  /* ── SCORE HERO ── */
-  .score-hero {
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-  }
-  .score-hero.abby { background: linear-gradient(135deg, var(--abby) 0%, var(--abby-dark) 100%); }
-  .score-hero.olivia { background: linear-gradient(135deg, var(--olivia) 0%, var(--olivia-dark) 100%); }
-  .score-hero::after {
-    content: '';
-    position: absolute;
-    right: -20px; top: -20px;
-    width: 120px; height: 120px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.08);
-  }
-  .hero-left h2 {
-    font-family: 'Fredoka One', cursive;
-    font-size: 26px;
-    color: white;
-  }
-  .hero-left .today-label {
-    font-size: 12px;
-    color: rgba(255,255,255,0.7);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .hero-score {
-    font-family: 'Fredoka One', cursive;
-    font-size: 52px;
-    color: white;
-    line-height: 1;
-  }
-  .hero-pts {
-    font-size: 13px;
-    color: rgba(255,255,255,0.7);
-    text-align: right;
-    font-weight: 700;
-  }
-  .weekly-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 20px;
-    padding: 4px 12px;
-    margin-top: 8px;
-    font-size: 12px;
-    color: white;
-    font-weight: 700;
-  }
+/* &#9472;&#9472; NAV BAR &#9472;&#9472; */
+.nav-bar {
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--bar-h);
+  background:rgba(255,255,255,0.82);
+  backdrop-filter:blur(40px) saturate(200%);
+  -webkit-backdrop-filter:blur(40px) saturate(200%);
+  border-top:1px solid rgba(255,255,255,0.7);
+  box-shadow:0 -1px 0 rgba(0,0,0,0.06);
+  display:flex;align-items:center;
+  z-index:200;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:10px 4px;border:none;background:none;font-family:'Inter',sans-serif;transition:all 0.15s;}
+.nav-tab:active{transform:scale(0.92);}
+.nav-icon{font-size:26px;line-height:1;}
+.nav-label{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0.2px;}
+.nav-tab.active-abby    .nav-label,.nav-tab.active-abby    .nav-icon{color:var(--abby);}
+.nav-tab.active-olivia  .nav-label,.nav-tab.active-olivia  .nav-icon{color:var(--olivia);}
+.nav-tab.active-week    .nav-label,.nav-tab.active-week    .nav-icon{color:var(--text);}
+.nav-tab.active-rosters .nav-label,.nav-tab.active-rosters .nav-icon{color:var(--text2);}
 
-  /* ── DESSERT BANNER ── */
-  .dessert-banner {
-    border-radius: 14px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 800;
-    font-size: 14px;
-  }
-  .dessert-banner .icon { font-size: 24px; }
-  .dessert-0 { background: #FFEAEA; color: #c0392b; }
-  .dessert-1 { background: #FFF3E0; color: #e67e22; }
-  .dessert-2 { background: #E8F5E9; color: #27ae60; }
-  .dessert-3 { background: linear-gradient(135deg, #FFF9C4, #FFF3E0); color: #f39c12; border: 2px solid #FFD700; }
+/* &#9472;&#9472; CALENDAR &#9472;&#9472; */
+.cal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+.cal-overlay.open{display:flex;}
+.cal-popup{
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(40px) saturate(200%);
+  -webkit-backdrop-filter:blur(40px) saturate(200%);
+  border-radius:28px 28px 0 0;
+  padding:20px 16px 36px;width:100%;max-width:420px;
+  box-shadow:0 -8px 60px rgba(0,0,0,0.2);
+  border-top:1px solid rgba(255,255,255,0.8);
+}
+.cal-handle{width:36px;height:4px;background:rgba(0,0,0,0.15);border-radius:2px;margin:0 auto 16px;}
+.cal-popup-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-month-nav{display:flex;align-items:center;gap:12px;}
+.cal-month-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border-dark);background:rgba(0,0,0,0.04);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);}
+.cal-month-title{font-size:16px;font-weight:700;color:var(--text);min-width:140px;text-align:center;}
+.cal-close{font-size:14px;font-weight:700;color:var(--abby);border:none;background:none;cursor:pointer;font-family:'Inter',sans-serif;}
+.cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;}
+.cal-days-header div{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:4px 0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;font-weight:500;cursor:pointer;color:var(--text);transition:all 0.12s;border:none;background:none;font-family:'Inter',sans-serif;}
+.cal-day:hover{background:rgba(0,0,0,0.06);}
+.cal-day.empty{cursor:default;}
+.cal-day.today{font-weight:800;color:var(--abby);}
+.cal-day.selected{background:var(--abby);color:white;font-weight:700;box-shadow:0 4px 12px rgba(181,36,94,0.35);}
 
-  /* ── SECTION ── */
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 20px 0 10px;
-  }
-  .section-header .tag {
-    background: var(--text);
-    color: white;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    padding: 3px 10px;
-    border-radius: 20px;
-  }
-  .section-header .time-range {
-    font-size: 12px;
-    color: var(--muted);
-    font-weight: 700;
-  }
+/* &#9472;&#9472; SCORE HERO &#9472;&#9472; */
+.score-hero{border-radius:var(--radius-xl);padding:22px 24px;margin-bottom:14px;overflow:hidden;position:relative;}
+.score-hero.abby{background:linear-gradient(145deg,#D81B60 0%,#880E4F 60%,#6A0035 100%);box-shadow:0 16px 48px rgba(181,36,94,0.35),0 1px 0 rgba(255,255,255,0.2) inset;}
+.score-hero.olivia{background:linear-gradient(145deg,#8E24AA 0%,#4A148C 60%,#2E006A 100%);box-shadow:0 16px 48px rgba(106,27,154,0.35),0 1px 0 rgba(255,255,255,0.2) inset;}
+.hero-light-sweep{position:absolute;top:-60px;right:-60px;width:250px;height:250px;background:radial-gradient(circle,rgba(255,255,255,0.12) 0%,transparent 60%);pointer-events:none;}
+.score-hero-inner{display:flex;align-items:flex-start;justify-content:space-between;position:relative;}
+.hero-name{font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);margin-bottom:2px;letter-spacing:0.2px;}
+.hero-score{font-size:56px;font-weight:800;color:white;line-height:1;letter-spacing:-2.5px;}
+.hero-pts{font-size:12px;color:rgba(255,255,255,0.55);font-weight:500;}
+.hero-right{text-align:right;}
+.hero-week-label{font-size:11px;color:rgba(255,255,255,0.5);font-weight:500;margin-bottom:2px;}
+.hero-week-pts{font-size:30px;font-weight:700;color:white;letter-spacing:-1px;line-height:1;}
+.hero-week-sub{font-size:11px;color:rgba(255,255,255,0.5);font-weight:500;}
+.hero-progress{margin-top:16px;position:relative;}
+.hero-prog-label{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.45);font-weight:500;margin-bottom:5px;}
+.hero-prog-track{height:4px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;}
+.hero-prog-fill{height:100%;background:rgba(255,255,255,0.75);border-radius:2px;transition:width 0.6s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 8px rgba(255,255,255,0.4);}
 
-  /* ── TASK CARD ── */
-  .task-card {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow);
-    border-left: 4px solid transparent;
-  }
-  .task-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .task-name {
-    font-weight: 800;
-    font-size: 15px;
-    flex: 1;
-  }
-  .task-pts-badge {
-    font-family: 'Fredoka One', cursive;
-    font-size: 16px;
-    min-width: 40px;
-    text-align: right;
-    white-space: nowrap;
-  }
-  .task-desc {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 3px;
-    font-weight: 600;
-  }
+/* &#9472;&#9472; AWARD PILL &#9472;&#9472; */
+.award-pill{display:flex;align-items:center;gap:12px;background:var(--glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:14px;box-shadow:var(--shadow-card);border:1px solid var(--border);}
+.ap-icon{font-size:24px;flex-shrink:0;}
+.ap-title{font-size:14px;font-weight:700;color:var(--text);}
+.ap-sub{font-size:11px;color:var(--muted);font-weight:500;margin-top:1px;}
+.ap-pts{margin-left:auto;text-align:right;flex-shrink:0;}
+.ap-pts .apv{font-size:20px;font-weight:800;line-height:1;letter-spacing:-0.5px;}
+.ap-pts .aps{font-size:10px;color:var(--muted);font-weight:500;}
 
-  /* ── SCORING BUTTONS ── */
-  .score-buttons {
-    display: flex;
-    gap: 6px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-  }
-  .score-btn {
-    flex: 1;
-    min-width: 0;
-    padding: 7px 4px;
-    border-radius: 10px;
-    border: 2px solid #eee;
-    background: white;
-    font-size: 11px;
-    font-weight: 800;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-    color: var(--muted);
-    line-height: 1.2;
-  }
-  .score-btn:hover { transform: translateY(-1px); }
-  .score-btn.selected-fast { background: #4CAF50; border-color: #4CAF50; color: white; }
-  .score-btn.selected-ontime { background: #8BC34A; border-color: #8BC34A; color: white; }
-  .score-btn.selected-asked { background: #FF9800; border-color: #FF9800; color: white; }
-  .score-btn.selected-nagged { background: #9E9E9E; border-color: #9E9E9E; color: white; }
-  .score-btn.selected-na { background: #eee; border-color: #ddd; color: #aaa; }
+/* &#9472;&#9472; CHARACTER CARD &#9472;&#9472; */
+.char-card{background:var(--glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;box-shadow:var(--shadow-card);border:1px solid var(--border);}
+.char-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.char-title{font-size:14px;font-weight:700;color:var(--text);}
+.char-sub{font-size:11px;color:var(--muted);font-weight:500;margin-top:1px;}
+.char-total{font-size:32px;font-weight:800;line-height:1;letter-spacing:-1px;}
+.char-total.pos{color:#30D158;} .char-total.neg{color:#FF453A;} .char-total.zero{color:var(--muted);}
+.char-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.char-btn{padding:18px;border-radius:var(--radius-md);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;transition:all 0.15s;font-family:'Inter',sans-serif;box-shadow:0 2px 12px rgba(0,0,0,0.06),0 1px 0 rgba(255,255,255,0.8) inset;}
+.char-btn:active{transform:scale(0.96);}
+.char-btn.plus {border:1px solid rgba(48,209,88,0.3);background:rgba(48,209,88,0.1);}
+.char-btn.minus{border:1px solid rgba(255,69,58,0.3);background:rgba(255,69,58,0.08);}
+.char-btn-sym{font-size:30px;font-weight:300;line-height:1;}
+.char-btn.plus  .char-btn-sym{color:#30D158;}
+.char-btn.minus .char-btn-sym{color:#FF453A;}
+.char-btn-lbl{font-size:12px;font-weight:600;color:var(--muted);}
+.char-reset{background:none;border:none;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;padding:8px 0 0;text-decoration:underline;display:block;text-align:center;width:100%;opacity:0.7;}
 
-  /* penalty-btn colours */
-  .score-btn.selected-penalty { background: #F44336; border-color: #F44336; color: white; }
+/* &#9472;&#9472; SECTION LABEL &#9472;&#9472; */
+.section-label{display:flex;align-items:center;gap:10px;padding:12px 0 8px;}
+.sl-text{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,0.5);}
+.sl-time{font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);margin-left:auto;}
+.section-label.big .sl-text{font-size:15px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:none;letter-spacing:-0.2px;}
+.section-label.big .sl-time{font-size:13px;font-weight:700;color:rgba(255,255,255,0.7);}
+.section-divider{height:1px;background:linear-gradient(90deg,rgba(255,255,255,0.2),rgba(255,255,255,0.05));margin-bottom:10px;}
 
-  /* ── PENALTY SECTION ── */
-  .penalty-card {
-    background: #FFF5F5;
-    border-radius: 16px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    border: 2px dashed #FFCDD2;
-  }
-  .penalty-card h4 {
-    font-size: 13px;
-    font-weight: 800;
-    color: #c0392b;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-  }
-  .penalty-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #FFEBEE;
-  }
-  .penalty-row:last-child { border-bottom: none; }
-  .penalty-name { font-size: 14px; font-weight: 700; flex: 1; }
-  .penalty-pts { font-size: 13px; color: #c0392b; font-weight: 800; margin-right: 10px; }
-  .penalty-counter {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .pen-btn {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    border: 2px solid #FFCDD2;
-    background: white;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800;
-    color: #c0392b;
-    transition: all 0.15s;
-  }
-  .pen-btn:hover { background: #FFCDD2; }
-  .pen-count {
-    font-family: 'Fredoka One', cursive;
-    font-size: 20px;
-    min-width: 24px;
-    text-align: center;
-    color: #c0392b;
-  }
+/* &#9472;&#9472; DINNER BREAK &#9472;&#9472; */
+.dinner-break{
+  background:rgba(20,20,32,0.7);
+  backdrop-filter:blur(40px) saturate(150%);
+  -webkit-backdrop-filter:blur(40px) saturate(150%);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:var(--radius-lg);
+  padding:18px 20px;margin:16px 0;text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,0.2),0 1px 0 rgba(255,255,255,0.08) inset;
+}
+.dinner-break-title{font-size:18px;font-weight:700;color:rgba(255,255,255,0.95);letter-spacing:-0.3px;}
+.dinner-break-time{font-size:13px;font-weight:500;color:rgba(255,255,255,0.4);margin-top:3px;}
 
-  /* ── KITCHEN ROSTER ── */
-  .kitchen-card {
-    background: white;
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: var(--shadow);
-  }
-  .kitchen-card h3 {
-    font-family: 'Fredoka One', cursive;
-    font-size: 18px;
-    margin-bottom: 12px;
-  }
-  .kitchen-roles {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .role-box {
-    border-radius: 12px;
-    padding: 12px;
-    text-align: center;
-  }
-  .role-box.abby-role { background: var(--abby-light); }
-  .role-box.olivia-role { background: var(--olivia-light); }
-  .role-box .girl-name {
-    font-weight: 800;
-    font-size: 14px;
-    margin-bottom: 4px;
-  }
-  .role-box.abby-role .girl-name { color: var(--abby-dark); }
-  .role-box.olivia-role .girl-name { color: var(--olivia-dark); }
-  .role-box .role-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .role-box ul {
-    list-style: none;
-    margin-top: 6px;
-  }
-  .role-box ul li {
-    font-size: 11px;
-    color: var(--muted);
-    font-weight: 600;
-    padding: 1px 0;
-  }
-  .role-box ul li::before { content: '✓ '; color: var(--green); }
-  .roster-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 12px;
-  }
-  .roster-week-badge {
-    background: var(--text);
-    color: white;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 800;
-  }
-  .roster-btn {
-    background: #eee;
-    border: none;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-family: 'Nunito', sans-serif;
-  }
-  .roster-btn:hover { background: #ddd; }
+/* &#9472;&#9472; TASK CARD &#9472;&#9472; */
+.task-card{border-radius:var(--radius-md);padding:14px 15px;margin-bottom:8px;backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,0.5);box-shadow:0 4px 20px rgba(0,0,0,0.06),0 1px 0 rgba(255,255,255,0.9) inset;}
+.morning-card {background:rgba(255,250,235,0.82);}
+.school-card  {background:rgba(235,245,255,0.82);}
+.dinner-card  {background:rgba(248,242,255,0.82);}
+.bonus-card   {background:rgba(235,252,244,0.82);}
+.task-card.na-card{opacity:0.35;pointer-events:none;}
+.task-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.task-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.3;}
+.task-desc{font-size:11px;color:var(--muted);font-weight:500;margin-top:2px;}
+.task-badge{font-size:13px;font-weight:700;flex-shrink:0;white-space:nowrap;}
+.task-badge.ep{color:#1a8a3a;} .task-badge.en{color:#cc2a22;} .task-badge.ez{color:var(--muted);} .task-badge.eu{color:var(--muted);font-size:11px;font-weight:500;}
+.score-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.score-btn{flex:1;min-width:0;padding:9px 4px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);background:rgba(255,255,255,0.7);font-size:10.5px;font-weight:600;cursor:pointer;text-align:center;line-height:1.3;color:var(--text2);transition:all 0.15s;font-family:'Inter',sans-serif;backdrop-filter:blur(8px);}
+.score-btn:active{transform:scale(0.95);}
+.score-btn.sel-complete,.score-btn.sel-fast,.score-btn.sel-8pm    {background:rgba(48,209,88,0.85);border-color:rgba(48,209,88,0.4);color:white;box-shadow:0 4px 12px rgba(48,209,88,0.3);}
+.score-btn.sel-reminded,.score-btn.sel-u10,.score-btn.sel-815     {background:rgba(100,216,136,0.85);border-color:rgba(100,216,136,0.4);color:white;box-shadow:0 4px 12px rgba(100,216,136,0.25);}
+.score-btn.sel-nagged,  .score-btn.sel-u15,.score-btn.sel-830     {background:rgba(255,159,10,0.85);border-color:rgba(255,159,10,0.4);color:white;box-shadow:0 4px 12px rgba(255,159,10,0.3);}
+.score-btn.sel-failed,  .score-btn.sel-over15,.score-btn.sel-after845{background:rgba(255,69,58,0.85);border-color:rgba(255,69,58,0.4);color:white;box-shadow:0 4px 12px rgba(255,69,58,0.3);}
+.score-btn.sel-845      {background:rgba(255,107,43,0.85);border-color:rgba(255,107,43,0.4);color:white;box-shadow:0 4px 12px rgba(255,107,43,0.3);}
+.score-btn.sel-na       {background:rgba(200,200,210,0.7);border-color:rgba(180,180,190,0.4);color:#888;}
+.na-note{font-size:11px;color:var(--muted);text-align:center;padding:6px;font-weight:500;}
 
-  /* ── SUMMARY PAGE ── */
-  .summary-week-card {
-    background: white;
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: var(--shadow);
-  }
-  .summary-week-card h3 {
-    font-family: 'Fredoka One', cursive;
-    font-size: 20px;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-  .week-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .week-girl-box {
-    border-radius: 14px;
-    padding: 16px;
-    text-align: center;
-  }
-  .week-girl-box.abby { background: var(--abby-light); }
-  .week-girl-box.olivia { background: var(--olivia-light); }
-  .week-girl-box .g-name {
-    font-weight: 800;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
-  .week-girl-box.abby .g-name { color: var(--abby-dark); }
-  .week-girl-box.olivia .g-name { color: var(--olivia-dark); }
-  .week-pts {
-    font-family: 'Fredoka One', cursive;
-    font-size: 40px;
-    line-height: 1;
-  }
-  .week-girl-box.abby .week-pts { color: var(--abby); }
-  .week-girl-box.olivia .week-pts { color: var(--olivia); }
-  .week-pts-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+/* &#9472;&#9472; DOG WALK BANNER &#9472;&#9472; */
+.dog-walk-banner{background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:var(--radius-md);padding:11px 15px;margin-bottom:8px;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:space-between;}
+.dwb-left{font-size:13px;font-weight:700;color:var(--text);}
+.dwb-right{font-size:13px;font-weight:700;}
 
-  /* dessert result */
-  .dessert-result {
-    border-radius: 14px;
-    padding: 14px;
-    text-align: center;
-    margin-top: 8px;
-  }
-  .dessert-result .d-icon { font-size: 32px; margin-bottom: 4px; }
-  .dessert-result .d-text { font-size: 15px; font-weight: 800; }
-  .dessert-result .d-sub { font-size: 12px; font-weight: 600; margin-top: 2px; }
+/* &#9472;&#9472; BONUS &#9472;&#9472; */
+.bonus-row{display:flex;align-items:center;gap:10px;padding:11px 15px;background:rgba(235,252,244,0.82);border-radius:var(--radius-md);margin-bottom:6px;border:1px solid rgba(200,237,216,0.8);cursor:pointer;transition:all 0.15s;backdrop-filter:blur(16px);box-shadow:0 2px 10px rgba(0,0,0,0.04);}
+.bonus-row:active{transform:scale(0.99);}
+.bonus-check{width:24px;height:24px;border-radius:50%;border:2px solid rgba(0,184,148,0.35);background:rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.18s;font-size:13px;font-weight:700;color:transparent;}
+.bonus-check.ticked{background:#00B894;border-color:#00B894;color:white;box-shadow:0 3px 10px rgba(0,184,148,0.4);}
+.bonus-name{font-size:14px;font-weight:600;color:var(--text);flex:1;}
+.bonus-pts-badge{font-size:13px;font-weight:700;color:#00796B;}
+.bonus-total-row{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;background:rgba(255,255,255,0.85);border-radius:var(--radius-md);border:1px solid rgba(200,237,216,0.8);margin-top:4px;backdrop-filter:blur(16px);}
+.bonus-total-label{font-size:12px;font-weight:600;color:var(--muted);}
+.bonus-total-val{font-size:18px;font-weight:800;color:#00796B;}
 
-  /* ── DAILY BREAKDOWN TABLE ── */
-  .breakdown-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-  }
-  .breakdown-table th {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    font-weight: 800;
-    padding: 6px 4px;
-    text-align: center;
-    border-bottom: 2px solid #eee;
-  }
-  .breakdown-table th:first-child { text-align: left; }
-  .breakdown-table td {
-    padding: 8px 4px;
-    text-align: center;
-    border-bottom: 1px solid #f5f5f5;
-    font-weight: 700;
-  }
-  .breakdown-table td:first-child { text-align: left; color: var(--text); font-size: 11px; }
-  .day-pts { font-family: 'Fredoka One', cursive; font-size: 16px; }
-  .day-pts.abby-col { color: var(--abby); }
-  .day-pts.olivia-col { color: var(--olivia); }
+/* &#9472;&#9472; KITCHEN MINI &#9472;&#9472; */
+.kitchen-mini{background:var(--glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-radius:var(--radius-md);padding:14px 15px;margin-bottom:8px;border:1px solid var(--border);box-shadow:var(--shadow-card);}
+.kitchen-mini-wk{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;background:rgba(29,29,31,0.8);color:white;padding:2px 10px;border-radius:20px;margin-bottom:6px;}
+.kitchen-mini-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.krc{border-radius:10px;padding:10px 12px;}
+.krc.role-a{background:rgba(200,240,210,0.6);}
+.krc.role-b{background:rgba(200,225,255,0.6);}
+.krc .krc-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;}
+.role-a .krc-title{color:#1e6b30;} .role-b .krc-title{color:#0e4fa0;}
+.krc ul{list-style:none;}
+.krc ul li{font-size:12px;font-weight:500;color:var(--text2);padding:2px 0;}
+.krc ul li::before{content:'&#x2713;  ';color:#30D158;font-weight:700;}
 
-  /* ── SAVE BUTTON ── */
-  .save-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: white;
-    padding: 12px 16px;
-    border-top: 2px solid #eee;
-    z-index: 200;
-  }
-  .save-btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 14px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 16px;
-    font-weight: 900;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.5px;
-  }
-  .save-btn.abby { background: var(--abby); color: white; }
-  .save-btn.olivia { background: var(--olivia); color: white; }
-  .save-btn.summary-save { background: var(--text); color: white; }
-  .save-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-  .save-btn:active { transform: translateY(0); }
+/* &#9472;&#9472; WEEK CARDS &#9472;&#9472; */
+.week-card{background:var(--glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-radius:var(--radius-xl);padding:20px;margin-bottom:14px;box-shadow:var(--shadow-card);border:1px solid var(--border);}
+.week-card h3{font-size:17px;font-weight:700;color:var(--text);margin-bottom:16px;letter-spacing:-0.3px;}
+.week-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.week-girl{border-radius:var(--radius-lg);padding:16px;text-align:center;}
+.week-girl.abby  {background:rgba(181,36,94,0.09);border:1px solid rgba(181,36,94,0.15);}
+.week-girl.olivia{background:rgba(106,27,154,0.09);border:1px solid rgba(106,27,154,0.15);}
+.wg-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.week-girl.abby   .wg-name{color:var(--abby);}
+.week-girl.olivia .wg-name{color:var(--olivia);}
+.wg-pts{font-size:38px;font-weight:800;letter-spacing:-1.5px;line-height:1;}
+.week-girl.abby   .wg-pts{color:var(--abby);}
+.week-girl.olivia .wg-pts{color:var(--olivia);}
+.wg-sub{font-size:11px;color:var(--muted);font-weight:500;margin-top:2px;}
+.wg-award{font-size:12px;font-weight:700;margin-top:6px;}
+.breakdown-table{width:100%;border-collapse:collapse;font-size:12px;}
+.breakdown-table th{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);font-weight:600;padding:5px 4px;text-align:center;border-bottom:1px solid rgba(0,0,0,0.07);}
+.breakdown-table th:first-child{text-align:left;}
+.breakdown-table td{padding:7px 4px;text-align:center;border-bottom:1px solid rgba(0,0,0,0.04);font-weight:600;font-size:12px;}
+.breakdown-table td:first-child{text-align:left;color:var(--text2);}
+.day-pts{font-size:14px;font-weight:700;}
+.day-pts.a{color:var(--abby);} .day-pts.o{color:var(--olivia);}
+.chart-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.cs{background:rgba(0,0,0,0.03);border-radius:var(--radius-sm);padding:12px;text-align:center;border:1px solid rgba(0,0,0,0.05);}
+.cs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:3px;}
+.cs-val{font-size:24px;font-weight:800;letter-spacing:-0.5px;line-height:1;}
+.cs-sub{font-size:10px;color:var(--muted);font-weight:500;margin-top:2px;}
 
-  /* toast */
-  .toast {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: #333;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 700;
-    opacity: 0;
-    transition: all 0.3s;
-    pointer-events: none;
-    z-index: 300;
-    white-space: nowrap;
-  }
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+/* &#9472;&#9472; ROSTER CARDS &#9472;&#9472; */
+.roster-card{background:var(--glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-radius:var(--radius-xl);padding:20px;margin-bottom:14px;box-shadow:var(--shadow-card);border:1px solid var(--border);}
+.roster-card h3{font-size:17px;font-weight:700;color:var(--text);margin-bottom:14px;letter-spacing:-0.3px;}
+.roster-table{width:100%;border-collapse:collapse;font-size:13px;}
+.roster-table th{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);font-weight:600;padding:5px 8px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.07);}
+.roster-table td{padding:9px 8px;border-bottom:1px solid rgba(0,0,0,0.04);font-weight:600;}
+.roster-table tr:last-child td{border-bottom:none;}
+.rt-abby{color:var(--abby);} .rt-olivia{color:var(--olivia);}
+.kitchen-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
-  /* dog walk badge */
-  .dog-walk-label {
-    font-size: 11px;
-    background: #FFF3E0;
-    color: #E65100;
-    border-radius: 10px;
-    padding: 2px 8px;
-    font-weight: 800;
-    display: inline-block;
-    margin-top: 4px;
-  }
-
-  /* NA overlay */
-  .task-card.na-task { opacity: 0.5; }
-
-  /* progress bar */
-  .progress-wrap { margin-top: 8px; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
-  .progress-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
-  .progress-fill.abby { background: var(--abby); }
-  .progress-fill.olivia { background: var(--olivia); }
-
-  .info-note {
-    font-size: 12px;
-    color: var(--muted);
-    text-align: center;
-    padding: 8px;
-    font-weight: 600;
-  }
-
-  /* ── BONUS CARD ── */
-  .bonus-card {
-    background: #F5F0FF;
-    border-radius: 16px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    border: 2px dashed #C9B8E8;
-  }
-  .bonus-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .bonus-title { font-size: 14px; font-weight: 800; color: #5a3e8a; }
-  .bonus-desc  { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 2px; }
-  .bonus-total {
-    font-family: 'Fredoka One', cursive;
-    font-size: 28px;
-    line-height: 1;
-    min-width: 48px;
-    text-align: right;
-  }
-  .bonus-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  .bonus-btn {
-    padding: 10px 6px;
-    border-radius: 12px;
-    border: none;
-    font-family: 'Nunito', sans-serif;
-    font-size: 13px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .bonus-btn:hover { transform: translateY(-1px); opacity: 0.9; }
-  .bonus-btn:active { transform: translateY(0); }
-  .bonus-btn.reward      { background: #E8F5E9; color: #2e7d32; }
-  .bonus-btn.reward.big  { background: #4CAF50; color: white; }
-  .bonus-btn.deduct      { background: #FFEBEE; color: #c0392b; }
-  .bonus-btn.deduct.big  { background: #F44336; color: white; }
-  .bonus-reset-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .bonus-reset {
-    background: white;
-    border: 2px solid #C9B8E8;
-    color: #7B5EA7;
-    border-radius: 20px;
-    padding: 4px 14px;
-    font-size: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-  }
-  .bonus-reset:hover { background: #ede8f8; }
-  .bonus-hint {
-    font-size: 11px;
-    color: var(--muted);
-    font-weight: 600;
-  }
+/* &#9472;&#9472; TOAST &#9472;&#9472; */
+.toast{position:fixed;bottom:calc(var(--bottom-total) + 12px);left:50%;transform:translateX(-50%) translateY(8px);background:rgba(20,20,28,0.88);backdrop-filter:blur(20px);color:white;padding:10px 20px;border-radius:22px;font-size:13px;font-weight:600;opacity:0;transition:all 0.22s;pointer-events:none;z-index:400;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 
-<header>
-  <h1>🏠 Emmerson HQ</h1>
-  <div class="subtitle">Evening Routine Tracker</div>
-  <div class="date-nav">
-    <button onclick="changeDay(-1)">‹</button>
-    <div class="date-display" id="dateDisplay"></div>
-    <button onclick="changeDay(1)">›</button>
-  </div>
-</header>
+<!-- BACKGROUND -->
+<div class="bg-scene">
+  <div class="bg-blob blob1"></div>
+  <div class="bg-blob blob2"></div>
+  <div class="bg-blob blob3"></div>
+</div>
+<div class="bg-noise"></div>
 
-<div class="tabs">
-  <div class="tab active-abby" id="tab-abby" onclick="showPage('abby')">🩷 Abby</div>
-  <div class="tab" id="tab-olivia" onclick="showPage('olivia')">💙 Olivia</div>
-  <div class="tab" id="tab-summary" onclick="showPage('summary')">📊 Week</div>
+<!-- PAGES -->
+<div class="page active" id="page-abby"><div class="page-pad" id="abby-content"></div></div>
+<div class="page" id="page-olivia"><div class="page-pad" id="olivia-content"></div></div>
+<div class="page" id="page-week"><div style="padding:16px" id="week-content"></div></div>
+<div class="page" id="page-rosters"><div style="padding:16px" id="rosters-content"></div></div>
+
+<!-- DATE BAR -->
+<div class="date-bar">
+  <button class="date-arrow" onclick="changeDay(-1)">&#x2039;</button>
+  <div class="date-center">
+    <button class="date-display-btn" id="dateDisplayBtn" onclick="openCal()"></button>
+    <button class="today-btn" onclick="goToday()">Today</button>
+  </div>
+  <button class="cal-icon-btn" onclick="openCal()">&#x1F4C5;</button>
+  <button class="cal-icon-btn" id="syncBtn" onclick="forceSync()" title="Sync with cloud">&#x2601;</button>
+  <button class="date-arrow" onclick="changeDay(1)">&#x203A;</button>
 </div>
 
-<!-- ═══════════════ ABBY PAGE ═══════════════ -->
-<div class="page active" id="page-abby">
-  <div id="abby-content"></div>
-  <div class="save-bar">
-    <button class="save-btn abby" onclick="saveDay('abby')">💾 Save Abby's Day</button>
-  </div>
-</div>
+<!-- NAV BAR -->
+<nav class="nav-bar">
+  <button class="nav-tab active-abby"  id="nav-abby"    onclick="showPage('abby')">   <div class="nav-icon">&#x1F97A;</div><div class="nav-label">Abby</div></button>
+  <button class="nav-tab"              id="nav-olivia"  onclick="showPage('olivia')"> <div class="nav-icon">&#x1F49C;</div><div class="nav-label">Olivia</div></button>
+  <button class="nav-tab"              id="nav-week"    onclick="showPage('week')">   <div class="nav-icon">&#x1F4CA;</div><div class="nav-label">Week</div></button>
+  <button class="nav-tab"              id="nav-rosters" onclick="showPage('rosters')"><div class="nav-icon">&#x1F4CB;</div><div class="nav-label">Rosters</div></button>
+</nav>
 
-<!-- ═══════════════ OLIVIA PAGE ═══════════════ -->
-<div class="page" id="page-olivia">
-  <div id="olivia-content"></div>
-  <div class="save-bar">
-    <button class="save-btn olivia" onclick="saveDay('olivia')">💾 Save Olivia's Day</button>
+<!-- CALENDAR -->
+<div class="cal-overlay" id="calOverlay" onclick="closeCal(event)">
+  <div class="cal-popup" onclick="event.stopPropagation()">
+    <div class="cal-handle"></div>
+    <div class="cal-popup-header">
+      <div class="cal-month-nav">
+        <button class="cal-month-btn" onclick="calPrevMonth()">&#x2039;</button>
+        <div class="cal-month-title" id="calMonthTitle"></div>
+        <button class="cal-month-btn" onclick="calNextMonth()">&#x203A;</button>
+      </div>
+      <button class="cal-close" onclick="closeCal()">Done</button>
+    </div>
+    <div class="cal-days-header"><div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>
+    <div class="cal-grid" id="calGrid"></div>
   </div>
-</div>
-
-<!-- ═══════════════ SUMMARY PAGE ═══════════════ -->
-<div class="page" id="page-summary">
-  <div id="summary-content"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════
-//  DATA DEFINITIONS
-// ══════════════════════════════════════════
+const STD2=[{key:'complete',label:'Complete',pts:2},{key:'reminded',label:'Reminded',pts:1},{key:'nagged',label:'Nagged',pts:0},{key:'failed',label:'Failed',pts:-1}];
+const STD3=[{key:'complete',label:'Complete',pts:3},{key:'reminded',label:'Reminded',pts:2},{key:'nagged',label:'Nagged',pts:1},{key:'failed',label:'Failed',pts:-1}];
 
-const TASKS = {
-  beforeSchool: {
-    label: 'Before School',
-    time: 'Morning',
-    tasks: [
-      { id: 'bs_breakfast', name: 'Breakfast eaten', desc: 'Must be eaten before leaving — not in the car', pts: [2, 2, 1, 0] },
-      { id: 'bs_teeth',     name: 'Teeth brushed',  desc: 'Morning brush before school', pts: [2, 2, 1, 0] },
-      { id: 'bs_dogfed',    name: 'Dog fed (AM)',    desc: 'Morning feed — penalty if missed', pts: [2, 2, 1, 0], penalty: true },
-    ]
-  },
-  afterSchool: {
-    label: 'After School',
-    time: '4:10pm – 5:50pm',
-    tasks: [
-      { id: 'as_dogwalk',   name: 'Dog walk',        desc: '~30 mins — check whose turn it is below', pts: [3, 2, 1, 0], dogwalk: true, penalty: true },
-      { id: 'as_homework',  name: 'Homework',        desc: 'Up to 30 mins — N/A if none tonight', pts: [2, 2, 1, 0], hasNA: true },
-      { id: 'as_music',     name: 'Music practice',  desc: '10 mins minimum', pts: [2, 2, 1, 0] },
-      { id: 'as_bedroom',   name: 'Bedroom floor tidy', desc: 'Clothes off floor, room walkable', pts: [2, 2, 1, 0] },
-      { id: 'as_dogfed',    name: 'Dog fed (PM)',    desc: 'Afternoon / evening feed', pts: [2, 2, 1, 0], penalty: true },
-    ]
-  },
-  afterDinner: {
-    label: 'After Dinner',
-    time: '6:30pm – 7:30pm',
-    tasks: [
-      { id: 'ad_lunch',     name: 'School lunch packed', desc: 'Under 5 min = 3pts, under 10 min = 2pts', pts: [3, 2, 1, 0], timed: true },
-      { id: 'ad_kitchen',   name: 'Kitchen duty',   desc: 'See roster below — full job list', pts: [3, 2, 1, 0] },
-      { id: 'ad_shower',    name: 'Shower',          desc: 'Under 7 minutes', pts: [3, 2, 1, 0] },
-      { id: 'ad_clothes',   name: 'Dirty clothes away', desc: 'In laundry or hamper — not the floor', pts: [2, 2, 1, 0] },
-      { id: 'ad_pjs',       name: 'PJs on',          desc: 'Changed and ready', pts: [1, 1, 0, 0] },
-      { id: 'ad_washing',   name: 'Clean washing put away', desc: 'If there is clean washing out', pts: [2, 2, 1, 0], hasNA: true },
-      { id: 'ad_bag',       name: 'School bag packed', desc: 'Everything in, ready to go', pts: [2, 2, 1, 0] },
-      { id: 'ad_teeth',     name: 'Teeth brushed',   desc: 'Night brush — penalty if missed', pts: [2, 2, 1, 0], penalty: true },
-    ]
-  },
-  bedtime: {
-    label: 'Bedtime',
-    time: '8:00pm – 8:15pm',
-    tasks: [
-      { id: 'bt_bed',       name: 'In bed, lights off', desc: '8:00pm = fast (3pts), 8:15pm = on time (2pts), after = 0', pts: [3, 2, 0, 0] },
-    ]
-  }
+const MORNING=[
+  {id:'m_breakfast',name:'Breakfast Eaten',  desc:'At the table &#8212; not in the car',btns:STD2},
+  {id:'m_teeth',    name:'Teeth Brushed',    desc:'Morning brush before leaving', btns:STD2},
+  {id:'m_dogfed',   name:'Dog Fed',          desc:'Morning feed',                 btns:STD2},
+  {id:'m_bed',      name:'Bed Made',         desc:'Sheets straight, pillows on',  btns:STD2},
+];
+const AFTERSCHOOL=[
+  {id:'as_dogwalk', name:'Dog Walk & Poo Patrol',desc:'~30 mins &#8212; check roster tab',dogwalk:true,btns:STD3},
+  {id:'as_homework',name:'Homework',             desc:'Up to 30 mins (N/A if none)',hasNA:true,  btns:STD2},
+  {id:'as_music',   name:'Music Practice',       desc:'10 minutes minimum',          btns:STD2},
+  {id:'as_bedroom', name:'Bedroom Tidy',         desc:'Floor clear, clothes away',   btns:STD2},
+  {id:'as_dogfed',  name:'Dog Fed',              desc:'Afternoon / evening feed',    btns:STD2},
+];
+const AFTERDINNER=[
+  {id:'ad_lunch',  name:'School Lunch Packed',desc:'Done by 7:00 pm',             noLunch:true,btns:STD2},
+  {id:'ad_kitchen',name:'Kitchen Duty',       desc:'Full checklist &#8212; see roster', btns:STD2},
+  {id:'ad_shower', name:'Shower',             desc:'Time yourself!',
+    btns:[{key:'fast',label:'Under 5 min',pts:2},{key:'u10',label:'Under 10 min',pts:1},{key:'u15',label:'Under 15 min',pts:0},{key:'over15',label:'Over 15 min',pts:-1}]},
+  {id:'ad_clothes',name:'Dirty Clothes Away', desc:'In laundry &#8212; not the floor',  btns:STD2},
+  {id:'ad_washing',name:'Clean Washing Away', desc:'Put away if any is out',      hasNA:true,btns:STD2},
+  {id:'ad_bag',    name:'School Bag Packed',  desc:'Ready for tomorrow',          noBag:true,btns:STD2},
+  {id:'ad_teeth',  name:'Teeth Brushed',      desc:'Night brush',                 btns:STD2},
+  {id:'ad_bed',    name:'In Bed, Lights Off', desc:'Points based on time',
+    btns:[{key:'8pm',label:'8:00 pm',pts:3},{key:'815',label:'8:15 pm',pts:2},{key:'830',label:'8:30 pm',pts:1},{key:'845',label:'8:45 pm',pts:0},{key:'after845',label:'After 8:45',pts:-1}]},
+];
+const BONUS=[
+  {id:'b_bible',    name:'Read Bible',       pts:5},
+  {id:'b_dinner',   name:'Cook Dinner',      pts:5},
+  {id:'b_bathroom', name:'Clean Bathroom',   pts:3},
+  {id:'b_toilet',   name:'Clean Toilet',     pts:2},
+  {id:'b_bin',      name:'Take Out Bin',     pts:2},
+  {id:'b_hangwash', name:'Hang Out Washing', pts:2},
+  {id:'b_bringwash',name:'Bring In Washing', pts:2},
+  {id:'b_yard',     name:'Yard Work',        pts:2},
+];
+const KITCHEN={
+  A:{abby:{cls:'role-a',title:'Role A &#8212; Dishes Side',items:['Unpack dishwasher','Load dirty dishes','Wash pots & pans','Put pots away']},olivia:{cls:'role-b',title:'Role B &#8212; Surfaces Side',items:['Clear & wipe bench','Clear & wipe table','Sweep floor','Stovetop (&#215;2/week)']}},
+  B:{abby:{cls:'role-b',title:'Role B &#8212; Surfaces Side',items:['Clear & wipe bench','Clear & wipe table','Sweep floor','Stovetop (&#215;2/week)']},olivia:{cls:'role-a',title:'Role A &#8212; Dishes Side',items:['Unpack dishwasher','Load dirty dishes','Wash pots & pans','Put pots away']}},
 };
-
-const PENALTIES = [
-  { id: 'pen_screens',   name: 'Screen time (weekday)',  pts: -1 },
-  { id: 'pen_fighting',  name: 'Fighting with each other', pts: -2 },
+const DOG_WALK={0:'Abby',1:'Abby',2:'Olivia',3:'Abby',4:'Olivia',5:'Abby',6:'Olivia'};
+const NO_LB_DAYS=[5,6];
+const AWARDS=[
+  {min:300,label:'Platinum',   sub:'$15 cash + 4 desserts',color:'#8E24AA',icon:'&#x1F48E;'},
+  {min:270,label:'Gold',       sub:'$10 cash + 3 desserts',color:'#F57F17',icon:'&#x1F947;'},
+  {min:230,label:'Silver',     sub:'$5 cash + 3 desserts', color:'#546E7A',icon:'&#x1F948;'},
+  {min:200,label:'3 Desserts', sub:'Excellent week',       color:'#2E7D32',icon:'&#x1F370;'},
+  {min:160,label:'2 Desserts', sub:'Great effort',         color:'#558B2F',icon:'&#x1F368;'},
+  {min:110,label:'1 Dessert',  sub:'Keep improving',       color:'#E65100',icon:'&#x1F366;'},
+  {min:0,  label:'No Dessert', sub:"Let's do better",      color:'#9E9E9E',icon:''},
 ];
 
-// Kitchen roster roles
-const KITCHEN_ROLES = {
-  A: {
-    abby:   { title: 'Role A — Dishes Side', items: ['Unpack dishwasher', 'Load dirty dishes', 'Wash pots & pans', 'Put pots away'] },
-    olivia: { title: 'Role B — Surfaces Side', items: ['Clear & wipe bench', 'Clear & wipe table', 'Sweep floor', 'Stovetop (×2/week)'] }
-  },
-  B: {
-    abby:   { title: 'Role B — Surfaces Side', items: ['Clear & wipe bench', 'Clear & wipe table', 'Sweep floor', 'Stovetop (×2/week)'] },
-    olivia: { title: 'Role A — Dishes Side', items: ['Unpack dishwasher', 'Load dirty dishes', 'Wash pots & pans', 'Put pots away'] }
+let currentDate=new Date();currentDate.setHours(0,0,0,0);
+let calViewDate=new Date();
+const dk=()=>currentDate.toISOString().split('T')[0];
+
+// &#9472;&#9472; CLOUD CONFIG &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+// Paste your Google Apps Script Web App URL below after deployment
+const SHEET_URL = 'PASTE_YOUR_SCRIPT_URL_HERE';
+const USE_CLOUD = SHEET_URL !== 'PASTE_YOUR_SCRIPT_URL_HERE';
+
+// In-memory cache so UI stays snappy
+let _cache = null;
+
+// Load from localStorage (always available instantly)
+const loadLocal = () => { try{return JSON.parse(localStorage.getItem('emmHQv6')||'{}')}catch(e){return{}} };
+const saveLocal = d => { localStorage.setItem('emmHQv6',JSON.stringify(d)); };
+
+// Load: return cache or localStorage immediately, then refresh from cloud
+function load() {
+  if (_cache) return _cache;
+  _cache = loadLocal();
+  if (USE_CLOUD) syncFromCloud();
+  return _cache;
+}
+
+// Save: write locally immediately, then push to cloud in background
+function save(data) {
+  _cache = data;
+  saveLocal(data);
+  if (USE_CLOUD) pushToCloud(data);
+}
+
+// Pull latest from cloud, merge into local, re-render
+async function syncFromCloud() {
+  try {
+    const res = await fetch(`${SHEET_URL}?action=get`, {method:'GET'});
+    if (!res.ok) return;
+    const text = await res.text();
+    const cloud = JSON.parse(text);
+    // Merge: cloud wins per key, but keep any local keys not in cloud
+    const local = loadLocal();
+    const merged = Object.assign({}, local, cloud);
+    _cache = merged;
+    saveLocal(merged);
+    // Re-render current page silently
+    const active = document.querySelector('.page.active')?.id?.replace('page-','');
+    if (active==='abby'||active==='olivia') renderGirl(active);
+    else if (active==='week') renderWeek();
+  } catch(e) {
+    // Cloud unavailable &#8212; local data still works fine
+    console.log('Cloud sync skipped (offline or URL not set)');
   }
-};
-
-// Dog walk roster — Abby: Mon/Wed/Fri/Sun, Olivia: Tue/Thu/Sat
-const DOG_WALK_ROSTER = { 0: 'Abby', 1: 'Olivia', 2: 'Abby', 3: 'Olivia', 4: 'Abby', 5: 'Olivia', 6: 'Abby' };
-// 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat  → corrected:
-// Abby: Mon(1),Wed(3),Fri(5),Sun(0)  Olivia: Tue(2),Thu(4),Sat(6)
-const DOG_WALK = { 0: 'Abby', 1: 'Abby', 2: 'Olivia', 3: 'Abby', 4: 'Olivia', 5: 'Abby', 6: 'Olivia' };
-
-// Dessert thresholds
-const DESSERT = [
-  { min: 65, count: 3, label: '3 Desserts 🎉', sub: 'Incredible week!', cls: 'dessert-3', icon: '🍰🍰🍰' },
-  { min: 50, count: 2, label: '2 Desserts 😊', sub: 'Great effort!',    cls: 'dessert-2', icon: '🍨🍨' },
-  { min: 35, count: 1, label: '1 Dessert 😐',  sub: 'Room to improve', cls: 'dessert-1', icon: '🍦' },
-  { min: 0,  count: 0, label: 'No Dessert 😔', sub: 'Better luck next week', cls: 'dessert-0', icon: '❌' },
-];
-
-// ══════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════
-
-let currentDate = new Date();
-currentDate.setHours(0,0,0,0);
-
-// data[dateKey][girl][taskId] = score key
-// score: 'fast'|'ontime'|'asked'|'nagged'|'na'|null
-// penalties[dateKey][girl][penId] = count
-
-function getDateKey(d) {
-  return d.toISOString().split('T')[0];
 }
 
-function loadData() {
-  try { return JSON.parse(localStorage.getItem('emmersonHQ') || '{}'); } catch(e) { return {}; }
-}
-function saveData(data) {
-  localStorage.setItem('emmersonHQ', JSON.stringify(data));
-}
-function getData() { return loadData(); }
-
-function getKitchenWeek() {
-  // Week A/B based on ISO week number parity
-  const d = new Date(currentDate);
-  const jan1 = new Date(d.getFullYear(), 0, 1);
-  const weekNo = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-  return weekNo % 2 === 0 ? 'B' : 'A';
-}
-
-// ══════════════════════════════════════════
-//  SCORING HELPERS
-// ══════════════════════════════════════════
-
-const SCORE_LABELS = {
-  fast:   { label: '⚡ Fast',    short: 'Fast' },
-  ontime: { label: '✅ On Time', short: 'On Time' },
-  asked:  { label: '🙋 Asked',   short: 'Asked' },
-  nagged: { label: '😤 Nagged',  short: 'Nagged' },
-  na:     { label: '— N/A',      short: 'N/A' },
-};
-
-function getPts(task, scoreKey) {
-  if (!scoreKey || scoreKey === 'na') return 0;
-  const map = { fast: 0, ontime: 1, asked: 2, nagged: 3 };
-  return task.pts[map[scoreKey]] ?? 0;
-}
-
-function calcDayScore(girl, dateKey) {
-  const data = getData();
-  const dayData = data[dateKey]?.[girl] || {};
-  const penData = data[dateKey]?.penalties?.[girl] || {};
-
-  let pts = 0;
-  // tasks
-  for (const section of Object.values(TASKS)) {
-    for (const task of section.tasks) {
-      const score = dayData[task.id];
-      if (score && score !== 'na') {
-        const p = getPts(task, score);
-        pts += p;
-        // penalty if task.penalty and score === 'nagged'
-        if (task.penalty && score === 'nagged') pts -= 1;
-      }
-    }
+// Push to cloud &#8212; fire and forget
+async function pushToCloud(data) {
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'text/plain'},
+      body: JSON.stringify({action:'set', data})
+    });
+  } catch(e) {
+    // Will sync next time app is opened with internet
   }
-  // penalties
-  for (const pen of PENALTIES) {
-    const count = penData[pen.id] || 0;
-    pts += pen.pts * count;
-  }
-  // bonus / custom
-  pts += data[dateKey]?.bonus?.[girl] || 0;
-
-  return pts;
 }
 
-function calcWeekScore(girl) {
-  const data = getData();
-  const mon = getMondayOfWeek(currentDate);
-  let total = 0;
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(mon);
-    d.setDate(d.getDate() + i);
-    total += calcDayScore(girl, getDateKey(d));
-  }
-  return total;
+// Manual refresh button &#8212; pull latest from cloud right now
+async function forceSync() {
+  if (!USE_CLOUD) { showToast('Set your Sheet URL first'); return; }
+  showSyncIndicator(true);
+  await syncFromCloud();
+  showSyncIndicator(false);
+  showToast('&#x2705; Synced with cloud');
 }
 
-function getMondayOfWeek(date) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = (day === 0) ? -6 : 1 - day;
-  d.setDate(d.getDate() + diff);
-  d.setHours(0,0,0,0);
-  return d;
+function showSyncIndicator(loading) {
+  const btn = document.getElementById('syncBtn');
+  if (btn) btn.textContent = loading ? '&#9203;' : '&#x2601;';
 }
+const getMon=d=>{const c=new Date(d),day=c.getDay();c.setDate(c.getDate()+(day===0?-6:1-day));c.setHours(0,0,0,0);return c;};
+const kitWk=()=>{const j=new Date(currentDate.getFullYear(),0,1),w=Math.ceil(((currentDate-j)/86400000+j.getDay()+1)/7);return w%2===0?'B':'A';};
+const getAward=pts=>{for(const a of AWARDS)if(pts>=a.min)return a;return AWARDS[AWARDS.length-1];};
 
-function getDessert(pts) {
-  for (const d of DESSERT) {
-    if (pts >= d.min) return d;
-  }
-  return DESSERT[3];
+function calcDay(girl,dateKey){
+  const data=load(),d=data[dateKey]?.[girl]||{},bon=data[dateKey]?.bonus?.[girl]||{};
+  const char=data[dateKey]?.char?.[girl]||0;
+  let pts=0;
+  for(const t of[...MORNING,...AFTERSCHOOL,...AFTERDINNER]){const s=d[t.id];if(!s||s==='na')continue;const b=t.btns.find(x=>x.key===s);if(b)pts+=b.pts;}
+  for(const t of BONUS){if(bon[t.id])pts+=t.pts;}
+  pts+=char;return pts;
 }
+function calcWeek(girl){const mon=getMon(currentDate);let t=0;for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);t+=calcDay(girl,d.toISOString().split('T')[0]);}return t;}
 
-// ══════════════════════════════════════════
-//  RENDERING
-// ══════════════════════════════════════════
+function renderGirl(girl){
+  const data=load(),d=data[dk()]?.[girl]||{},bon=data[dk()]?.bonus?.[girl]||{};
+  const charTotal=data[dk()]?.char?.[girl]||0;
+  const dayPts=calcDay(girl,dk()),weekPts=calcWeek(girl);
+  const award=getAward(weekPts),kw=kitWk(),role=KITCHEN[kw][girl];
+  const dogToday=DOG_WALK[currentDate.getDay()];
+  const isMyWalk=dogToday===(girl==='abby'?'Abby':'Olivia');
+  const skipLB=NO_LB_DAYS.includes(currentDate.getDay());
+  const name=girl==='abby'?'Abby':'Olivia';
+  const maxDay=44,pct=Math.min(100,Math.round((Math.max(0,dayPts)/maxDay)*100));
+  let h='';
 
-function renderGirlPage(girl) {
-  const dateKey = getDateKey(currentDate);
-  const data = getData();
-  const dayData = data[dateKey]?.[girl] || {};
-  const penData = data[dateKey]?.penalties?.[girl] || {};
-
-  const dayPts  = calcDayScore(girl, dateKey);
-  const weekPts = calcWeekScore(girl);
-  const color   = girl === 'abby' ? 'abby' : 'olivia';
-  const name    = girl === 'abby' ? 'Abby' : 'Olivia';
-  const weekDessert = getDessert(weekPts);
-  const kitchenWeek = getKitchenWeek();
-  const dogWalkDay  = DOG_WALK[currentDate.getDay()];
-  const maxDay = 34; // rough max per day
-
-  let html = '';
-
-  // Score hero
-  html += `
-  <div class="score-hero ${color}">
-    <div class="hero-left">
-      <div class="today-label">Today's Score</div>
-      <h2>${name}</h2>
-      <div class="weekly-pill">📅 Week total: ${weekPts} pts</div>
+  h+=`<div class="score-hero ${girl}">
+    <div class="hero-light-sweep"></div>
+    <div class="score-hero-inner">
+      <div><div class="hero-name">${name}'s Score</div><div class="hero-score">${dayPts}</div><div class="hero-pts">points today</div></div>
+      <div class="hero-right"><div class="hero-week-label">This week</div><div class="hero-week-pts">${weekPts}</div><div class="hero-week-sub">${award.label}</div></div>
     </div>
-    <div>
-      <div class="hero-score">${dayPts}</div>
-      <div class="hero-pts">pts today</div>
+    <div class="hero-progress">
+      <div class="hero-prog-label"><span>Daily progress</span><span>${dayPts} / ~${maxDay}</span></div>
+      <div class="hero-prog-track"><div class="hero-prog-fill" style="width:${pct}%"></div></div>
     </div>
   </div>`;
 
-  // Progress bar
-  const pct = Math.min(100, Math.round((dayPts / maxDay) * 100));
-  html += `
-  <div class="progress-wrap">
-    <div class="progress-label"><span>Today's progress</span><span>${dayPts} / ~${maxDay}</span></div>
-    <div class="progress-bar"><div class="progress-fill ${color}" style="width:${pct}%"></div></div>
+  h+=`<div class="award-pill">
+    <div class="ap-icon">${award.icon}</div>
+    <div><div class="ap-title">${award.label}</div><div class="ap-sub">${award.sub}</div></div>
+    <div class="ap-pts"><div class="apv" style="color:${award.color}">${weekPts}</div><div class="aps">pts this week</div></div>
   </div>`;
 
-  // Dessert banner
-  html += `
-  <div class="dessert-banner ${weekDessert.cls}" style="margin-top:14px">
-    <div class="icon">${weekDessert.icon}</div>
-    <div>
-      <div>${weekDessert.label} this week</div>
-      <div style="font-size:11px;opacity:0.8;font-weight:600">${weekDessert.sub} — ${weekPts} pts total</div>
+  const cc=charTotal>0?'pos':charTotal<0?'neg':'zero';
+  h+=`<div class="char-card">
+    <div class="char-top">
+      <div><div class="char-title">Character Points</div><div class="char-sub">Kindness &#183; Courage &#183; Generosity &#183; Attitude</div></div>
+      <div class="char-total ${cc}">${charTotal>=0?'+':''}${charTotal}</div>
     </div>
+    <div class="char-btns">
+      <button class="char-btn plus"  onclick="changeChar('${girl}',1)"><div class="char-btn-sym">+</div><div class="char-btn-lbl">Award Point</div></button>
+      <button class="char-btn minus" onclick="changeChar('${girl}',-1)"><div class="char-btn-sym">&#8722;</div><div class="char-btn-lbl">Deduct Point</div></button>
+    </div>
+    <button class="char-reset" onclick="resetChar('${girl}')">Reset to 0</button>
   </div>`;
 
-  // Dog walk notice
-  html += `<div style="background:white;border-radius:14px;padding:12px 14px;margin-bottom:4px;box-shadow:var(--shadow)">
-    <span style="font-size:13px;font-weight:800">🐕 Dog Walk Today: </span>
-    <span style="font-size:13px;font-weight:700;color:${dogWalkDay === 'Abby' ? 'var(--abby-dark)' : 'var(--olivia-dark)'}">${dogWalkDay}'s turn</span>
-    <span style="font-size:11px;color:var(--muted);font-weight:600"> — ${dogWalkDay !== name ? 'Not your turn today' : 'Your turn!'}</span>
-  </div>`;
+  h+=`<div class="section-label"><div class="sl-text">Morning</div><div class="sl-time">Before you leave</div></div>`;
+  for(const t of MORNING) h+=taskCard(girl,t,d[t.id],false,'morning-card');
 
-  // Kitchen roster
-  const role = KITCHEN_ROLES[kitchenWeek][girl];
-  html += `
-  <div class="kitchen-card" style="margin-top:12px">
-    <h3>🍽️ Kitchen This Week (Week ${kitchenWeek})</h3>
-    <div class="role-box ${color}-role" style="border-radius:12px;padding:12px">
-      <div class="girl-name">${name} — ${role.title}</div>
-      <ul>${role.items.map(i => `<li>${i}</li>`).join('')}</ul>
-    </div>
-    <p class="info-note" style="margin-top:8px">Roles swap every week. Toggle in the Week tab.</p>
-  </div>`;
+  h+=`<div class="section-label big" style="margin-top:8px"><div class="sl-text">After School</div><div class="sl-time">Complete by 5:50 pm</div></div><div class="section-divider"></div>`;
+  h+=`<div class="dog-walk-banner"><div class="dwb-left">Dog Walk Today</div><div class="dwb-right" style="color:${dogToday==='Abby'?'var(--abby)':'var(--olivia)'}">${dogToday}${isMyWalk?' &#8212; your turn &#x1F448;':''}</div></div>`;
+  for(const t of AFTERSCHOOL) h+=taskCard(girl,t,d[t.id],t.dogwalk&&!isMyWalk,'school-card');
 
-  // Task sections
-  for (const [sectionKey, section] of Object.entries(TASKS)) {
-    html += `
-    <div class="section-header">
-      <div class="tag">${section.label}</div>
-      <div class="time-range">${section.time}</div>
-    </div>`;
+  h+=`<div class="dinner-break"><div class="dinner-break-title">Dinner Time</div><div class="dinner-break-time">6:00 &#8211; 6:30 pm</div></div>`;
 
-    for (const task of section.tasks) {
-      const currentScore = dayData[task.id] || null;
-      const earnedPts = currentScore ? getPts(task, currentScore) : null;
+  h+=`<div class="section-label big"><div class="sl-text">After Dinner</div><div class="sl-time">Complete by 7:30 pm</div></div><div class="section-divider"></div>`;
+  for(const t of AFTERDINNER){const isNA=(t.noLunch||t.noBag)&&skipLB;h+=taskCard(girl,t,d[t.id],isNA,'dinner-card');}
 
-      // Skip dog walk if not your turn (but still show grayed out)
-      const notYourWalk = task.dogwalk && dogWalkDay !== name;
+  h+=`<div class="kitchen-mini"><div class="kitchen-mini-wk">Kitchen &#8212; Week ${kw}</div><div class="kitchen-mini-title">${name}'s Role: ${role.title}</div><div class="krc ${role.cls}"><div class="krc-title">${role.title}</div><ul>${role.items.map(i=>`<li>${i}</li>`).join('')}</ul></div></div>`;
 
-      let ptsBadgeHtml = '';
-      if (earnedPts !== null && currentScore !== 'na') {
-        ptsBadgeHtml = `<div class="task-pts-badge" style="color:${earnedPts > 0 ? 'var(--green)' : 'var(--muted)'}">${earnedPts > 0 ? '+' : ''}${earnedPts}pts</div>`;
-      } else {
-        ptsBadgeHtml = `<div class="task-pts-badge" style="color:var(--muted);font-size:12px">up to +${task.pts[0]}pts</div>`;
-      }
-
-      html += `<div class="task-card${currentScore === 'na' ? ' na-task' : ''}" id="card-${girl}-${task.id}">
-        <div class="task-header">
-          <div>
-            <div class="task-name">${task.name}</div>
-            <div class="task-desc">${task.desc}</div>
-            ${task.dogwalk ? `<div class="dog-walk-label">Today: ${dogWalkDay}'s turn</div>` : ''}
-            ${task.penalty ? `<div style="font-size:11px;color:#c0392b;font-weight:700;margin-top:2px">⚠️ Nagged = 0pts + −1 penalty</div>` : ''}
-          </div>
-          ${ptsBadgeHtml}
-        </div>
-        <div class="score-buttons">
-          <button class="score-btn ${currentScore === 'fast' ? 'selected-fast' : ''}" onclick="setScore('${girl}','${task.id}','fast')">⚡ Fast<br><small>+${task.pts[0]}pts</small></button>
-          <button class="score-btn ${currentScore === 'ontime' ? 'selected-ontime' : ''}" onclick="setScore('${girl}','${task.id}','ontime')">✅ On Time<br><small>+${task.pts[1]}pts</small></button>
-          <button class="score-btn ${currentScore === 'asked' ? 'selected-asked' : ''}" onclick="setScore('${girl}','${task.id}','asked')">🙋 Asked<br><small>+${task.pts[2]}pts</small></button>
-          <button class="score-btn ${currentScore === 'nagged' ? 'selected-nagged' : ''}" onclick="setScore('${girl}','${task.id}','nagged')">😤 Nagged<br><small>+${task.pts[3]}pts</small></button>
-          ${task.hasNA ? `<button class="score-btn ${currentScore === 'na' ? 'selected-na' : ''}" onclick="setScore('${girl}','${task.id}','na')">— N/A</button>` : ''}
-        </div>
-      </div>`;
-    }
-  }
-
-  // Penalties
-  html += `
-  <div class="section-header">
-    <div class="tag" style="background:#c0392b">Penalties</div>
-    <div class="time-range">Deducted from total</div>
-  </div>
-  <div class="penalty-card">
-    <h4>⚠️ Point Deductions</h4>`;
-
-  for (const pen of PENALTIES) {
-    const count = penData[pen.id] || 0;
-    html += `
-    <div class="penalty-row">
-      <div class="penalty-name">${pen.name}</div>
-      <div class="penalty-pts">${pen.pts} pts each</div>
-      <div class="penalty-counter">
-        <button class="pen-btn" onclick="changePenalty('${girl}','${pen.id}',-1)">−</button>
-        <div class="pen-count">${count}</div>
-        <button class="pen-btn" onclick="changePenalty('${girl}','${pen.id}',1)">+</button>
-      </div>
-    </div>`;
-  }
-  html += '</div>';
-
-  // Bonus / Custom adjust
-  const bonus = (getData()[dateKey]?.bonus?.[girl]) || 0;
-  html += `
-  <div class="section-header">
-    <div class="tag" style="background:#7B5EA7">Bonus / Custom</div>
-    <div class="time-range">One-off rewards & extras</div>
-  </div>
-  <div class="bonus-card">
-    <div class="bonus-top">
-      <div>
-        <div class="bonus-title">⭐ Custom Points</div>
-        <div class="bonus-desc">For anything not on the list — good or bad</div>
-      </div>
-      <div class="bonus-total" style="color:${bonus >= 0 ? '#7B5EA7' : '#c0392b'}">${bonus >= 0 ? '+' : ''}${bonus}</div>
-    </div>
-    <div class="bonus-buttons">
-      <button class="bonus-btn reward" onclick="changeBonus('${girl}', 1)">＋1 Bonus Point</button>
-      <button class="bonus-btn reward big" onclick="changeBonus('${girl}', 3)">＋3 Big Reward</button>
-      <button class="bonus-btn deduct" onclick="changeBonus('${girl}', -1)">−1 Deduct Point</button>
-      <button class="bonus-btn deduct big" onclick="changeBonus('${girl}', -3)">−3 Big Penalty</button>
-    </div>
-    <div class="bonus-reset-row">
-      <button class="bonus-reset" onclick="resetBonus('${girl}')">↺ Reset to 0</button>
-      <div class="bonus-hint">Running total for today</div>
-    </div>
-  </div>`;
-
-  html += '<div style="height:80px"></div>';
-
-  document.getElementById(`${girl}-content`).innerHTML = html;
+  h+=`<div class="section-label" style="margin-top:8px"><div class="sl-text">Bonus Tasks</div><div class="sl-time">Extra points</div></div>`;
+  let bonTotal=0;
+  for(const t of BONUS){const tk=!!bon[t.id];if(tk)bonTotal+=t.pts;h+=`<div class="bonus-row" onclick="toggleBonus('${girl}','${t.id}')"><div class="bonus-check${tk?' ticked':''}">&#x2713;</div><div class="bonus-name">${t.name}</div><div class="bonus-pts-badge">+${t.pts}</div></div>`;}
+  h+=`<div class="bonus-total-row"><div class="bonus-total-label">Bonus total today</div><div class="bonus-total-val">+${bonTotal} pts</div></div>`;
+  h+='<div style="height:24px"></div>';
+  document.getElementById(`${girl}-content`).innerHTML=h;
 }
 
-function renderSummary() {
-  const mon = getMondayOfWeek(currentDate);
-  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const kitchenWeek = getKitchenWeek();
+function taskCard(girl,task,score,isNA,bgCls){
+  if(isNA)return`<div class="task-card ${bgCls} na-card"><div class="task-row-top"><div><div class="task-name">${task.name}</div></div></div><div class="na-note">Not applicable today</div></div>`;
+  const earned=score?task.btns.find(b=>b.key===score):null,pts=earned?earned.pts:null;
+  let badge=pts!==null&&score!=='na'?`<div class="task-badge ${pts>0?'ep':pts<0?'en':'ez'}">${pts>=0?'+':''}${pts} pts</div>`:`<div class="task-badge eu">up to +${task.btns[0].pts}</div>`;
+  const btns=task.btns.map(b=>`<button class="score-btn ${score===b.key?'sel-'+b.key:''}" onclick="setScore('${girl}','${task.id}','${b.key}')">${b.label}<br><small>${b.pts>=0?'+':''}${b.pts}</small></button>`).join('');
+  const naBtn=task.hasNA?`<button class="score-btn ${score==='na'?'sel-na':''}" onclick="setScore('${girl}','${task.id}','na')">N/A</button>`:'';
+  return`<div class="task-card ${bgCls}"><div class="task-row-top"><div><div class="task-name">${task.name}</div>${task.desc?`<div class="task-desc">${task.desc}</div>`:''}</div>${badge}</div><div class="score-btns">${btns}${naBtn}</div></div>`;
+}
 
-  let abbyWeek = 0, oliviaWeek = 0;
-  let tableRows = '';
-
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(mon);
-    d.setDate(d.getDate() + i);
-    const dk = getDateKey(d);
-    const ap = calcDayScore('abby', dk);
-    const op = calcDayScore('olivia', dk);
-    abbyWeek += ap;
-    oliviaWeek += op;
-    const isToday = dk === getDateKey(currentDate);
-    tableRows += `<tr style="${isToday ? 'background:#f9f9f9;' : ''}">
-      <td>${isToday ? '<strong>' : ''}${days[i]}${isToday ? '</strong>' : ''}<br><small style="color:var(--muted)">${d.toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</small></td>
-      <td><span class="day-pts abby-col">${ap || '—'}</span></td>
-      <td><span class="day-pts olivia-col">${op || '—'}</span></td>
-    </tr>`;
+function renderWeek(){
+  const mon=getMon(currentDate),days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let aWk=0,oWk=0,rows='';
+  for(let i=0;i<7;i++){
+    const d=new Date(mon);d.setDate(d.getDate()+i);
+    const dkey=d.toISOString().split('T')[0],ap=calcDay('abby',dkey),op=calcDay('olivia',dkey);
+    aWk+=ap;oWk+=op;
+    const today=dkey===dk();
+    rows+=`<tr style="${today?'background:rgba(0,0,0,0.03)':''}"><td>${today?'<strong>':''}${days[i]}<br><small style="color:var(--muted)">${d.toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</small>${today?'</strong>':''}</td><td><span class="day-pts a">${ap||'&#8212;'}</span></td><td><span class="day-pts o">${op||'&#8212;'}</span></td></tr>`;
   }
-
-  const abbyDessert   = getDessert(abbyWeek);
-  const oliviaDessert = getDessert(oliviaWeek);
-
-  const weekStart = mon.toLocaleDateString('en-AU', { day:'numeric', month:'short' });
-  const weekEnd   = new Date(mon.getTime() + 6*86400000).toLocaleDateString('en-AU', { day:'numeric', month:'short' });
-
-  let html = `
-  <div class="summary-week-card">
-    <h3>Week of ${weekStart} – ${weekEnd}</h3>
+  const aAw=getAward(aWk),oAw=getAward(oWk);
+  const wS=mon.toLocaleDateString('en-AU',{day:'numeric',month:'short'}),wE=new Date(mon.getTime()+6*86400000).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+  const hist=getHistory();
+  let h=`
+  <div class="week-card">
+    <h3>Week of ${wS} &#8211; ${wE}</h3>
     <div class="week-grid">
-      <div class="week-girl-box abby">
-        <div class="g-name">Abby</div>
-        <div class="week-pts">${abbyWeek}</div>
-        <div class="week-pts-label">points</div>
-        <div class="dessert-result ${abbyDessert.cls}" style="margin-top:8px">
-          <div class="d-icon">${abbyDessert.icon}</div>
-          <div class="d-text">${abbyDessert.label}</div>
-        </div>
-      </div>
-      <div class="week-girl-box olivia">
-        <div class="g-name">Olivia</div>
-        <div class="week-pts">${oliviaWeek}</div>
-        <div class="week-pts-label">points</div>
-        <div class="dessert-result ${oliviaDessert.cls}" style="margin-top:8px">
-          <div class="d-icon">${oliviaDessert.icon}</div>
-          <div class="d-text">${oliviaDessert.label}</div>
-        </div>
-      </div>
+      <div class="week-girl abby"><div class="wg-name">Abby</div><div class="wg-pts">${aWk}</div><div class="wg-sub">points</div><div class="wg-award" style="color:${aAw.color}">${aAw.label}</div></div>
+      <div class="week-girl olivia"><div class="wg-name">Olivia</div><div class="wg-pts">${oWk}</div><div class="wg-sub">points</div><div class="wg-award" style="color:${oAw.color}">${oAw.label}</div></div>
     </div>
-
     <table class="breakdown-table">
-      <thead>
-        <tr>
-          <th>Day</th>
-          <th style="color:var(--abby)">Abby</th>
-          <th style="color:var(--olivia)">Olivia</th>
-        </tr>
-      </thead>
-      <tbody>${tableRows}</tbody>
-      <tfoot>
-        <tr style="border-top:2px solid #eee">
-          <td><strong>Total</strong></td>
-          <td><span class="day-pts abby-col">${abbyWeek}</span></td>
-          <td><span class="day-pts olivia-col">${oliviaWeek}</span></td>
-        </tr>
-      </tfoot>
+      <thead><tr><th>Day</th><th style="color:var(--abby)">Abby</th><th style="color:var(--olivia)">Olivia</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="border-top:1px solid rgba(0,0,0,0.07)"><td><strong>Total</strong></td><td><span class="day-pts a">${aWk}</span></td><td><span class="day-pts o">${oWk}</span></td></tr></tfoot>
     </table>
   </div>
+  <div class="week-card"><h3>Award Ladder</h3>${renderLadder(aWk,oWk)}</div>
+  <div class="week-card"><h3>Weekly Points History</h3><div style="position:relative"><canvas id="wChart" style="width:100%;height:200px"></canvas></div><div class="chart-stats" id="cStats"></div></div>`;
+  document.getElementById('week-content').innerHTML=h;
+  renderChart(hist);
+}
 
-  <div class="summary-week-card">
-    <h3>🍽️ Kitchen Roster — Week ${kitchenWeek}</h3>
-    <div class="kitchen-roles">
-      <div class="role-box abby-role">
-        <div class="girl-name">Abby</div>
-        <div class="role-title">${KITCHEN_ROLES[kitchenWeek].abby.title}</div>
-        <ul>${KITCHEN_ROLES[kitchenWeek].abby.items.map(i=>`<li>${i}</li>`).join('')}</ul>
-      </div>
-      <div class="role-box olivia-role">
-        <div class="girl-name">Olivia</div>
-        <div class="role-title">${KITCHEN_ROLES[kitchenWeek].olivia.title}</div>
-        <ul>${KITCHEN_ROLES[kitchenWeek].olivia.items.map(i=>`<li>${i}</li>`).join('')}</ul>
-      </div>
+function renderLadder(aWk,oWk){
+  const findTier=pts=>{for(let i=0;i<AWARDS.length;i++)if(pts>=AWARDS[i].min)return i;return AWARDS.length-1;};
+  const aT=findTier(aWk),oT=findTier(oWk);
+  let rows='';
+  AWARDS.forEach((t,i)=>{
+    const aHere=i===aT,oHere=i===oT;
+    const markers=(aHere||oHere)?`<span style="display:inline-flex;gap:4px;margin-left:8px">${aHere?`<span style="background:var(--abby);color:white;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px">A</span>`:''} ${oHere?`<span style="background:var(--olivia);color:white;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px">O</span>`:''}</span>`:'';
+    const ptsLabel=i===0?`${t.min}+ pts`:i===AWARDS.length-1?`0&#8211;${AWARDS[i-1].min-1} pts`:`${t.min}&#8211;${AWARDS[i-1].min-1} pts`;
+    rows+=`<div style="display:flex;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.06)${i===0?';border-top:1px solid rgba(0,0,0,0.06)':''}">
+      <div style="width:10px;height:10px;border-radius:50%;background:${t.color};flex-shrink:0;margin-right:12px;box-shadow:0 2px 6px ${t.color}55"></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center">${t.label}${markers}</div><div style="font-size:11px;color:var(--muted);font-weight:500;margin-top:1px">${t.sub}</div></div>
+      <div style="font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;padding-left:8px">${ptsLabel}</div>
+    </div>`;
+  });
+  return`<div style="margin-bottom:10px;display:flex;gap:12px"><span style="font-size:11px;font-weight:600;color:var(--muted)"><span style="background:var(--abby);color:white;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700">A</span> Abby &#8212; ${aWk} pts</span><span style="font-size:11px;font-weight:600;color:var(--muted)"><span style="background:var(--olivia);color:white;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700">O</span> Olivia &#8212; ${oWk} pts</span></div>${rows}`;
+}
+
+function getHistory(){
+  const data=load(),keys=Object.keys(data).sort();
+  if(!keys.length)return[];
+  let d=new Date(keys[0]);d.setHours(0,0,0,0);
+  const day=d.getDay();d.setDate(d.getDate()+(day===0?-6:1-day));
+  const today=new Date();today.setHours(0,0,0,0);
+  const weeks=[];
+  while(d<=today){let aW=0,oW=0;for(let i=0;i<7;i++){const wd=new Date(d);wd.setDate(wd.getDate()+i);const dkey=wd.toISOString().split('T')[0];aW+=calcDay('abby',dkey);oW+=calcDay('olivia',dkey);}weeks.push({label:d.toLocaleDateString('en-AU',{day:'numeric',month:'short'}),abby:aW,olivia:oW});d.setDate(d.getDate()+7);}
+  return weeks;
+}
+
+function renderChart(weeks){
+  const canvas=document.getElementById('wChart');if(!canvas)return;
+  if(!weeks.length){document.getElementById('cStats').innerHTML='<p style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:12px">Track a few weeks to see history here.</p>';return;}
+  const W=canvas.parentElement.offsetWidth,H=200;
+  canvas.width=W*devicePixelRatio;canvas.height=H*devicePixelRatio;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);
+  const pad={top:16,right:16,bottom:42,left:42};
+  const cW=W-pad.left-pad.right,cH=H-pad.top-pad.bottom;
+  const allV=weeks.flatMap(w=>[w.abby,w.olivia]).filter(v=>v>0);
+  const maxV=allV.length?Math.ceil(Math.max(...allV,310)/50)*50:350;
+  const toX=i=>pad.left+(weeks.length<2?cW/2:(i/(weeks.length-1))*cW);
+  const toY=v=>pad.top+cH-(v/maxV)*cH;
+  ctx.font=`500 9px Inter,sans-serif`;
+  [0,50,100,150,200,250,300,350].forEach(v=>{
+    if(v>maxV)return;const y=toY(v);
+    ctx.strokeStyle='rgba(0,0,0,0.05)';ctx.lineWidth=1;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cW,y);ctx.stroke();
+    ctx.fillStyle='#AEAEB2';ctx.textAlign='right';ctx.fillText(v,pad.left-5,y+3.5);
+  });
+  [{v:300,c:'#8E24AA',l:'Platinum'},{v:270,c:'#F57F17',l:'Gold'},{v:230,c:'#546E7A',l:'Silver'}].forEach(t=>{
+    if(t.v>maxV)return;const y=toY(t.v);
+    ctx.strokeStyle=t.c;ctx.lineWidth=1;ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cW,y);ctx.stroke();
+    ctx.setLineDash([]);ctx.fillStyle=t.c;ctx.font='600 8px Inter,sans-serif';ctx.textAlign='left';ctx.fillText(t.l,pad.left+3,y-3);
+  });
+  const drawLine=(key,color)=>{
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.setLineDash([]);
+    ctx.beginPath();weeks.forEach((w,i)=>{const x=toX(i),y=toY(w[key]);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
+    weeks.forEach((w,i)=>{ctx.beginPath();ctx.arc(toX(i),toY(w[key]),4,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.stroke();});
+  };
+  drawLine('abby','#B5245E');drawLine('olivia','#6A1B9A');
+  ctx.fillStyle='#AEAEB2';ctx.textAlign='center';ctx.font='500 9px Inter,sans-serif';
+  const step=Math.max(1,Math.ceil(weeks.length/5));
+  weeks.forEach((w,i)=>{if(i%step===0||i===weeks.length-1)ctx.fillText(w.label,toX(i),H-pad.bottom+14);});
+  ctx.font='600 10px Inter,sans-serif';
+  ctx.fillStyle='#B5245E';ctx.fillRect(pad.left,H-pad.bottom+24,8,8);ctx.fillStyle='#48484A';ctx.textAlign='left';ctx.fillText('Abby',pad.left+11,H-pad.bottom+32);
+  ctx.fillStyle='#6A1B9A';ctx.fillRect(pad.left+55,H-pad.bottom+24,8,8);ctx.fillText('Olivia',pad.left+66,H-pad.bottom+32);
+  const aAvg=weeks.length?Math.round(weeks.reduce((s,w)=>s+w.abby,0)/weeks.length):0;
+  const oAvg=weeks.length?Math.round(weeks.reduce((s,w)=>s+w.olivia,0)/weeks.length):0;
+  document.getElementById('cStats').innerHTML=`<div class="cs"><div class="cs-label" style="color:var(--abby)">Abby Avg / Week</div><div class="cs-val" style="color:var(--abby)">${aAvg}</div><div class="cs-sub">${Math.round(aAvg/7)} pts/day avg</div></div><div class="cs"><div class="cs-label" style="color:var(--olivia)">Olivia Avg / Week</div><div class="cs-val" style="color:var(--olivia)">${oAvg}</div><div class="cs-sub">${Math.round(oAvg/7)} pts/day avg</div></div>`;
+}
+
+function renderRosters(){
+  const kw=kitWk();
+  document.getElementById('rosters-content').innerHTML=`
+  <div class="roster-card"><h3>Dog Walk Roster</h3>
+    <table class="roster-table"><thead><tr><th>Day</th><th>Who Walks</th></tr></thead><tbody>
+      ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].map((d,i)=>`<tr><td>${d}</td><td class="rt-${DOG_WALK[i].toLowerCase()}">${DOG_WALK[i]}</td></tr>`).join('')}
+    </tbody></table>
+  </div>
+  <div class="roster-card"><h3>Kitchen Roster &#8212; Week ${kw}</h3>
+    <div class="kitchen-grid">
+      ${['abby','olivia'].map(g=>{const r=KITCHEN[kw][g];return`<div class="krc ${r.cls}"><div class="krc-title">${g==='abby'?'Abby':'Olivia'}</div><div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text2)">${r.title}</div><ul>${r.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;}).join('')}
     </div>
-    <div class="roster-toggle">
-      <span class="roster-week-badge">Week ${kitchenWeek}</span>
-      <button class="roster-btn" onclick="overrideKitchenWeek()">↔ Swap roles manually</button>
-    </div>
-  </div>
-
-  <div class="summary-week-card">
-    <h3>🐕 Dog Walk Roster</h3>
-    <table class="breakdown-table">
-      <thead><tr><th>Day</th><th colspan="2">Who walks</th></tr></thead>
-      <tbody>
-        ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((d,i) => `
-          <tr><td>${d}</td><td colspan="2" style="text-align:left;color:${DOG_WALK[i]==='Abby'?'var(--abby-dark)':'var(--olivia-dark)'};font-weight:800">${DOG_WALK[i]}</td></tr>
-        `).join('')}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="summary-week-card">
-    <h3>📋 Dessert Key</h3>
-    ${DESSERT.map(d => `<div class="dessert-banner ${d.cls}" style="margin-bottom:8px">
-      <div class="icon">${d.icon}</div>
-      <div><div>${d.label}</div><div style="font-size:11px;opacity:0.8">${d.count === 3 ? '65+' : d.count === 2 ? '50–64' : d.count === 1 ? '35–49' : '0–34'} pts/week</div></div>
-    </div>`).join('')}
-  </div>
-
-  <div style="height:20px"></div>`;
-
-  document.getElementById('summary-content').innerHTML = html;
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;font-weight:500">Roles swap automatically each week</p>
+  </div>`;
 }
 
-// ══════════════════════════════════════════
-//  INTERACTIONS
-// ══════════════════════════════════════════
-
-function setScore(girl, taskId, scoreKey) {
-  const dateKey = getDateKey(currentDate);
-  const data = getData();
-  if (!data[dateKey]) data[dateKey] = {};
-  if (!data[dateKey][girl]) data[dateKey][girl] = {};
-
-  // Toggle off if same
-  if (data[dateKey][girl][taskId] === scoreKey) {
-    delete data[dateKey][girl][taskId];
-  } else {
-    data[dateKey][girl][taskId] = scoreKey;
-  }
-  saveData(data);
-  renderGirlPage(girl);
+function setScore(girl,tid,key){const data=load(),dkey=dk();if(!data[dkey])data[dkey]={};if(!data[dkey][girl])data[dkey][girl]={};data[dkey][girl][tid]=data[dkey][girl][tid]===key?null:key;save(data);renderGirl(girl);}
+function toggleBonus(girl,tid){const data=load(),dkey=dk();if(!data[dkey])data[dkey]={};if(!data[dkey].bonus)data[dkey].bonus={};if(!data[dkey].bonus[girl])data[dkey].bonus[girl]={};data[dkey].bonus[girl][tid]=!data[dkey].bonus[girl][tid];save(data);renderGirl(girl);}
+function changeChar(girl,delta){const data=load(),dkey=dk();if(!data[dkey])data[dkey]={};if(!data[dkey].char)data[dkey].char={};data[dkey].char[girl]=(data[dkey].char[girl]||0)+delta;save(data);renderGirl(girl);showToast(delta>0?'Character point awarded':'Character point deducted');}
+function resetChar(girl){const data=load(),dkey=dk();if(data[dkey]?.char)data[dkey].char[girl]=0;save(data);renderGirl(girl);showToast('Character points reset');}
+function changeDay(d){currentDate.setDate(currentDate.getDate()+d);updateDateDisplay();refresh();}
+function goToday(){currentDate=new Date();currentDate.setHours(0,0,0,0);updateDateDisplay();refresh();}
+function updateDateDisplay(){const today=new Date();today.setHours(0,0,0,0);const isToday=currentDate.getTime()===today.getTime();const fmt=currentDate.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});document.getElementById('dateDisplayBtn').textContent=isToday?`Today, ${fmt}`:fmt;}
+function refresh(){const active=document.querySelector('.page.active').id.replace('page-','');if(active==='abby'||active==='olivia')renderGirl(active);else if(active==='week')renderWeek();else renderRosters();}
+function openCal(){calViewDate=new Date(currentDate);renderCalGrid();document.getElementById('calOverlay').classList.add('open');}
+function closeCal(e){if(!e||e.target===document.getElementById('calOverlay'))document.getElementById('calOverlay').classList.remove('open');}
+function calPrevMonth(){calViewDate.setMonth(calViewDate.getMonth()-1);renderCalGrid();}
+function calNextMonth(){calViewDate.setMonth(calViewDate.getMonth()+1);renderCalGrid();}
+function renderCalGrid(){
+  const y=calViewDate.getFullYear(),m=calViewDate.getMonth();
+  document.getElementById('calMonthTitle').textContent=new Date(y,m,1).toLocaleDateString('en-AU',{month:'long',year:'numeric'});
+  const first=new Date(y,m,1).getDay(),daysInMonth=new Date(y,m+1,0).getDate();
+  const today=new Date();today.setHours(0,0,0,0);
+  let html='';
+  for(let i=0;i<first;i++)html+=`<button class="cal-day empty"></button>`;
+  for(let d=1;d<=daysInMonth;d++){const date=new Date(y,m,d);date.setHours(0,0,0,0);const isToday=date.getTime()===today.getTime(),isSel=date.getTime()===currentDate.getTime();html+=`<button class="cal-day${isToday?' today':''}${isSel?' selected':''}" onclick="selectCalDay(${y},${m},${d})">${d}</button>`;}
+  document.getElementById('calGrid').innerHTML=html;
 }
+function selectCalDay(y,m,d){currentDate=new Date(y,m,d);currentDate.setHours(0,0,0,0);updateDateDisplay();document.getElementById('calOverlay').classList.remove('open');refresh();}
+function showPage(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>{t.className='nav-tab';});document.getElementById(`page-${page}`).classList.add('active');document.getElementById(`nav-${page}`).classList.add(`active-${page}`);if(page==='abby'||page==='olivia')renderGirl(page);else if(page==='week')renderWeek();else renderRosters();}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
-function changePenalty(girl, penId, delta) {
-  const dateKey = getDateKey(currentDate);
-  const data = getData();
-  if (!data[dateKey]) data[dateKey] = {};
-  if (!data[dateKey].penalties) data[dateKey].penalties = {};
-  if (!data[dateKey].penalties[girl]) data[dateKey].penalties[girl] = {};
-  const current = data[dateKey].penalties[girl][penId] || 0;
-  data[dateKey].penalties[girl][penId] = Math.max(0, current + delta);
-  saveData(data);
-  renderGirlPage(girl);
-}
-
-function changeBonus(girl, delta) {
-  const dateKey = getDateKey(currentDate);
-  const data = getData();
-  if (!data[dateKey]) data[dateKey] = {};
-  if (!data[dateKey].bonus) data[dateKey].bonus = {};
-  data[dateKey].bonus[girl] = (data[dateKey].bonus[girl] || 0) + delta;
-  saveData(data);
-  renderGirlPage(girl);
-  const val = data[dateKey].bonus[girl];
-  showToast(`${delta > 0 ? '⭐ +' + delta + ' bonus' : '⚠️ ' + delta + ' deducted'} — custom total: ${val >= 0 ? '+' : ''}${val}`);
-}
-
-function resetBonus(girl) {
-  const dateKey = getDateKey(currentDate);
-  const data = getData();
-  if (data[dateKey]?.bonus) data[dateKey].bonus[girl] = 0;
-  saveData(data);
-  renderGirlPage(girl);
-  showToast('Custom points reset to 0');
-}
-
-function saveDay(girl) {
-  const dateKey = getDateKey(currentDate);
-  const pts = calcDayScore(girl, dateKey);
-  showToast(`✅ ${girl === 'abby' ? 'Abby' : 'Olivia'}'s day saved — ${pts} points`);
-}
-
-let kitchenOverride = null;
-function overrideKitchenWeek() {
-  const current = getKitchenWeek();
-  kitchenOverride = current === 'A' ? 'B' : 'A';
-  renderSummary();
-  showToast('Kitchen roles swapped for this view');
-}
-// Override getKitchenWeek to use manual override if set
-const _origGetKitchenWeek = getKitchenWeek;
-
-function changeDay(delta) {
-  currentDate.setDate(currentDate.getDate() + delta);
-  kitchenOverride = null;
-  updateDateDisplay();
-  const active = document.querySelector('.page.active').id;
-  if (active === 'page-abby') renderGirlPage('abby');
-  else if (active === 'page-olivia') renderGirlPage('olivia');
-  else renderSummary();
-}
-
-function updateDateDisplay() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const isToday = currentDate.getTime() === today.getTime();
-  const fmt = currentDate.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
-  document.getElementById('dateDisplay').textContent = isToday ? `Today — ${fmt}` : fmt;
-}
-
-function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => { t.className = 'tab'; });
-  document.getElementById(`page-${page}`).classList.add('active');
-  const tab = document.getElementById(`tab-${page}`);
-  tab.classList.add(`active-${page}`);
-  if (page === 'abby') renderGirlPage('abby');
-  else if (page === 'olivia') renderGirlPage('olivia');
-  else renderSummary();
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ══════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════
-updateDateDisplay();
-renderGirlPage('abby');
+updateDateDisplay();renderGirl('abby');
 </script>
 </body>
 </html>
