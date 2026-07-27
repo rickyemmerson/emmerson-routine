@@ -406,10 +406,8 @@ const BONUS=[
   {id:'b_yard',     name:'Yard Work',        pts:2},
   {id:'b_washdog',  name:'Wash & Dry Dog',   pts:2},
 ];
-const KITCHEN={
-  A:{abby:{cls:'role-a',title:'Role A \u2014 Dishes Side',items:['Unpack dishwasher','Load dirty dishes','Wash pots & pans','Put pots away']},olivia:{cls:'role-b',title:'Role B \u2014 Surfaces Side',items:['Clear & wipe bench','Clear & wipe table','Sweep floor','Stovetop (\u00D72/week)']}},
-  B:{abby:{cls:'role-b',title:'Role B \u2014 Surfaces Side',items:['Clear & wipe bench','Clear & wipe table','Sweep floor','Stovetop (\u00D72/week)']},olivia:{cls:'role-a',title:'Role A \u2014 Dishes Side',items:['Unpack dishwasher','Load dirty dishes','Wash pots & pans','Put pots away']}},
-};
+const KITCHEN_ROSTER={0:null,1:'olivia',2:'abby',3:'olivia',4:'abby',5:'olivia',6:'abby'};
+const DISHES_TASKS=['Unpack dishwasher','Load dirty dishes','Wash pots & pans','Wipe benches & table','Sweep floor'];
 const DOG_WALK={0:'Abby',1:'Abby',2:'Olivia',3:'Abby',4:'Olivia',5:'Abby',6:'Olivia'};
 const NO_LB_DAYS=[5,6];
 const AWARDS=[
@@ -500,7 +498,7 @@ async function pushToCloud(data) {
 
 
 const getMon=d=>{const c=new Date(d),day=c.getDay();c.setDate(c.getDate()+(day===0?-6:1-day));c.setHours(0,0,0,0);return c;};
-const kitWk=()=>{const j=new Date(currentDate.getFullYear(),0,1),w=Math.ceil(((currentDate-j)/86400000+j.getDay()+1)/7);return w%2===0?'B':'A';};
+const kitWk=()=>KITCHEN_ROSTER[currentDate.getDay()];
 const getAward=pts=>{for(const a of AWARDS)if(pts>=a.min)return a;return AWARDS[AWARDS.length-1];};
 
 function calcDay(girl,dateKey){
@@ -517,7 +515,7 @@ function renderGirl(girl){
   const data=load(),d=data[dk()]?.[girl]||{},bon=data[dk()]?.bonus?.[girl]||{};
   const charTotal=data[dk()]?.char?.[girl]||0;
   const dayPts=calcDay(girl,dk()),weekPts=calcWeek(girl);
-  const award=getAward(weekPts),kw=kitWk(),role=KITCHEN[kw][girl];
+  const award=getAward(weekPts);
   const dogToday=DOG_WALK[currentDate.getDay()];
   const isMyWalk=dogToday===(girl==='abby'?'Abby':'Olivia');
   const skipLB=NO_LB_DAYS.includes(currentDate.getDay());
@@ -570,7 +568,18 @@ function renderGirl(girl){
     const isNA=(t.noLunch||t.noBag)&&skipLB;
     h+=taskCard(girl,t,d[t.id],isNA,'dinner-card');
     if(t.id==='ad_kitchen'){
-      h+=`<div class="kitchen-mini"><div class="kitchen-mini-wk">Kitchen — Week ${kw}</div><div class="kitchen-mini-title">${name}'s Role: ${role.title}</div><div class="krc ${role.cls}"><div class="krc-title">${role.title}</div><ul>${role.items.map(i=>`<li>${i}</li>`).join('')}</ul></div></div>`;
+      // Kitchen duty - show who's on tonight
+      const kitchenToday = KITCHEN_ROSTER[currentDate.getDay()];
+      if(kitchenToday) {
+        const isMyKitchen = kitchenToday === girl;
+        h+=`<div class="kitchen-mini">
+          <div class="kitchen-mini-wk">${isMyKitchen ? 'Your Kitchen Night' : 'Not Your Night'}</div>
+          <div class="kitchen-mini-title">${isMyKitchen ? 'Dishes are yours tonight' : (kitchenToday==='abby'?'Abby':'Olivia')+' is on dishes tonight'}</div>
+          ${isMyKitchen ? `<div class="krc role-a"><div class="krc-title">Your Tasks</div><ul>${DISHES_TASKS.map(i=>`<li>${i}</li>`).join('')}</ul></div>` : ''}
+        </div>`;
+      } else {
+        h+=`<div class="kitchen-mini"><div class="kitchen-mini-wk">No Kitchen Duty Tonight</div><div class="kitchen-mini-title" style="color:var(--muted);font-size:13px;font-weight:500">Sunday \u2014 night off</div></div>`;
+      }
     }
   }
 
@@ -695,21 +704,22 @@ function renderChart(weeks){
 }
 
 function renderRosters(){
-  const kw=kitWk();
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const kitchenWho={0:'Night off',1:'Olivia',2:'Abby',3:'Olivia',4:'Abby',5:'Olivia',6:'Abby'};
+  const kitchenCls={0:'',1:'rt-olivia',2:'rt-abby',3:'rt-olivia',4:'rt-abby',5:'rt-olivia',6:'rt-abby'};
   document.getElementById('rosters-content').innerHTML=`
   <div class="roster-card"><h3>Dog Walk Roster</h3>
     <table class="roster-table"><thead><tr><th>Day</th><th>Who Walks</th></tr></thead><tbody>
-      ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].map((d,i)=>`<tr><td>${d}</td><td class="rt-${DOG_WALK[i].toLowerCase()}">${DOG_WALK[i]}</td></tr>`).join('')}
+      ${days.map((d,i)=>`<tr><td>${d}</td><td class="rt-${DOG_WALK[i].toLowerCase()}">${DOG_WALK[i]}</td></tr>`).join('')}
     </tbody></table>
   </div>
-  <div class="roster-card"><h3>Kitchen Roster \u2014 Week ${kw}</h3>
-    <div class="kitchen-grid">
-      ${['abby','olivia'].map(g=>{const r=KITCHEN[kw][g];return`<div class="krc ${r.cls}"><div class="krc-title">${g==='abby'?'Abby':'Olivia'}</div><div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text2)">${r.title}</div><ul>${r.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;}).join('')}
-    </div>
-    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;font-weight:500">Roles swap automatically each week</p>
+  <div class="roster-card"><h3>Kitchen Roster</h3>
+    <table class="roster-table"><thead><tr><th>Day</th><th>Who Does Dishes</th></tr></thead><tbody>
+      ${days.map((d,i)=>`<tr><td>${d}</td><td class="${kitchenCls[i]}">${kitchenWho[i]}</td></tr>`).join('')}
+    </tbody></table>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;font-weight:500">Abby: Tue, Thu, Sat &nbsp;|&nbsp; Olivia: Mon, Wed, Fri &nbsp;|&nbsp; Sunday: night off</p>
   </div>`;
 }
-
 function setScore(girl,tid,key){const data=load(),dkey=dk();if(!data[dkey])data[dkey]={};if(!data[dkey][girl])data[dkey][girl]={};data[dkey][girl][tid]=data[dkey][girl][tid]===key?null:key;save(data);renderGirl(girl);}
 function toggleBonus(girl,tid){const data=load(),dkey=dk();if(!data[dkey])data[dkey]={};if(!data[dkey].bonus)data[dkey].bonus={};if(!data[dkey].bonus[girl])data[dkey].bonus[girl]={};data[dkey].bonus[girl][tid]=!data[dkey].bonus[girl][tid];save(data);renderGirl(girl);}
 function changeChar(girl,delta){const data=load(),dkey=dk();if(!data[dkey])data[dkey]={};if(!data[dkey].char)data[dkey].char={};data[dkey].char[girl]=(data[dkey].char[girl]||0)+delta;save(data);renderGirl(girl);showToast(delta>0?'Character point awarded':'Character point deducted');}
