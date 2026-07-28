@@ -310,6 +310,16 @@ body {
 /* ── TOAST ── */
 .toast{position:fixed;bottom:calc(var(--bottom-total) + 12px);left:50%;transform:translateX(-50%) translateY(8px);background:rgba(20,20,28,0.88);backdrop-filter:blur(20px);color:white;padding:10px 20px;border-radius:22px;font-size:13px;font-weight:600;opacity:0;transition:all 0.22s;pointer-events:none;z-index:400;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── ROUTINE V2 ── */
+.welcome{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;z-index:3;}
+.welcome-card,.hub-card{width:min(100%,420px);background:var(--glass-strong);backdrop-filter:blur(28px);border:1px solid var(--border);box-shadow:var(--shadow-hero);border-radius:var(--radius-xl);padding:24px;}
+.welcome-card h1{font-size:31px;letter-spacing:-1px;margin-bottom:7px}.welcome-card p{color:var(--muted);line-height:1.5;font-size:13px;margin-bottom:22px}
+.profile-choice{width:100%;border:0;border-radius:16px;padding:17px;margin:7px 0;text-align:left;font:700 16px 'Inter',sans-serif;color:white;cursor:pointer}.profile-choice small{display:block;margin-top:3px;opacity:.72;font-size:11px;font-weight:500}.profile-choice.abby{background:linear-gradient(135deg,#D81B60,#880E4F)}.profile-choice.olivia{background:linear-gradient(135deg,#8E24AA,#4A148C)}.profile-choice.parent{background:#272735}
+.hub-card{width:auto;margin-bottom:14px}.hub-title{font-size:21px;font-weight:800;letter-spacing:-.6px}.hub-sub{font-size:12px;color:var(--muted);margin-top:4px}.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.person-card{border:0;border-radius:18px;padding:15px;text-align:left;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif}.person-card.abby{background:rgba(181,36,94,.12)}.person-card.olivia{background:rgba(106,27,154,.12)}.person-card .pc-name{font-weight:800;font-size:16px}.person-card .pc-points{font-size:31px;font-weight:900;letter-spacing:-1px;margin-top:7px}.person-card .pc-detail{font-size:11px;color:var(--muted);font-weight:600}
+.status-list{margin-top:12px}.status-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-dark);font-size:13px;font-weight:600}.status-row:last-child{border:0}.status-pill{border-radius:20px;padding:4px 9px;font-size:10px;font-weight:800}.status-pill.pending{background:#fff0d1;color:#9a5900}.status-pill.done{background:#dff7e6;color:#167033}.status-pill.none{background:#eeeef2;color:#777}
+.kid-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.kid-top h2{font-size:24px;color:white;letter-spacing:-.7px}.wallet-mini{border:0;border-radius:14px;padding:9px 12px;background:rgba(255,255,255,.15);color:white;text-align:right;font:700 12px 'Inter',sans-serif;cursor:pointer}.wallet-mini strong{display:block;font-size:16px}.submit-btn{width:100%;border:0;border-radius:11px;padding:11px;background:#252533;color:white;font:700 12px 'Inter',sans-serif;cursor:pointer}.submitted-note{font-size:12px;color:#a56600;font-weight:700;padding:8px 0}.review-card{background:var(--glass);border:1px solid var(--border);box-shadow:var(--shadow-card);border-radius:18px;padding:15px;margin-bottom:9px}.review-card h3{font-size:15px;margin-bottom:3px}.review-meta{font-size:11px;color:var(--muted);margin-bottom:12px}.review-actions{display:flex;gap:5px;flex-wrap:wrap}.review-actions button{flex:1;border:0;border-radius:10px;padding:9px 4px;font:700 10px 'Inter',sans-serif;cursor:pointer;background:#efeff2}.review-actions .good{background:#dff7e6;color:#167033}.review-actions .warn{background:#fff0d1;color:#9a5900}.review-actions .bad{background:#ffe2df;color:#b4251b}
+.wallet-balance{background:linear-gradient(135deg,#252535,#3a294e);color:white;border-radius:20px;padding:19px;margin-bottom:14px}.wallet-balance .cash{font-size:35px;font-weight:900;letter-spacing:-1.5px}.wallet-balance .credits{font-size:13px;opacity:.72;margin-top:4px}.reward-row{display:flex;align-items:center;gap:12px;background:var(--glass);border:1px solid var(--border);box-shadow:var(--shadow-card);border-radius:16px;padding:13px;margin:8px 0}.reward-row .reward-name{font-size:14px;font-weight:800;flex:1}.reward-row .reward-desc{font-size:11px;color:var(--muted);margin-top:2px}.reward-row button,.primary-btn{border:0;border-radius:10px;padding:9px 11px;background:#252533;color:white;font:700 11px 'Inter',sans-serif;cursor:pointer}.ledger{font-size:12px}.ledger-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-dark)}.ledger-row small{display:block;color:var(--muted);margin-top:2px}.ledger-amount{font-weight:800;white-space:nowrap}.parent-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}.parent-head h2{color:white;font-size:23px}.settle-note{font-size:12px;line-height:1.45;color:var(--text2);margin:11px 0}.nav-tab.active-home .nav-label,.nav-tab.active-home .nav-icon,.nav-tab.active-wallet .nav-label,.nav-tab.active-wallet .nav-icon,.nav-tab.active-parent .nav-label,.nav-tab.active-parent .nav-icon{color:white}.pin-overlay{position:fixed;inset:0;z-index:700;background:rgba(10,10,18,.58);display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(7px)}.pin-overlay.open{display:flex}.pin-box{width:min(100%,330px);padding:22px;border-radius:22px;background:white;box-shadow:var(--shadow-hero)}.pin-box h3{font-size:19px}.pin-box p{font-size:12px;color:var(--muted);margin:5px 0 16px}.pin-box input{width:100%;border:1px solid #ddd;border-radius:12px;padding:13px;font:700 20px 'Inter',sans-serif;letter-spacing:8px;text-align:center;margin-bottom:10px}.pin-actions{display:flex;gap:8px;justify-content:flex-end}.secondary-btn{border:0;background:#eeeef2;border-radius:10px;padding:10px 12px;font:700 12px 'Inter',sans-serif;cursor:pointer}
 </style>
 </head>
 <body>
@@ -323,10 +333,12 @@ body {
 <div class="bg-noise"></div>
 
 <!-- PAGES -->
-<div class="page active" id="page-abby"><div class="page-pad" id="abby-content"></div></div>
+<div class="page active" id="page-welcome"><div class="welcome" id="welcome-content"></div></div>
+<div class="page" id="page-home"><div class="page-pad" id="home-content"></div></div>
+<div class="page" id="page-abby"><div class="page-pad" id="abby-content"></div></div>
 <div class="page" id="page-olivia"><div class="page-pad" id="olivia-content"></div></div>
-<div class="page" id="page-week"><div style="padding:16px" id="week-content"></div></div>
-<div class="page" id="page-rosters"><div style="padding:16px" id="rosters-content"></div></div>
+<div class="page" id="page-wallet"><div class="page-pad" id="wallet-content"></div></div>
+<div class="page" id="page-parent"><div class="page-pad" id="parent-content"></div></div>
 
 <!-- DATE BAR -->
 <div class="date-bar">
@@ -341,10 +353,11 @@ body {
 
 <!-- NAV BAR -->
 <nav class="nav-bar">
-  <button class="nav-tab active-abby"  id="nav-abby"    onclick="showPage('abby')">   <div class="nav-icon">🩷</div><div class="nav-label">Abby</div></button>
-  <button class="nav-tab"              id="nav-olivia"  onclick="showPage('olivia')"> <div class="nav-icon">💜</div><div class="nav-label">Olivia</div></button>
-  <button class="nav-tab"              id="nav-week"    onclick="showPage('week')">   <div class="nav-icon">📊</div><div class="nav-label">Week</div></button>
-  <button class="nav-tab"              id="nav-rosters" onclick="showPage('rosters')"><div class="nav-icon">📋</div><div class="nav-label">Rosters</div></button>
+  <button class="nav-tab" id="nav-home" onclick="appShow('home')"><div class="nav-icon">⌂</div><div class="nav-label">Home</div></button>
+  <button class="nav-tab" id="nav-abby" onclick="openKid('abby')"><div class="nav-icon">🩷</div><div class="nav-label">Abby</div></button>
+  <button class="nav-tab" id="nav-olivia" onclick="openKid('olivia')"><div class="nav-icon">💜</div><div class="nav-label">Olivia</div></button>
+  <button class="nav-tab" id="nav-wallet" onclick="appShow('wallet')"><div class="nav-icon">◉</div><div class="nav-label">Wallet</div></button>
+  <button class="nav-tab" id="nav-parent" onclick="openParent()"><div class="nav-icon">⚙</div><div class="nav-label">Parent</div></button>
 </nav>
 
 <!-- CALENDAR -->
@@ -365,6 +378,7 @@ body {
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="pin-overlay" id="pinOverlay"><div class="pin-box"><h3 id="pinTitle">Enter PIN</h3><p id="pinHelp">Enter your four-digit PIN to continue.</p><input id="pinInput" inputmode="numeric" maxlength="4" type="password" aria-label="PIN"><div class="pin-actions"><button class="secondary-btn" onclick="closePin()">Cancel</button><button class="primary-btn" onclick="verifyPin()">Continue</button></div></div></div>
 
 <script>
 const STD2=[{key:'complete',label:'Complete',pts:2},{key:'reminded',label:'Reminded',pts:1},{key:'nagged',label:'Nagged',pts:0},{key:'failed',label:'Failed',pts:-1}];
@@ -747,6 +761,90 @@ function showPage(page){document.querySelectorAll('.page').forEach(p=>p.classLis
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
 updateDateDisplay();renderGirl('abby');
+</script>
+<script>
+/* Routine v2: child submissions, parent review and reward wallets. */
+const APP_KEY='emmRoutineV7';
+const PARENT_PIN='2468'; // Change before sharing the app with the girls.
+const CHILD_PINS={abby:'1111',olivia:'2222'};
+let appData=null, appSession=null, appGirl=null, pinRole=null;
+let appDate=new Date();appDate.setHours(0,0,0,0);
+const appDateKey=(d=appDate)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const appMonday=(d=appDate)=>{const x=new Date(d),day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));x.setHours(0,0,0,0);return x;};
+const appWeekKey=(d=appDate)=>appDateKey(appMonday(d));
+const appName=g=>g==='abby'?'Abby':'Olivia';
+const appColor=g=>g==='abby'?'var(--abby)':'var(--olivia)';
+
+function appDefault(){return{version:7,daily:{},wallets:{abby:{cash:0,desserts:0,ledger:[]},olivia:{cash:0,desserts:0,ledger:[]}},settlements:{},settings:{pins:{parent:PARENT_PIN,abby:CHILD_PINS.abby,olivia:CHILD_PINS.olivia}}};}
+function appLoad(){
+  if(appData)return appData;
+  try{appData=JSON.parse(localStorage.getItem(APP_KEY)||'null')}catch(e){}
+  if(!appData){
+    appData=appDefault();
+    /* Bring existing recorded scores forward so history is not lost. */
+    try{const old=JSON.parse(localStorage.getItem('emmHQv6')||'{}');if(Object.keys(old).length)appData.daily=old;}catch(e){}
+  }
+  appData.settings||(appData.settings={pins:{parent:PARENT_PIN,abby:CHILD_PINS.abby,olivia:CHILD_PINS.olivia}});appData.settings.pins||=( {parent:PARENT_PIN,abby:CHILD_PINS.abby,olivia:CHILD_PINS.olivia} );
+  appSync();return appData;
+}
+function appPersist(){localStorage.setItem(APP_KEY,JSON.stringify(appData));appPush();}
+async function appSync(){
+  try{const r=await fetch(SUPA_URL+'/rest/v1/data?select=value&order=id.desc&limit=1',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}});if(!r.ok)return;const rows=await r.json();if(!rows[0]?.value)return;const cloud=JSON.parse(rows[0].value).routineV7;if(!cloud)return;appData=cloud;localStorage.setItem(APP_KEY,JSON.stringify(appData));appRender();}catch(e){console.log('Routine sync unavailable',e);}
+}
+async function appPush(){
+  try{await fetch(SUPA_URL+'/rest/v1/data',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify({id:1,value:JSON.stringify({routineV7:appData})})});}catch(e){console.log('Routine save unavailable',e);}
+}
+function appDay(){const key=appDateKey();return appLoad().daily[key]||(appLoad().daily[key]={});}
+function appGirlDay(g){const day=appDay();return day[g]||(day[g]={});}
+function appRecord(g,id){return appGirlDay(g)[id];}
+function appIsAssigned(g,t){const dow=appDate.getDay();if(t.dogwalk&&DOG_WALK[dow]!==appName(g))return false;if((t.noLunch||t.noBag)&&NO_LB_DAYS.includes(dow))return false;return true;}
+function appAllTasks(){return[...MORNING,...AFTERSCHOOL,...AFTERDINNER];}
+function appScoreValue(t,record){const score=typeof record==='string'?record:record?.score;if(!score||score==='na')return 0;return t.btns.find(b=>b.key===score)?.pts||0;}
+function appDayScore(g,d=new Date(appDate)){
+  const key=appDateKey(d),day=appLoad().daily[key]||{},scores=day[g]||{},bon=day.bonus?.[g]||{};let total=day.char?.[g]||0;
+  for(const t of appAllTasks()){if(t.dogwalk&&DOG_WALK[d.getDay()]!==appName(g))continue;if((t.noLunch||t.noBag)&&NO_LB_DAYS.includes(d.getDay()))continue;total+=appScoreValue(t,scores[t.id]);}
+  for(const b of BONUS)if(bon[b.id]===true||bon[b.id]?.score==='complete')total+=b.pts;
+  return total;
+}
+function appWeekScore(g,mon=appMonday()){let n=0;for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);n+=appDayScore(g,d);}return n;}
+function appPayout(points){if(points>=300)return{cash:1500,desserts:4,label:'Platinum'};if(points>=270)return{cash:1000,desserts:3,label:'Gold'};if(points>=230)return{cash:500,desserts:3,label:'Silver'};if(points>=200)return{cash:0,desserts:3,label:'3 Desserts'};if(points>=160)return{cash:0,desserts:2,label:'2 Desserts'};if(points>=110)return{cash:0,desserts:1,label:'1 Dessert'};return{cash:0,desserts:0,label:'No reward'};}
+function appMoney(cents){return new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD'}).format(cents/100);}
+function appWallet(g){return appLoad().wallets[g]||(appLoad().wallets[g]={cash:0,desserts:0,ledger:[]});}
+function appLedger(g,entry){appWallet(g).ledger.unshift({id:crypto.randomUUID?.()||Date.now()+Math.random(),at:new Date().toISOString(),...entry});}
+
+function showWelcome(){appSession=null;appGirl=null;document.querySelector('.date-bar').style.display='none';document.querySelector('.nav-bar').style.display='none';document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-welcome').classList.add('active');document.getElementById('welcome-content').innerHTML=`<div class="welcome-card"><h1>Emmerson Routine</h1><p>Choose your profile to see today’s routine and rewards.</p><button class="profile-choice abby" onclick="beginLogin('abby')">🩷 Abby<small>My routine & wallet</small></button><button class="profile-choice olivia" onclick="beginLogin('olivia')">💜 Olivia<small>My routine & wallet</small></button><button class="profile-choice parent" onclick="beginLogin('parent')">⚙ Parent<small>Review, rewards & settings</small></button></div>`;}
+function beginLogin(role){pinRole=role;document.getElementById('pinTitle').textContent=`${role==='parent'?'Parent':appName(role)} PIN`;document.getElementById('pinHelp').textContent='Enter your four-digit PIN to continue.';const input=document.getElementById('pinInput');input.value='';document.getElementById('pinOverlay').classList.add('open');setTimeout(()=>input.focus(),0);}
+function closePin(){pinRole=null;document.getElementById('pinOverlay').classList.remove('open');}
+function verifyPin(){const pin=document.getElementById('pinInput').value,expected=appLoad().settings.pins[pinRole];if(pin!==expected){showToast('That PIN is not correct');return;}const role=pinRole;closePin();appSession=role;appGirl=role==='parent'?null:role;document.querySelector('.date-bar').style.display='flex';document.querySelector('.nav-bar').style.display='flex';appShow(role==='parent'?'home':role);}
+function openKid(g){if(appSession===g){appShow(g);return;}beginLogin(g);}
+function openParent(){if(appSession==='parent'){appShow('parent');return;}beginLogin('parent');}
+function appShow(page){if(!appSession){showWelcome();return;}if(appSession!=='parent'&&['home','parent'].includes(page)){showWelcome();return;}if(appSession!=='parent'&&page==='wallet')page='wallet';document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');document.querySelectorAll('.nav-tab').forEach(t=>t.className='nav-tab');document.getElementById('nav-'+page)?.classList.add('active-'+page);if(page==='home')renderHome();if(page==='abby'||page==='olivia')renderKid(page);if(page==='wallet')renderWallet();if(page==='parent')renderParent();}
+function appRender(){if(!appSession)return;const page=document.querySelector('.page.active')?.id.replace('page-','');if(page)appShow(page);}
+
+function renderHome(){const today=appDate.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'});const cards=['abby','olivia'].map(g=>{const pending=appPending(g).length,pts=appWeekScore(g);return`<button class="person-card ${g}" onclick="openKid('${g}')"><div class="pc-name">${appName(g)}</div><div class="pc-points">${pts}</div><div class="pc-detail">points this week · ${pending?pending+' to review':'all reviewed'}</div></button>`}).join('');document.getElementById('home-content').innerHTML=`<div class="hub-card"><div class="hub-title">Today at home</div><div class="hub-sub">${today} · ${DOG_WALK[appDate.getDay()]} walks the dog · ${KITCHEN_ROSTER[appDate.getDay()]?appName(KITCHEN_ROSTER[appDate.getDay()])+' has kitchen duty':'Kitchen night off'}</div><div class="home-grid">${cards}</div></div><div class="hub-card"><div class="hub-title">Ready to review</div><div class="status-list"><div class="status-row"><span>Abby</span><span class="status-pill ${appPending('abby').length?'pending':'done'}">${appPending('abby').length||'All'} ${appPending('abby').length?'pending':'reviewed'}</span></div><div class="status-row"><span>Olivia</span><span class="status-pill ${appPending('olivia').length?'pending':'done'}">${appPending('olivia').length||'All'} ${appPending('olivia').length?'pending':'reviewed'}</span></div></div><button class="primary-btn" style="margin-top:14px" onclick="appShow('parent')">Open parent review</button></div>`;}
+function appPending(g){return appAllTasks().filter(t=>appIsAssigned(g,t)&&appRecord(g,t.id)?.state==='submitted');}
+function kidTask(g,t,section){if(!appIsAssigned(g,t))return'';const record=appRecord(g,t.id),score=appScoreValue(t,record),submitted=record?.state==='submitted';const label=submitted?'Waiting for review':score||score===0&&record?.score?'Reviewed':record?'Submitted':'Not started';return`<div class="task-card ${section}"><div class="task-row-top"><div><div class="task-name">${t.name}</div><div class="task-desc">${t.desc||''}</div></div><div class="task-badge ${submitted?'eu':score>0?'ep':'ez'}">${submitted?'Pending':record?.score?`${score>=0?'+':''}${score} pts`:'To do'}</div></div>${submitted?'<div class="submitted-note">Submitted — a parent will review this.</div>':`<button class="submit-btn" onclick="submitTask('${g}','${t.id}')">${record?.score?'Submit correction':'I did this'}</button>`}</div>`;}
+function renderKid(g){const wallet=appWallet(g),week=appWeekScore(g),award=appPayout(week);const groups=[['Morning',MORNING,'morning-card'],['After school',AFTERSCHOOL,'school-card'],['After dinner',AFTERDINNER,'dinner-card']];let body=`<div class="kid-top"><div><h2>${appName(g)}’s day</h2><div class="hub-sub" style="color:rgba(255,255,255,.65)">${week} points this week · ${award.label}</div></div><button class="wallet-mini" onclick="appShow('wallet')">Wallet<strong>${appMoney(wallet.cash)} · 🍰 ${wallet.desserts}</strong></button></div>`;for(const [name,tasks,cls]of groups){body+=`<div class="section-label big"><div class="sl-text">${name}</div></div>`+tasks.map(t=>kidTask(g,t,cls)).join('');}body+=`<div class="section-label big"><div class="sl-text">Bonus tasks</div></div>`+BONUS.map(b=>{const r=appGirlDay(g).bonus?.[b.id],pending=r?.state==='submitted',done=r===true||r?.score==='complete';return`<div class="bonus-row"><div class="bonus-check ${done?'ticked':''}">✓</div><div class="bonus-name">${b.name}${pending?' · waiting for review':''}</div><div class="bonus-pts-badge">+${b.pts}</div>${!pending&&!done?`<button class="primary-btn" onclick="submitBonus('${g}','${b.id}')">I did it</button>`:''}</div>`}).join('');document.getElementById(g+'-content').innerHTML=body;}
+function submitTask(g,id){const r=appGirlDay(g)[id]||{};appGirlDay(g)[id]={...r,state:'submitted',submittedAt:new Date().toISOString()};appPersist();renderKid(g);showToast('Submitted for review');}
+function submitBonus(g,id){const d=appGirlDay(g);d.bonus||(d.bonus={});d.bonus[id]={state:'submitted',submittedAt:new Date().toISOString()};appPersist();renderKid(g);showToast('Bonus task submitted');}
+
+function renderParent(){const items=['abby','olivia'].flatMap(g=>appPending(g).map(t=>({g,t,bonus:false})));for(const g of['abby','olivia']){const bonus=appGirlDay(g).bonus||{};for(const b of BONUS)if(bonus[b.id]?.state==='submitted')items.push({g,t:b,bonus:true});}const html=items.length?items.map(x=>`<div class="review-card"><h3>${x.t.name}</h3><div class="review-meta">${appName(x.g)} submitted this today${x.bonus?' · bonus +'+x.t.pts+' pts':''}</div><div class="review-actions">${x.bonus?`<button class="good" onclick="reviewBonus('${x.g}','${x.t.id}',true)">Approve +${x.t.pts}</button><button class="bad" onclick="reviewBonus('${x.g}','${x.t.id}',false)">Not approved</button>`:x.t.btns.map(b=>`<button class="${b.pts>1?'good':b.pts<0?'bad':'warn'}" onclick="reviewTask('${x.g}','${x.t.id}','${b.key}')">${b.label}<br>${b.pts>=0?'+':''}${b.pts}</button>`).join('')}</div></div>`).join(''):`<div class="hub-card"><div class="hub-title">Nothing waiting</div><div class="hub-sub">Submitted chores will appear here for a quick review.</div></div>`;const pins=appLoad().settings.pins;document.getElementById('parent-content').innerHTML=`<div class="parent-head"><h2>Parent review</h2><button class="primary-btn" onclick="showWelcome()">Sign out</button></div>${html}<div class="hub-card"><div class="hub-title">Weekly settlement</div><div class="settle-note">Rewards settle automatically when the app next opens after 8:00 pm on Sunday. You can also settle or correct a week here.</div><button class="primary-btn" onclick="settleWeek(appWeekKey(),true)">Settle this week now</button></div><div class="hub-card"><div class="hub-title">Profile PINs</div><div class="settle-note">Change these before handing the iPads over.</div><div class="review-actions"><input id="set-parent-pin" aria-label="Parent PIN" inputmode="numeric" maxlength="4" value="${pins.parent}"><input id="set-abby-pin" aria-label="Abby PIN" inputmode="numeric" maxlength="4" value="${pins.abby}"><input id="set-olivia-pin" aria-label="Olivia PIN" inputmode="numeric" maxlength="4" value="${pins.olivia}"><button class="primary-btn" onclick="savePins()">Save PINs</button></div></div>`;}
+function savePins(){const pins={parent:document.getElementById('set-parent-pin').value,abby:document.getElementById('set-abby-pin').value,olivia:document.getElementById('set-olivia-pin').value};if(Object.values(pins).some(p=>!/^\d{4}$/.test(p))){showToast('Each PIN needs four numbers');return;}appLoad().settings.pins=pins;appPersist();showToast('PINs saved');}
+function reviewTask(g,id,score){const r=appGirlDay(g)[id]||{};appGirlDay(g)[id]={...r,state:'reviewed',score,reviewedAt:new Date().toISOString()};appPersist();renderParent();showToast(`${appName(g)}’s task reviewed`);}
+function reviewBonus(g,id,ok){const d=appGirlDay(g);d.bonus||(d.bonus={});d.bonus[id]=ok?{state:'reviewed',score:'complete',reviewedAt:new Date().toISOString()}:{state:'reviewed',score:'failed',reviewedAt:new Date().toISOString()};appPersist();renderParent();}
+
+function settleWeek(weekKey,manual=false){const [y,m,d]=weekKey.split('-').map(Number),mon=new Date(y,m-1,d);for(const g of['abby','olivia']){const points=appWeekScore(g,mon),next=appPayout(points),key=`${weekKey}:${g}`,previous=appLoad().settlements[key]||{cash:0,desserts:0};const cashDiff=next.cash-previous.cash,dessertDiff=next.desserts-previous.desserts;if(cashDiff||dessertDiff){const w=appWallet(g);w.cash+=cashDiff;w.desserts+=dessertDiff;appLedger(g,{type:previous.settledAt?'adjustment':'weekly reward',cash:cashDiff,desserts:dessertDiff,note:`${next.label} · week of ${weekKey}`});}appLoad().settlements[key]={cash:next.cash,desserts:next.desserts,points,settledAt:new Date().toISOString()};}appPersist();if(manual)showToast('Weekly rewards settled');appRender();}
+function maybeSettle(){const now=new Date();if(now.getDay()===0&&(now.getHours()>20||(now.getHours()===20&&now.getMinutes()>=0)))settleWeek(appWeekKey(now),false);}
+function renderWallet(){const g=appSession==='parent'?(appGirl||'abby'):appSession,w=appWallet(g);const entries=w.ledger.slice(0,12).map(e=>`<div class="ledger-row"><div>${e.type}<small>${e.note||new Date(e.at).toLocaleDateString('en-AU')}</small></div><div class="ledger-amount">${e.cash?`${e.cash>0?'+':'-'}${appMoney(Math.abs(e.cash))}`:''}${e.desserts?` ${e.desserts>0?'+':''}🍰 ${e.desserts}`:''}</div></div>`).join('')||'<div class="hub-sub">Rewards earned and redemptions will appear here.</div>';const cashAction=appSession==='parent'?`<button onclick="redeem('${g}','cash',${Math.min(500,w.cash)})" ${w.cash?'':'disabled'}>Transfer ${appMoney(Math.min(500,w.cash))}</button>`:'<button>Ask parent</button>';document.getElementById('wallet-content').innerHTML=`<div class="kid-top"><div><h2>${appName(g)}’s wallet</h2><div class="hub-sub" style="color:rgba(255,255,255,.65)">Spend when you choose</div></div></div><div class="wallet-balance"><div class="cash">${appMoney(w.cash)}</div><div class="credits">🍰 ${w.desserts} dessert credit${w.desserts===1?'':'s'} saved</div></div><div class="reward-row"><div><div class="reward-name">Dessert</div><div class="reward-desc">Use one saved dessert credit</div></div><button onclick="redeem('${g}','dessert')" ${w.desserts?'':'disabled'}>Request</button></div><div class="reward-row"><div><div class="reward-name">Cash to bank</div><div class="reward-desc">A parent records the transfer after it is made</div></div>${cashAction}</div><div class="hub-card"><div class="hub-title">Wallet history</div><div class="ledger">${entries}</div></div>`;}
+function redeem(g,type,amountCents=0){if(appSession!=='parent'){showToast('Ask a parent to approve your request');return;}const w=appWallet(g);if(type==='dessert'){if(!w.desserts)return;w.desserts--;appLedger(g,{type:'dessert redeemed',desserts:-1,note:'Approved by parent'});showToast('Dessert redeemed');}else{const cents=amountCents;if(!Number.isFinite(cents)||cents<=0||cents>w.cash){showToast('Enter an amount within the available balance');return;}w.cash-=cents;appLedger(g,{type:'bank transfer',cash:-cents,note:'Approved by parent — transfer still to be made'});showToast('Transfer recorded');}appPersist();renderWallet();}
+
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)maybeSettle();});
+function appUpdateDateDisplay(){document.getElementById('dateDisplayBtn').textContent=appDate.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});}
+window.changeDay=d=>{appDate.setDate(appDate.getDate()+d);currentDate=new Date(appDate);appUpdateDateDisplay();appRender();};
+window.goToday=()=>{appDate=new Date();appDate.setHours(0,0,0,0);currentDate=new Date(appDate);appUpdateDateDisplay();appRender();};
+window.openCal=()=>{currentDate=new Date(appDate);calViewDate=new Date(appDate);renderCalGrid();document.getElementById('calOverlay').classList.add('open');};
+window.selectCalDay=(y,m,d)=>{appDate=new Date(y,m,d);appDate.setHours(0,0,0,0);currentDate=new Date(appDate);appUpdateDateDisplay();document.getElementById('calOverlay').classList.remove('open');appRender();};
+appLoad();maybeSettle();showWelcome();
 </script>
 </body>
 </html>
