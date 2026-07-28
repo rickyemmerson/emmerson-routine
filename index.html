@@ -55,21 +55,25 @@ body {
 .blob1{width:500px;height:500px;top:-100px;left:-150px;background:radial-gradient(circle,rgba(181,36,94,0.5),transparent 70%);}
 .blob2{width:600px;height:600px;bottom:-200px;right:-200px;background:radial-gradient(circle,rgba(106,27,154,0.45),transparent 70%);}
 .blob3{width:400px;height:400px;top:40%;left:30%;background:radial-gradient(circle,rgba(80,120,255,0.3),transparent 70%);}
-/* Each girl gets her own bright little world. */
-body[data-theme="abby"]{background:#fff3f7;}
-body[data-theme="abby"] .bg-scene{background:radial-gradient(circle at 8% 10%,rgba(255,255,255,.95) 0 4%,transparent 24%),radial-gradient(circle at 88% 20%,rgba(255,211,126,.62),transparent 25%),linear-gradient(145deg,#ffe5f0 0%,#ffd9e6 46%,#fff1c9 100%);}
-body[data-theme="abby"] .blob1{background:radial-gradient(circle,rgba(255,74,153,.35),transparent 70%)}
-body[data-theme="abby"] .blob2{background:radial-gradient(circle,rgba(255,177,92,.38),transparent 70%)}
-body[data-theme="abby"] .blob3{background:radial-gradient(circle,rgba(255,255,255,.82),transparent 70%)}
-body[data-theme="abby"] .kid-top h2{color:#8c2452;}
-body[data-theme="abby"] .kid-top .hub-sub{color:rgba(105,35,69,.68)!important;}
-body[data-theme="olivia"]{background:#eef8ff;}
-body[data-theme="olivia"] .bg-scene{background:radial-gradient(circle at 8% 12%,rgba(255,255,255,.95) 0 4%,transparent 24%),radial-gradient(circle at 87% 18%,rgba(194,164,255,.55),transparent 26%),linear-gradient(145deg,#e2f8ff 0%,#eae3ff 48%,#dff7ff 100%);}
-body[data-theme="olivia"] .blob1{background:radial-gradient(circle,rgba(94,211,255,.35),transparent 70%)}
-body[data-theme="olivia"] .blob2{background:radial-gradient(circle,rgba(135,86,238,.32),transparent 70%)}
-body[data-theme="olivia"] .blob3{background:radial-gradient(circle,rgba(255,255,255,.85),transparent 70%)}
-body[data-theme="olivia"] .kid-top h2{color:#58319a;}
-body[data-theme="olivia"] .kid-top .hub-sub{color:rgba(69,43,127,.68)!important;}
+/* Two deliberately different worlds: warm daylight for Abby, punchy night-sky for Olivia. */
+body[data-theme="abby"]{background:#fff1dc;}
+body[data-theme="abby"] .bg-scene{background:#fff1dc;}
+body[data-theme="abby"] .blob1{background:#ff6b78;filter:blur(92px);opacity:.42}
+body[data-theme="abby"] .blob2{background:#ffb52f;filter:blur(100px);opacity:.44}
+body[data-theme="abby"] .blob3{background:#3fd3b5;filter:blur(120px);opacity:.16}
+body[data-theme="abby"] .kid-top h2{color:#a32d43;}
+body[data-theme="abby"] .kid-top .hub-sub{color:rgba(112,41,49,.7)!important;}
+body[data-theme="abby"] .points-hero{background:#f55769;box-shadow:0 14px 35px rgba(202,55,75,.28)}
+body[data-theme="abby"] .wallet-mini{background:#a32d43;color:#fff}
+body[data-theme="abby"] .section-label.big .sl-text,body[data-theme="abby"] .section-label.big .sl-time{color:#7b3540}
+body[data-theme="olivia"]{background:#201938;}
+body[data-theme="olivia"] .bg-scene{background:#201938;}
+body[data-theme="olivia"] .blob1{background:#00c9c6;filter:blur(95px);opacity:.28}
+body[data-theme="olivia"] .blob2{background:#7c4dff;filter:blur(105px);opacity:.5}
+body[data-theme="olivia"] .blob3{background:#ff4fc3;filter:blur(125px);opacity:.14}
+body[data-theme="olivia"] .kid-top h2{color:#fff;}
+body[data-theme="olivia"] .kid-top .hub-sub{color:rgba(255,255,255,.72)!important;}
+body[data-theme="olivia"] .points-hero{background:#6546dc;box-shadow:0 14px 35px rgba(98,70,220,.35)}
 .bg-noise {
   position:fixed;inset:0;z-index:1;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
