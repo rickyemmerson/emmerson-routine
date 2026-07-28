@@ -776,6 +776,13 @@ const appName=g=>g==='abby'?'Abby':'Olivia';
 const appColor=g=>g==='abby'?'var(--abby)':'var(--olivia)';
 
 function appDefault(){return{version:7,daily:{},wallets:{abby:{cash:0,desserts:0,ledger:[]},olivia:{cash:0,desserts:0,ledger:[]}},settlements:{},settings:{pins:{parent:PARENT_PIN,abby:CHILD_PINS.abby,olivia:CHILD_PINS.olivia}}};}
+function appEnsureData(data){
+  data=data&&typeof data==='object'?data:appDefault();
+  data.daily||={};data.wallets||={};data.settlements||={};data.settings||={};data.settings.pins||={};
+  for(const g of['abby','olivia']){data.wallets[g]||={cash:0,desserts:0,ledger:[]};data.wallets[g].cash??=0;data.wallets[g].desserts??=0;data.wallets[g].ledger||=[];data.settings.pins[g]||=CHILD_PINS[g];}
+  data.settings.pins.parent||=PARENT_PIN;
+  return data;
+}
 function appLoad(){
   if(appData)return appData;
   try{appData=JSON.parse(localStorage.getItem(APP_KEY)||'null')}catch(e){}
@@ -784,12 +791,12 @@ function appLoad(){
     /* Bring existing recorded scores forward so history is not lost. */
     try{const old=JSON.parse(localStorage.getItem('emmHQv6')||'{}');if(Object.keys(old).length)appData.daily=old;}catch(e){}
   }
-  appData.settings||(appData.settings={pins:{parent:PARENT_PIN,abby:CHILD_PINS.abby,olivia:CHILD_PINS.olivia}});appData.settings.pins||=( {parent:PARENT_PIN,abby:CHILD_PINS.abby,olivia:CHILD_PINS.olivia} );
+  appData=appEnsureData(appData);
   appSync();return appData;
 }
 function appPersist(){localStorage.setItem(APP_KEY,JSON.stringify(appData));appPush();}
 async function appSync(){
-  try{const r=await fetch(SUPA_URL+'/rest/v1/data?select=value&order=id.desc&limit=1',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}});if(!r.ok)return;const rows=await r.json();if(!rows[0]?.value)return;const cloud=JSON.parse(rows[0].value).routineV7;if(!cloud)return;appData=cloud;localStorage.setItem(APP_KEY,JSON.stringify(appData));appRender();}catch(e){console.log('Routine sync unavailable',e);}
+  try{const r=await fetch(SUPA_URL+'/rest/v1/data?select=value&order=id.desc&limit=1',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}});if(!r.ok)return;const rows=await r.json();if(!rows[0]?.value)return;const cloud=JSON.parse(rows[0].value).routineV7;if(!cloud)return;appData=appEnsureData(cloud);localStorage.setItem(APP_KEY,JSON.stringify(appData));appRender();}catch(e){console.log('Routine sync unavailable',e);}
 }
 async function appPush(){
   try{await fetch(SUPA_URL+'/rest/v1/data',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify({id:1,value:JSON.stringify({routineV7:appData})})});}catch(e){console.log('Routine save unavailable',e);}
