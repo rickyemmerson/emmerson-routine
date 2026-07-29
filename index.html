@@ -32,8 +32,8 @@
   --bonus-blob:rgba(50,200,120,0.15);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{font-size:15px;height:100%;overflow:hidden;}
-body{overflow-y:auto;-webkit-overflow-scrolling:touch;height:100%;}
+html{font-size:15px;min-height:100%;overflow-x:hidden;overflow-y:auto;}
+body{overflow-y:visible;-webkit-overflow-scrolling:touch;min-height:100%;height:auto;}
 
 body {
   font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
@@ -819,7 +819,7 @@ const ROUTINE_AFTER_DINNER=[
   {id:'ad_teeth',name:'Teeth Brushed',desc:'Night brush',btns:YES_REM,due:'8:00 pm'},
   {id:'ad_bed',name:'In Bed, Lights Off',desc:'Points based on time',due:'8:45 pm',btns:[{key:'8pm',label:'8:00 pm',pts:3},{key:'815',label:'8:15 pm',pts:2},{key:'830',label:'8:30 pm',pts:1},{key:'845',label:'8:45 pm',pts:0},{key:'after845',label:'After 8:45',pts:-1}]},
 ];
-let appData=null, appSession=null, appGirl=null, pinRole=null;
+let appData=null, appSession=null, appGirl=null, pinRole=null, appRevision=0;
 let appDate=new Date();appDate.setHours(0,0,0,0);
 const appDateKey=(d=appDate)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const appMonday=(d=appDate)=>{const x=new Date(d),day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));x.setHours(0,0,0,0);return x;};
@@ -847,9 +847,10 @@ function appLoad(){
   appData=appEnsureData(appData);
   appSync();return appData;
 }
-function appPersist(){localStorage.setItem(APP_KEY,JSON.stringify(appData));appPush();}
+function appPersist(){appRevision++;localStorage.setItem(APP_KEY,JSON.stringify(appData));appPush();}
 async function appSync(){
-  try{const r=await fetch(SUPA_URL+'/rest/v1/data?select=value&order=id.desc&limit=1',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}});if(!r.ok)return;const rows=await r.json();if(!rows[0]?.value)return;const cloud=JSON.parse(rows[0].value).routineV7;if(!cloud)return;appData=appEnsureData(cloud);localStorage.setItem(APP_KEY,JSON.stringify(appData));appRender();}catch(e){console.log('Routine sync unavailable',e);}
+  const startRevision=appRevision;
+  try{const r=await fetch(SUPA_URL+'/rest/v1/data?select=value&order=id.desc&limit=1',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}});if(!r.ok)return;const rows=await r.json();if(!rows[0]?.value)return;const cloud=JSON.parse(rows[0].value).routineV7;if(!cloud||appRevision!==startRevision)return;appData=appEnsureData(cloud);localStorage.setItem(APP_KEY,JSON.stringify(appData));appRender();}catch(e){console.log('Routine sync unavailable',e);}
 }
 async function appPush(){
   try{await fetch(SUPA_URL+'/rest/v1/data',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify({id:1,value:JSON.stringify({routineV7:appData})})});}catch(e){console.log('Routine save unavailable',e);}
