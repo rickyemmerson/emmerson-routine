@@ -259,8 +259,11 @@ body[data-theme="olivia"] .points-hero{background:#6546dc;box-shadow:0 14px 35px
 .score-btn{flex:1;min-width:0;padding:9px 4px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);background:rgba(255,255,255,0.7);font-size:10.5px;font-weight:600;cursor:pointer;text-align:center;line-height:1.3;color:var(--text2);transition:all 0.15s;font-family:'Inter',sans-serif;backdrop-filter:blur(8px);}
 .score-btn:active{transform:scale(0.95);}
 .score-btn.sel-complete,.score-btn.sel-fast,.score-btn.sel-8pm    {background:rgba(48,209,88,0.85);border-color:rgba(48,209,88,0.4);color:white;box-shadow:0 4px 12px rgba(48,209,88,0.3);}
+.score-btn.sel-yes,.score-btn.sel-spotless{background:rgba(48,209,88,0.9);border-color:rgba(48,209,88,0.5);color:white;box-shadow:0 4px 12px rgba(48,209,88,0.3);}
 .score-btn.sel-reminded,.score-btn.sel-u10,.score-btn.sel-815     {background:rgba(100,216,136,0.85);border-color:rgba(100,216,136,0.4);color:white;box-shadow:0 4px 12px rgba(100,216,136,0.25);}
+.score-btn.sel-tidy{background:rgba(100,216,136,0.85);border-color:rgba(100,216,136,0.4);color:white;box-shadow:0 4px 12px rgba(100,216,136,0.25);}
 .score-btn.sel-nagged,  .score-btn.sel-u15,.score-btn.sel-830     {background:rgba(255,159,10,0.85);border-color:rgba(255,159,10,0.4);color:white;box-shadow:0 4px 12px rgba(255,159,10,0.3);}
+.score-btn.sel-no{background:rgba(116,116,128,0.78);border-color:rgba(116,116,128,0.42);color:white;box-shadow:0 4px 12px rgba(80,80,90,0.18);}
 .score-btn.sel-failed,  .score-btn.sel-over15,.score-btn.sel-after845{background:rgba(255,69,58,0.85);border-color:rgba(255,69,58,0.4);color:white;box-shadow:0 4px 12px rgba(255,69,58,0.3);}
 .score-btn.sel-845      {background:rgba(255,107,43,0.85);border-color:rgba(255,107,43,0.4);color:white;box-shadow:0 4px 12px rgba(255,107,43,0.3);}
 .score-btn.sel-na       {background:rgba(200,200,210,0.7);border-color:rgba(180,180,190,0.4);color:#888;}
@@ -872,21 +875,18 @@ function appWeekScore(g,mon=appMonday()){let n=0;for(let i=0;i<7;i++){const d=ne
 function appMoney(cents){return new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD'}).format(cents/100);}
 function appWallet(g){return appLoad().wallets[g]||(appLoad().wallets[g]={ledger:[],savingsStart:appMonthKey()});}
 function appLedger(g,entry){appWallet(g).ledger.unshift({id:crypto.randomUUID?.()||Date.now()+Math.random(),at:new Date().toISOString(),...entry});}
-function appEarned(g,asOf){let total=0;for(const key of Object.keys(appLoad().daily)){if(!/^\d{4}-\d{2}-\d{2}$/.test(key))continue;const d=new Date(key+'T00:00:00');if(asOf&&d>asOf)continue;total+=appDayScore(g,d);}return total;}
-function appAccount(g,asOf){const cutoff=asOf?new Date(asOf):null,w=appWallet(g),ledger=w.ledger.filter(e=>!cutoff||new Date(e.at)<=cutoff);const ledgerPoints=ledger.reduce((n,e)=>n+(e.points||0),0),bonus=ledger.filter(e=>e.type==='monthly savings bonus').reduce((n,e)=>n+(e.points||0),0);const spent=-ledger.filter(e=>e.type==='reward redemption').reduce((n,e)=>n+Math.min(0,e.points||0),0),rawEarned=appEarned(g,cutoff),earned=w.openingEarned===undefined?rawEarned:20+Math.max(0,rawEarned-w.openingEarned);return{earned,bonus,spent,available:rawEarned+ledgerPoints};}
+function appEarned(g,asOf,fromDate){let total=0;for(const key of Object.keys(appLoad().daily)){if(!/^\d{4}-\d{2}-\d{2}$/.test(key)||fromDate&&key<fromDate)continue;const d=new Date(key+'T00:00:00');if(asOf&&d>asOf)continue;total+=appDayScore(g,d);}return total;}
+function appAccount(g,asOf){const cutoff=asOf?new Date(asOf):null,w=appWallet(g),start=w.scoreStartDate||'0000-01-01',base=w.startingBalance??20,ledger=w.ledger.filter(e=>(!cutoff||new Date(e.at)<=cutoff)&&e.type!=='opening balance'),ledgerPoints=ledger.reduce((n,e)=>n+(e.points||0),0),bonus=ledger.filter(e=>e.type==='monthly savings bonus').reduce((n,e)=>n+(e.points||0),0),spent=-ledger.filter(e=>e.type==='reward redemption').reduce((n,e)=>n+Math.min(0,e.points||0),0),taskPoints=appEarned(g,cutoff,start),earned=base+taskPoints;return{earned,bonus,spent,available:base+taskPoints+ledgerPoints};}
 function appTogetherPoints(){return appAccount('abby').available+appAccount('olivia').available;}
 function appCharacterPoints(g){return appDay().char?.[g]||0;}
 function appChangeCharacter(g,delta){const day=appDay();day.char||={};day.char[g]=(day.char[g]||0)+delta;appPersist();appRender();showToast(delta>0?'Character point awarded':'Character point deducted');}
 function appResetCharacter(g){const day=appDay();day.char||={};day.char[g]=0;appPersist();appRender();showToast('Character points reset');}
 function appStartPoints(){
-  /* Rebase once for the revised routine: both accounts begin at exactly 20 points. */
-  if(appLoad().settings.pointsAccountStartedV2)return;
-  for(const g of['abby','olivia']){
-    const w=appWallet(g),current=appAccount(g).available;
-    w.openingEarned=appEarned(g);
-    appLedger(g,{type:'opening balance',points:20-current,note:'Revised points account starts with 20 points'});
-  }
-  appLoad().settings.pointsAccountStartedV2=true;
+  /* Start fresh at 20, then add only scores from today onward. */
+  if(appLoad().settings.pointsAccountStartedV3)return;
+  const startDate=appDateKey(new Date());
+  for(const g of['abby','olivia']){const w=appWallet(g);w.startingBalance=20;w.scoreStartDate=startDate;}
+  appLoad().settings.pointsAccountStartedV3=true;
   appPersist();
 }
 function appApplySavingsBonus(){const current=appMonthKey();let changed=false;for(const g of['abby','olivia']){const w=appWallet(g);let [y,m]=w.savingsStart.split('-').map(Number);while(`${y}-${String(m).padStart(2,'0')}`<current){const month=`${y}-${String(m).padStart(2,'0')}`;if(!w.ledger.some(e=>e.interestMonth===month)){const end=new Date(y,m,0,23,59,59),balance=appAccount(g,end).available,points=Math.min(100,Math.floor(balance*.05));if(points>0){const at=new Date(y,m,1,9,0,0),monthName=new Date(y,m-1,1).toLocaleDateString('en-AU',{month:'long'});appLedger(g,{type:'monthly savings bonus',points,interestMonth:month,at:at.toISOString(),note:`5% savings bonus for ${monthName}`});w.notice={points,month:monthName};changed=true;}}m++;if(m===13){m=1;y++;}}}if(changed)appPersist();}
