@@ -823,7 +823,7 @@ const ROUTINE_AFTER_DINNER=[
   {id:'ad_teeth',name:'Teeth Brushed',desc:'Night brush',btns:YES_REM,due:'8:00 pm'},
   {id:'ad_bed',name:'In Bed, Lights Off',desc:'Points based on time',due:'8:45 pm',btns:[{key:'8pm',label:'8:00 pm',pts:3},{key:'815',label:'8:15 pm',pts:2},{key:'830',label:'8:30 pm',pts:1},{key:'845',label:'8:45 pm',pts:0},{key:'after845',label:'After 8:45',pts:-1}]},
 ];
-let appData=null, appSession=null, appGirl=null, pinRole=null, appRevision=0;
+let appData=null, appSession=null, appGirl=null, pinRole=null, appRevision=0, appInitialSync=null, appSaving=false, appPushQueued=false;
 let appDate=new Date();appDate.setHours(0,0,0,0);
 const appDateKey=(d=appDate)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const appMonday=(d=appDate)=>{const x=new Date(d),day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));x.setHours(0,0,0,0);return x;};
@@ -832,7 +832,7 @@ const appMonthKey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).p
 const appName=g=>g==='abby'?'Abby':'Olivia';
 const appColor=g=>g==='abby'?'var(--abby)':'var(--olivia)';
 
-function appDefault(){return{version:8,daily:{},wallets:{abby:{ledger:[],savingsStart:appMonthKey()},olivia:{ledger:[],savingsStart:appMonthKey()}},settings:{pins:{parent:PARENT_PIN,abby:CHILD_PINS.abby,olivia:CHILD_PINS.olivia}}};}
+function appDefault(){return{version:9,daily:{},wallets:{abby:{ledger:[],savingsStart:appMonthKey()},olivia:{ledger:[],savingsStart:appMonthKey()}},settings:{pins:{parent:PARENT_PIN,abby:CHILD_PINS.abby,olivia:CHILD_PINS.olivia}}};}
 function appEnsureData(data){
   data=data&&typeof data==='object'?data:appDefault();
   data.daily||={};data.wallets||={};data.settings||={};data.settings.pins||={};
@@ -849,7 +849,7 @@ function appLoad(){
     try{const old=JSON.parse(localStorage.getItem('emmHQv6')||'{}');if(Object.keys(old).length)appData.daily=old;}catch(e){}
   }
   appData=appEnsureData(appData);
-  appSync();return appData;
+  appInitialSync=appSync();return appData;
 }
 function appPersist(){appRevision++;localStorage.setItem(APP_KEY,JSON.stringify(appData));appPush();}
 async function appSync(){
@@ -857,7 +857,16 @@ async function appSync(){
   try{const r=await fetch(SUPA_URL+'/rest/v1/data?select=value&order=id.desc&limit=1',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}});if(!r.ok)return;const rows=await r.json();if(!rows[0]?.value)return;const cloud=JSON.parse(rows[0].value).routineV7;if(!cloud||appRevision!==startRevision)return;appData=appEnsureData(cloud);localStorage.setItem(APP_KEY,JSON.stringify(appData));appRender();}catch(e){console.log('Routine sync unavailable',e);}
 }
 async function appPush(){
-  try{await fetch(SUPA_URL+'/rest/v1/data',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify({id:1,value:JSON.stringify({routineV7:appData})})});}catch(e){console.log('Routine save unavailable',e);}
+  if(appSaving){appPushQueued=true;return;}
+  appSaving=true;
+  do{
+    appPushQueued=false;
+    try{
+      const r=await fetch(SUPA_URL+'/rest/v1/data?on_conflict=id',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:1,value:JSON.stringify({routineV7:appData})})});
+      if(!r.ok)throw new Error(`Save failed (${r.status})`);
+    }catch(e){console.log('Routine save unavailable',e);showToast('Saved on this device — online sync will retry next time');}
+  }while(appPushQueued);
+  appSaving=false;
 }
 function appDay(){const key=appDateKey();return appLoad().daily[key]||(appLoad().daily[key]={});}
 function appGirlDay(g){const day=appDay();return day[g]||(day[g]={});}
@@ -875,18 +884,32 @@ function appWeekScore(g,mon=appMonday()){let n=0;for(let i=0;i<7;i++){const d=ne
 function appMoney(cents){return new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD'}).format(cents/100);}
 function appWallet(g){return appLoad().wallets[g]||(appLoad().wallets[g]={ledger:[],savingsStart:appMonthKey()});}
 function appLedger(g,entry){appWallet(g).ledger.unshift({id:crypto.randomUUID?.()||Date.now()+Math.random(),at:new Date().toISOString(),...entry});}
-function appEarned(g,asOf,fromDate){let total=0;for(const key of Object.keys(appLoad().daily)){if(!/^\d{4}-\d{2}-\d{2}$/.test(key)||fromDate&&key<fromDate)continue;const d=new Date(key+'T00:00:00');if(asOf&&d>asOf)continue;total+=appDayScore(g,d);}return total;}
-function appAccount(g,asOf){const cutoff=asOf?new Date(asOf):null,w=appWallet(g),start=w.scoreStartDate||'0000-01-01',base=w.startingBalance??20,ledger=w.ledger.filter(e=>(!cutoff||new Date(e.at)<=cutoff)&&e.type!=='opening balance'),ledgerPoints=ledger.reduce((n,e)=>n+(e.points||0),0),bonus=ledger.filter(e=>e.type==='monthly savings bonus').reduce((n,e)=>n+(e.points||0),0),spent=-ledger.filter(e=>e.type==='reward redemption').reduce((n,e)=>n+Math.min(0,e.points||0),0),taskPoints=appEarned(g,cutoff,start),earned=base+taskPoints;return{earned,bonus,spent,available:base+taskPoints+ledgerPoints};}
+function appRoutineReference(dateKey){return`routine:${dateKey}`;}
+function appRoutineAt(dateKey){return new Date(`${dateKey}T12:00:00`).toISOString();}
+function appSyncRoutineLedger(g,dateKey=appDateKey()){
+  const w=appWallet(g),points=appDayScore(g,new Date(`${dateKey}T12:00:00`)),reference=appRoutineReference(dateKey),entry=w.ledger.find(e=>e.reference===reference);
+  if(entry){entry.points=points;entry.note=`Routine points · ${new Date(`${dateKey}T12:00:00`).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}`;return;}
+  appLedger(g,{type:'routine points',points,reference,at:appRoutineAt(dateKey),note:`Routine points · ${new Date(`${dateKey}T12:00:00`).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}`});
+}
+function appAccount(g,asOf){
+  const cutoff=asOf?new Date(asOf):null,ledger=appWallet(g).ledger.filter(e=>!cutoff||new Date(e.at)<=cutoff),available=ledger.reduce((n,e)=>n+(e.points||0),0),bonus=ledger.filter(e=>e.type==='monthly savings bonus').reduce((n,e)=>n+(e.points||0),0),spent=-ledger.filter(e=>e.type==='reward redemption').reduce((n,e)=>n+Math.min(0,e.points||0),0),earned=ledger.filter(e=>e.type!=='monthly savings bonus'&&e.type!=='reward redemption').reduce((n,e)=>n+(e.points||0),0);
+  return{earned,bonus,spent,available};
+}
 function appTogetherPoints(){return appAccount('abby').available+appAccount('olivia').available;}
 function appCharacterPoints(g){return appDay().char?.[g]||0;}
-function appChangeCharacter(g,delta){const day=appDay();day.char||={};day.char[g]=(day.char[g]||0)+delta;appPersist();appRender();showToast(delta>0?'Character point awarded':'Character point deducted');}
-function appResetCharacter(g){const day=appDay();day.char||={};day.char[g]=0;appPersist();appRender();showToast('Character points reset');}
+function appChangeCharacter(g,delta){const day=appDay();day.char||={};day.char[g]=(day.char[g]||0)+delta;appSyncRoutineLedger(g);appPersist();appRender();showToast(delta>0?'Character point awarded':'Character point deducted');}
+function appResetCharacter(g){const day=appDay();day.char||={};day.char[g]=0;appSyncRoutineLedger(g);appPersist();appRender();showToast('Character points reset');}
 function appStartPoints(){
-  /* Start fresh at 20, then add only scores from today onward. */
-  if(appLoad().settings.pointsAccountStartedV3)return;
-  const startDate=appDateKey(new Date());
-  for(const g of['abby','olivia']){const w=appWallet(g);w.startingBalance=20;w.scoreStartDate=startDate;}
-  appLoad().settings.pointsAccountStartedV3=true;
+  /* One-time migration: a real account is a ledger, never a daily recalculation. */
+  if(appLoad().settings.pointsLedgerV4)return;
+  for(const g of['abby','olivia']){
+    const w=appWallet(g),oldOpening=w.ledger.find(e=>e.type==='opening balance'),start=oldOpening?appDateKey(new Date(oldOpening.at)):(w.scoreStartDate||appDateKey());
+    w.ledger=w.ledger.filter(e=>e.type!=='opening balance');
+    if(!w.ledger.some(e=>e.type==='account opening'))appLedger(g,{type:'account opening',points:20,at:appRoutineAt(start),note:'Points account opened with 20 points'});
+    Object.keys(appLoad().daily).filter(key=>/^\d{4}-\d{2}-\d{2}$/.test(key)&&key>=start).sort().forEach(key=>appSyncRoutineLedger(g,key));
+    delete w.startingBalance;delete w.scoreStartDate;delete w.openingEarned;
+  }
+  appLoad().settings.pointsLedgerV4=true;
   appPersist();
 }
 function appApplySavingsBonus(){const current=appMonthKey();let changed=false;for(const g of['abby','olivia']){const w=appWallet(g);let [y,m]=w.savingsStart.split('-').map(Number);while(`${y}-${String(m).padStart(2,'0')}`<current){const month=`${y}-${String(m).padStart(2,'0')}`;if(!w.ledger.some(e=>e.interestMonth===month)){const end=new Date(y,m,0,23,59,59),balance=appAccount(g,end).available,points=Math.min(100,Math.floor(balance*.05));if(points>0){const at=new Date(y,m,1,9,0,0),monthName=new Date(y,m-1,1).toLocaleDateString('en-AU',{month:'long'});appLedger(g,{type:'monthly savings bonus',points,interestMonth:month,at:at.toISOString(),note:`5% savings bonus for ${monthName}`});w.notice={points,month:monthName};changed=true;}}m++;if(m===13){m=1;y++;}}}if(changed)appPersist();}
@@ -906,11 +929,11 @@ function renderHome(){const today=appDate.toLocaleDateString('en-AU',{weekday:'l
 function appPending(g){return appAllTasks().filter(t=>appIsAssigned(g,t)&&appRecord(g,t.id)?.state==='submitted');}
 function kidTask(g,t,section){if(!appIsAssigned(g,t))return'';const record=appRecord(g,t.id),score=appScoreValue(t,record),submitted=record?.state==='submitted',locked=appChildLocked()&&appSession!=='parent',disabled=locked?' disabled':'';const choices=t.btns.map(b=>`<button class="score-btn ${record?.score===b.key?'sel-'+b.key:''}" onclick="submitTask('${g}','${t.id}','${b.key}')"${disabled}>${b.label}<br><small>${b.pts>=0?'+':''}${b.pts}</small></button>`).join('');return`<div class="task-card ${section}${locked?' task-locked':''}"><div class="task-row-top"><div><div class="task-name">${t.name}</div><div class="task-desc">${t.desc||''}</div><div class="task-time">Complete by ${t.due}</div></div><div class="task-badge ${score>0?'ep':record?.score?'ez':'eu'}">${record?.score?`${score>=0?'+':''}${score} pts`:'To do'}</div></div><div class="score-btns">${choices}</div>${locked?`<div class="task-lock-note">Point entry closes at ${CHILD_CUTOFF.label}</div>`:submitted?'<div class="submitted-note">Saved — a parent can still review or correct this.</div>':record?.state==='reviewed'?'<div class="submitted-note" style="color:#167033">Reviewed by parent</div>':''}</div>`;}
 function renderKid(g){const account=appAccount(g),week=appWeekScore(g),wallet=appWallet(g),locked=appChildLocked()&&appSession!=='parent',notice=wallet.notice;const groups=[['Morning',ROUTINE_MORNING,'morning-card'],['After school',ROUTINE_AFTER_SCHOOL,'school-card'],['After dinner',ROUTINE_AFTER_DINNER,'dinner-card']];let body=`<div class="kid-top"><div><h2>${appName(g)}’s day</h2><div class="hub-sub" style="color:rgba(255,255,255,.65)">+${week} points this week</div></div><div style="display:flex;gap:7px"><button class="wallet-mini" onclick="appShow('wallet')">My points<strong>${account.available}</strong></button><button class="wallet-mini" onclick="openParent()">⚙<strong>Parent</strong></button></div></div><div class="points-hero"><div class="points-label">My points account</div><div class="points-number">${account.available}</div><div class="points-meta">${account.earned} earned · ${account.spent} spent</div><div class="together-chip">Together: ${appTogetherPoints()} points ✦</div></div>`;if(notice)body+=`<div class="savings-pop"><button onclick="dismissNotice('${g}')">Got it</button><strong>🎉 Savings bonus: +${notice.points} points!</strong><div style="font-size:12px;margin-top:3px">You earned 5% for saving your points in ${notice.month}.</div></div>`;for(const [name,tasks,cls]of groups){body+=`<div class="section-label big"><div class="sl-text">${name}</div></div>`+tasks.map(t=>kidTask(g,t,cls)).join('');}body+=`<div class="section-label big"><div class="sl-text">Bonus tasks</div><div class="sl-time">Point entry closes ${CHILD_CUTOFF.label}</div></div>`+BONUS.map(b=>{const r=appGirlDay(g).bonus?.[b.id],done=r===true||r?.score==='complete';return`<div class="bonus-row${locked?' task-locked':''}" onclick="toggleBonus('${g}','${b.id}')"><div class="bonus-check ${done?'ticked':''}">✓</div><div class="bonus-name">${b.name}</div><div class="bonus-pts-badge">+${b.pts}</div></div>`}).join('')+(locked?`<div class="task-lock-note">Bonus point entry closes at ${CHILD_CUTOFF.label}</div>`:'');document.getElementById(g+'-content').innerHTML=body;}
-function submitTask(g,id,score){const r=appGirlDay(g)[id]||{},parentEdit=appSession==='parent';appGirlDay(g)[id]={...r,state:parentEdit?'reviewed':'submitted',score,...(parentEdit?{reviewedAt:new Date().toISOString()}:{submittedAt:new Date().toISOString()})};appPersist();renderKid(g);showToast(parentEdit?'Updated by parent':'Points account updated');}
-function toggleBonus(g,id){if(appChildLocked()&&appSession!=='parent'){showToast(`Tasks closed at ${CHILD_CUTOFF.label}`);return;}const d=appGirlDay(g);d.bonus||(d.bonus={});const current=d.bonus[id];d.bonus[id]=!(current===true||current?.score==='complete');appPersist();renderKid(g);}
+function submitTask(g,id,score){const r=appGirlDay(g)[id]||{},parentEdit=appSession==='parent';appGirlDay(g)[id]={...r,state:parentEdit?'reviewed':'submitted',score,...(parentEdit?{reviewedAt:new Date().toISOString()}:{submittedAt:new Date().toISOString()})};appSyncRoutineLedger(g);appPersist();renderKid(g);showToast(parentEdit?'Updated by parent':'Points account updated');}
+function toggleBonus(g,id){if(appChildLocked()&&appSession!=='parent'){showToast(`Tasks closed at ${CHILD_CUTOFF.label}`);return;}const d=appGirlDay(g);d.bonus||(d.bonus={});const current=d.bonus[id];d.bonus[id]=!(current===true||current?.score==='complete');appSyncRoutineLedger(g);appPersist();renderKid(g);}
 function dismissNotice(g){delete appWallet(g).notice;appPersist();renderKid(g);}
 
-function renderParent(){const items=['abby','olivia'].flatMap(g=>appPending(g).map(t=>({g,t,bonus:false}))),pins=appLoad().settings.pins;const reviews=items.length?`<div class="section-label big"><div class="sl-text">Waiting for review</div></div>`+items.map(x=>{const proposed=x.t.btns.find(b=>b.key===appRecord(x.g,x.t.id)?.score)?.label||appRecord(x.g,x.t.id)?.score||'No score';return`<div class="review-card"><h3>${appName(x.g)} · ${x.t.name}</h3><div class="review-meta">She chose ${proposed}</div><div class="review-actions">${x.t.btns.map(b=>`<button class="${b.pts>1?'good':b.pts<0?'bad':'warn'}" onclick="reviewTask('${x.g}','${x.t.id}','${b.key}')">${b.label}<br>${b.pts>=0?'+':''}${b.pts}</button>`).join('')}</div></div>`}).join(''):`<div class="review-summary"><span class="review-dot"></span>Nothing waiting for review</div>`;const girlCards=['abby','olivia'].map(g=>{const a=appAccount(g);return`<section class="parent-girl-card ${g}"><div class="parent-girl-top"><div class="parent-girl-name">${appName(g)}</div><div class="parent-girl-points">${a.available} pts</div></div><div class="parent-girl-sub">${a.earned} earned · ${a.spent} spent</div><div class="parent-card-actions"><button onclick="appShow('${g}')">Edit routine</button><button onclick="openWallet('${g}')">Rewards & cash</button></div></section>`}).join('');document.getElementById('parent-content').innerHTML=`<div class="parent-head"><h2>Parent dashboard</h2><button class="primary-btn" onclick="exitParent()">Done</button></div><div class="parent-intro">Correct scores, check points, or record a reward.</div>${girlCards}${reviews}<details class="parent-settings"><summary>Settings & savings</summary><div class="settle-note">5% of each unspent balance is added the first time the app opens in a new month (up to 100 points).</div><div class="settle-note">Parent PIN</div><div class="review-actions"><input id="set-parent-pin" aria-label="Parent PIN" inputmode="numeric" maxlength="4" value="${pins.parent}"><button class="primary-btn" onclick="savePins()">Save PIN</button></div></details>`;}
+function renderParent(){const items=['abby','olivia'].flatMap(g=>appPending(g).map(t=>({g,t,bonus:false}))),pins=appLoad().settings.pins;const reviews=items.length?`<div class="section-label big"><div class="sl-text">Waiting for review</div></div>`+items.map(x=>{const proposed=x.t.btns.find(b=>b.key===appRecord(x.g,x.t.id)?.score)?.label||appRecord(x.g,x.t.id)?.score||'No score';return`<div class="review-card"><h3>${appName(x.g)} · ${x.t.name}</h3><div class="review-meta">She chose ${proposed}</div><div class="review-actions">${x.t.btns.map(b=>`<button class="${b.pts>1?'good':b.pts<0?'bad':'warn'}" onclick="reviewTask('${x.g}','${x.t.id}','${b.key}')">${b.label}<br>${b.pts>=0?'+':''}${b.pts}</button>`).join('')}</div></div>`}).join(''):`<div class="review-summary"><span class="review-dot"></span>Nothing waiting for review</div>`;const girlCards=['abby','olivia'].map(g=>{const a=appAccount(g);return`<section class="parent-girl-card ${g}"><div class="parent-girl-top"><div class="parent-girl-name">${appName(g)}</div><div class="parent-girl-points">${a.available} pts</div></div><div class="parent-girl-sub">${a.earned} earned · ${a.spent} spent</div><div class="parent-card-actions"><button onclick="appShow('${g}')">Edit routine</button><button onclick="openWallet('${g}')">Rewards & cash</button><button onclick="adjustBalance('${g}')">Adjust points</button></div></section>`}).join('');document.getElementById('parent-content').innerHTML=`<div class="parent-head"><h2>Parent dashboard</h2><button class="primary-btn" onclick="exitParent()">Done</button></div><div class="parent-intro">Correct scores, check points, or record a reward.</div>${girlCards}${reviews}<details class="parent-settings"><summary>Settings & savings</summary><div class="settle-note">5% of each unspent balance is added the first time the app opens in a new month (up to 100 points).</div><div class="settle-note">Parent PIN</div><div class="review-actions"><input id="set-parent-pin" aria-label="Parent PIN" inputmode="numeric" maxlength="4" value="${pins.parent}"><button class="primary-btn" onclick="savePins()">Save PIN</button></div></details>`;}
 function appCharacterCard(g){const total=appCharacterPoints(g),state=total>0?'pos':total<0?'neg':'zero';return`<div class="char-card"><div class="char-top"><div><div class="char-title">Character Points</div><div class="char-sub">Kindness · Courage · Generosity · Attitude</div></div><div class="char-total ${state}">${total>=0?'+':''}${total}</div></div><div class="char-btns"><button class="char-btn plus" onclick="appChangeCharacter('${g}',1)"><div class="char-btn-sym">+</div><div class="char-btn-lbl">Award Point</div></button><button class="char-btn minus" onclick="appChangeCharacter('${g}',-1)"><div class="char-btn-sym">−</div><div class="char-btn-lbl">Deduct Point</div></button></div><button class="char-reset" onclick="appResetCharacter('${g}')">Reset to 0</button></div>`;}
 function appParentCharacterCard(){return`<section class="parent-character"><h3>Character points</h3>${['abby','olivia'].map(g=>{const total=appCharacterPoints(g);return`<div class="parent-character-row"><span class="parent-character-name">${appName(g)}</span><button class="minus" onclick="appChangeCharacter('${g}',-1)">−</button><span class="parent-character-total">${total>=0?'+':''}${total}</span><button class="plus" onclick="appChangeCharacter('${g}',1)">+</button></div>`}).join('')}</section>`;}
 const appBaseRenderKid=renderKid;
@@ -918,8 +941,9 @@ renderKid=function(g){appBaseRenderKid(g);const hero=document.querySelector('#'+
 const appBaseRenderParent=renderParent;
 renderParent=function(){appBaseRenderParent();const review=document.querySelector('#parent-content .review-summary, #parent-content .section-label.big');if(review)review.insertAdjacentHTML('beforebegin',appParentCharacterCard());};
 function savePins(){const parent=document.getElementById('set-parent-pin').value;if(!/^\d{4}$/.test(parent)){showToast('The Parent PIN needs four numbers');return;}appLoad().settings.pins.parent=parent;appPersist();showToast('Parent PIN saved');}
-function reviewTask(g,id,score){const r=appGirlDay(g)[id]||{};appGirlDay(g)[id]={...r,state:'reviewed',score,reviewedAt:new Date().toISOString()};appPersist();renderParent();showToast(`${appName(g)}’s task reviewed`);}
-function reviewBonus(g,id,ok){const d=appGirlDay(g);d.bonus||(d.bonus={});d.bonus[id]=ok?{state:'reviewed',score:'complete',reviewedAt:new Date().toISOString()}:{state:'reviewed',score:'failed',reviewedAt:new Date().toISOString()};appPersist();renderParent();}
+function adjustBalance(g){const current=appAccount(g).available,answer=window.prompt(`Set ${appName(g)}’s total points account.\nCurrent balance: ${current}`,String(current));if(answer===null)return;const desired=Number(answer);if(!Number.isInteger(desired)||desired<0){showToast('Enter a whole number, zero or higher');return;}const change=desired-current;if(!change)return;appLedger(g,{type:'parent adjustment',points:change,note:'Parent balance correction'});appPersist();renderParent();showToast(`${appName(g)}’s balance adjusted to ${desired}`);}
+function reviewTask(g,id,score){const r=appGirlDay(g)[id]||{};appGirlDay(g)[id]={...r,state:'reviewed',score,reviewedAt:new Date().toISOString()};appSyncRoutineLedger(g);appPersist();renderParent();showToast(`${appName(g)}’s task reviewed`);}
+function reviewBonus(g,id,ok){const d=appGirlDay(g);d.bonus||(d.bonus={});d.bonus[id]=ok?{state:'reviewed',score:'complete',reviewedAt:new Date().toISOString()}:{state:'reviewed',score:'failed',reviewedAt:new Date().toISOString()};appSyncRoutineLedger(g);appPersist();renderParent();}
 
 function openWallet(g){appGirl=g;appShow('wallet');}
 function renderWallet(){const g=appSession==='parent'?(appGirl||'abby'):appSession,a=appAccount(g),w=appWallet(g),rewards=[{id:'dessert',emoji:'🍨',name:'Dessert',desc:'Spend points for a dessert whenever you choose.',cost:50},{id:'cash5',emoji:'💵',name:'$5 to bank',desc:'Small cash transfer.',cost:150},{id:'cash10',emoji:'💰',name:'$10 to bank',desc:'Save 25 points compared with two $5 transfers.',cost:275},{id:'cash20',emoji:'🌟',name:'$20 to bank',desc:'Best value — save 100 points.',cost:500}];const entries=w.ledger.slice(0,12).map(e=>`<div class="ledger-row"><div>${e.type}<small>${e.note||new Date(e.at).toLocaleDateString('en-AU')}</small></div><div class="ledger-amount" style="color:${e.points<0?'#c23b55':'#1a8a3a'}">${e.points>0?'+':''}${e.points||0} pts</div></div>`).join('')||'<div class="hub-sub">Your bonus and spending history will appear here.</div>';const rows=rewards.map(r=>{const parentOnly=r.id!=='dessert',disabled=a.available<r.cost||(parentOnly&&appSession!=='parent');return`<div class="reward-row"><div class="reward-emoji">${r.emoji}</div><div style="flex:1"><div class="reward-name">${r.name} <span class="cost">${r.cost} pts</span></div><div class="reward-desc">${r.desc}</div></div><button onclick="redeemPoints('${g}','${r.id}',${r.cost})" ${disabled?'disabled':''}>${parentOnly&&appSession!=='parent'?'Parent':'Spend'}</button></div>`}).join('');document.getElementById('wallet-content').innerHTML=`<div class="kid-top"><div><h2>${appName(g)}’s points</h2><div class="hub-sub" style="color:rgba(255,255,255,.65)">Save to earn a 5% bonus each month</div></div><button class="wallet-mini" onclick="appShow('${g}')">Back<strong>Routine</strong></button></div><div class="points-hero"><div class="points-label">Available to spend</div><div class="points-number">${a.available}</div><div class="wallet-stats"><div class="wallet-stat"><strong>${a.earned}</strong><span>Earned</span></div><div class="wallet-stat"><strong>${a.spent}</strong><span>Spent</span></div><div class="wallet-stat"><strong>+${a.bonus}</strong><span>Bonuses</span></div></div></div><div class="hub-card"><div class="hub-title">Rewards</div><div class="hub-sub">Desserts are instant. Cash redemptions are recorded by a parent before transfer.</div>${rows}</div><div class="hub-card"><div class="hub-title">Points history</div><div class="ledger">${entries}</div></div>`;}
@@ -931,7 +955,12 @@ window.changeDay=d=>{appDate.setDate(appDate.getDate()+d);currentDate=new Date(a
 window.goToday=()=>{appDate=new Date();appDate.setHours(0,0,0,0);currentDate=new Date(appDate);appUpdateDateDisplay();appRender();};
 window.openCal=()=>{currentDate=new Date(appDate);calViewDate=new Date(appDate);renderCalGrid();document.getElementById('calOverlay').classList.add('open');};
 window.selectCalDay=(y,m,d)=>{appDate=new Date(y,m,d);appDate.setHours(0,0,0,0);currentDate=new Date(appDate);appUpdateDateDisplay();document.getElementById('calOverlay').classList.remove('open');appRender();};
-appLoad();appStartPoints();appApplySavingsBonus();exitParent();
+function appBootstrap(){
+  appLoad();
+  exitParent();
+  Promise.resolve(appInitialSync).finally(()=>{appStartPoints();appApplySavingsBonus();appRender();});
+}
+appBootstrap();
 </script>
 </body>
 </html>
