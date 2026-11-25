@@ -8,30 +8,37 @@
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: #20192c; color: #faf6ff; font: 400 18px/1.35 system-ui, sans-serif; }
-  main { max-width: 1920px; margin: auto; padding: 3.5vh 5vw 2vh; }
+  main { max-width: 1920px; margin: auto; padding: 2.4vh 4.5vw 1.5vh; }
   header, .person, .group-title { display: flex; justify-content: space-between; align-items: baseline; gap: .7rem; }
   h1, h2, h3, p { margin: 0; }
-  h1 { font-size: 5vw; font-size: clamp(24px, min(4.7vw, 6.5vh), 76px); font-weight: 600; letter-spacing: -.025em; line-height: 1.1; }
+  h1 { font-size: 4vw; font-size: clamp(23px, min(4.2vw, 5.6vh), 68px); font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
   #date, footer { color: #ded0ec; font-size: clamp(13px, min(1.65vw, 2.4vh), 28px); }
-  header { margin-bottom: 3vh; }
+  header { margin-bottom: 2vh; }
   #board { display: flex; justify-content: space-between; align-items: stretch; }
   section { width: 48.25%; min-width: 0; border-radius: 14px; background: #fff5f7; color: #421729; overflow: hidden; }
   section + section { background: #f5efff; color: #30194e; }
-  .person { padding: 1.6vh 2.4vw; color: #72213e; background: #f6dfe7; }
-  section + section .person { color: #49296f; background: #e9ddf7; }
-  h2 { font-size: clamp(22px, min(3vw, 4.25vh), 60px); font-weight: 600; line-height: 1.15; }
-  .points { font-size: clamp(14px, min(2vw, 3vh), 38px); font-variant-numeric: tabular-nums; text-align: right; }
-  .groups { padding: .6vh 2.4vw 1.5vh; }
-  .group-title { margin-top: 1.6vh; padding-bottom: .6vh; font-size: clamp(14px, min(1.7vw, 2.6vh), 32px); font-weight: 600; line-height: 1.2; }
+  .person { align-items: center; position: relative; overflow: hidden; padding: 1.25vh 2.25vw; color: #421729; background: #ffabc8; }
+  section + section .person { color: #30194e; background: #c6b4ff; }
+  .person::before, .person::after { content: ''; position: absolute; pointer-events: none; border: .5vh solid currentColor; opacity: .16; transform: rotate(24deg); }
+  .person::before { width: 4.8vh; height: 4.8vh; border-radius: 50%; left: 46%; top: -2.4vh; }
+  .person::after { width: 2.6vh; height: 2.6vh; border-radius: 20%; left: 57%; bottom: -1vh; }
+  h2 { font-size: clamp(22px, min(4vw, 5.8vh), 75px); font-weight: 750; letter-spacing: -.025em; line-height: 1.05; }
+  .points { display: flex; align-items: center; gap: .65em; padding: .45vh .65em; border: 1px solid #ffffff75; border-radius: 10px; background: #ffffff70; font-size: clamp(12px, min(1.3vw, 2.1vh), 25px); line-height: 1.15; }
+  .points strong { font-size: 1.9em; font-variant-numeric: tabular-nums; }
+  .groups { padding: .55vh 2.25vw 1.35vh; }
+  .group-title { margin-top: .85vh; padding: .44vh .65em; border-radius: 5px; background: #fae6b5; color: #4d3415; font-size: clamp(13px, min(1.55vw, 2.5vh), 30px); font-weight: 700; line-height: 1.2; }
+  .group-1 { background: #dcecd7; color: #274531; }
+  .group-2 { background: #e6def5; color: #43285f; }
   .group-title span { font-weight: 400; text-align: right; }
   ol { padding: 0; margin: 0; list-style: none; }
-  li { display: flex; align-items: center; gap: .8em; padding: .55vh 0; font-size: 2.8vh; font-size: clamp(13px, min(2vw, 3.05vh), 39px); line-height: 1.25; }
+  li { display: flex; align-items: center; gap: .7em; padding: .36vh .45em; font-size: 2.4vh; font-size: clamp(13px, min(1.7vw, 2.5vh), 34px); line-height: 1.24; }
   #board.morning li { padding: 1.2vh 0; font-size: clamp(16px, min(2.8vw, 5vh), 52px); }
   .mark { width: .65em; height: .65em; flex: 0 0 .65em; border: 1px solid currentColor; border-radius: 3px; }
   .done .mark { background: #256343; border-color: #256343; }
   .done .mark::after { content: ''; display: block; width: .24em; height: .4em; margin: -.03em auto 0; border: solid white; border-width: 0 .08em .08em 0; transform: rotate(45deg); }
   .done .label { text-decoration: line-through; }
-  .state { margin-left: auto; padding-left: .3em; text-align: right; font-size: .72em; }
+  .task-time { margin-left: auto; padding-left: .3em; text-align: right; font-size: .76em; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
   footer { margin-top: 1.4vh; }
   @media (orientation: portrait) and (max-width: 590px) {
     #board { display: block; }
@@ -80,7 +87,7 @@
     if (status.textContent !== connection) status.textContent = connection;
     if (key === lastRender) return;
     lastRender = key;
-    document.getElementById('title').textContent = morning ? 'Morning jobs' : 'Afternoon & evening';
+    document.getElementById('title').textContent = morning ? 'Morning jobs' : 'Today’s jobs';
     document.getElementById('date').textContent = weekdays[dow] + ' · ' + now.getUTCDate() + '/' + (now.getUTCMonth() + 1);
     var board = document.getElementById('board');
     board.className = morning ? 'morning' : 'later';
@@ -90,13 +97,17 @@
       var panel = element('section');
       var heading = element('div', '', 'person');
       heading.appendChild(element('h2', girl === 'abby' ? 'Abby' : 'Olivia'));
-      heading.appendChild(element('p', (ready ? (typeof person.points === 'number' ? person.points : 0) : '—') + ' points today', 'points'));
+      var points = element('p', '', 'points');
+      var score = ready ? (typeof person.points === 'number' ? person.points : 0) : '—';
+      points.appendChild(element('strong', String(score)));
+      points.appendChild(element('span', 'Points today'));
+      heading.appendChild(points);
       panel.appendChild(heading);
       var content = element('div', '', 'groups');
-      (morning ? [0] : [1, 2]).forEach(function (index) {
+      (morning ? [0] : [0, 1, 2]).forEach(function (index) {
         var title = index === 0 ? 'Before school' : index === 1 ? 'After school' : 'After dinner';
         var deadline = index === 0 ? 'Ready by 7:45 am' : index === 1 ? 'By 6 pm' : 'By 8 pm';
-        var groupTitle = element('h3', title, 'group-title');
+        var groupTitle = element('h3', title, 'group-title group-' + index);
         groupTitle.appendChild(element('span', deadline));
         content.appendChild(groupTitle);
         var list = element('ol');
@@ -110,9 +121,8 @@
           mark.setAttribute('aria-hidden', 'true');
           row.appendChild(mark);
           row.appendChild(element('span', task[1], 'label'));
-          var suffix = done ? 'Done' : state === 'missed' ? 'Not done' : '';
-          if (task[0] === 'ad_bed' && !done) suffix = suffix ? suffix + ' · 8:45 pm' : '8:45 pm';
-          if (suffix) row.appendChild(element('span', suffix, 'state'));
+          row.appendChild(element('span', done ? ' (completed)' : ' (unchecked)', 'sr-only'));
+          if (task[0] === 'ad_bed') row.appendChild(element('span', task[3], 'task-time'));
           list.appendChild(row);
         });
         content.appendChild(list);
