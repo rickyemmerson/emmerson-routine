@@ -7,27 +7,27 @@
 <title>Emmerson Routine · TV board</title>
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; background: #20192c; color: #faf6ff; font: 600 18px/1.35 system-ui, sans-serif; }
-  main { max-width: 1920px; margin: auto; padding: 3vh 4vw 2vh; }
+  body { margin: 0; background: #20192c; color: #faf6ff; font: 400 18px/1.35 system-ui, sans-serif; }
+  main { max-width: 1920px; margin: auto; padding: 3.5vh 5vw 2vh; }
   header, .person, .group-title { display: flex; justify-content: space-between; align-items: baseline; gap: .7rem; }
   h1, h2, h3, p { margin: 0; }
-  h1 { font-size: 5vw; font-size: clamp(24px, min(5vw, 7vh), 80px); letter-spacing: -.035em; line-height: 1.1; }
+  h1 { font-size: 5vw; font-size: clamp(24px, min(4.7vw, 6.5vh), 76px); font-weight: 600; letter-spacing: -.025em; line-height: 1.1; }
   #date, footer { color: #ded0ec; font-size: clamp(13px, min(1.65vw, 2.4vh), 28px); }
-  header { margin-bottom: 2vh; }
+  header { margin-bottom: 3vh; }
   #board { display: flex; justify-content: space-between; align-items: stretch; }
-  section { width: 49%; min-width: 0; border-radius: 14px; background: #fff5f7; color: #421729; overflow: hidden; }
+  section { width: 48.25%; min-width: 0; border-radius: 14px; background: #fff5f7; color: #421729; overflow: hidden; }
   section + section { background: #f5efff; color: #30194e; }
-  .person { padding: 1.2vh 2vw; color: white; background: #932747; }
-  section + section .person { background: #59338b; }
-  h2 { font-size: clamp(22px, min(3vw, 4.5vh), 62px); line-height: 1.15; }
+  .person { padding: 1.6vh 2.4vw; color: #72213e; background: #f6dfe7; }
+  section + section .person { color: #49296f; background: #e9ddf7; }
+  h2 { font-size: clamp(22px, min(3vw, 4.25vh), 60px); font-weight: 600; line-height: 1.15; }
   .points { font-size: clamp(14px, min(2vw, 3vh), 38px); font-variant-numeric: tabular-nums; text-align: right; }
-  .groups { padding: .8vh 2vw 1.3vh; }
-  .group-title { margin-top: 1.2vh; padding-bottom: .6vh; font-size: clamp(14px, min(1.7vw, 2.7vh), 32px); line-height: 1.2; }
-  .group-title span { font-weight: 500; text-align: right; }
+  .groups { padding: .6vh 2.4vw 1.5vh; }
+  .group-title { margin-top: 1.6vh; padding-bottom: .6vh; font-size: clamp(14px, min(1.7vw, 2.6vh), 32px); font-weight: 600; line-height: 1.2; }
+  .group-title span { font-weight: 400; text-align: right; }
   ol { padding: 0; margin: 0; list-style: none; }
-  li { display: flex; align-items: center; gap: .65em; padding: .42vh 0; border-top: 1px solid #22112b30; font-size: 2.8vh; font-size: clamp(13px, min(2.1vw, 3.25vh), 40px); line-height: 1.25; }
+  li { display: flex; align-items: center; gap: .8em; padding: .55vh 0; font-size: 2.8vh; font-size: clamp(13px, min(2vw, 3.05vh), 39px); line-height: 1.25; }
   #board.morning li { padding: 1.2vh 0; font-size: clamp(16px, min(2.8vw, 5vh), 52px); }
-  .mark { width: .65em; height: .65em; flex: 0 0 .65em; border: 2px solid currentColor; border-radius: 3px; }
+  .mark { width: .65em; height: .65em; flex: 0 0 .65em; border: 1px solid currentColor; border-radius: 3px; }
   .done .mark { background: #256343; border-color: #256343; }
   .done .mark::after { content: ''; display: block; width: .24em; height: .4em; margin: -.03em auto 0; border: solid white; border-width: 0 .08em .08em 0; transform: rotate(45deg); }
   .done .label { text-decoration: line-through; }
