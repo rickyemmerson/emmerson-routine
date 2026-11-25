@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Emmerson Routine · TV board</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;display=swap">
 <style>
   * { box-sizing: border-box; }
+  :root { --display-font: "Fredoka", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif; }
   body { margin: 0; background: #20192c; color: #faf6ff; font: 400 18px/1.35 system-ui, sans-serif; }
   main { max-width: 1920px; margin: auto; padding: 2.4vh 4.5vw 1.5vh; }
   header, .person, .group-title { display: flex; justify-content: space-between; align-items: baseline; gap: .7rem; }
   h1, h2, h3, p { margin: 0; }
-  h1 { font-size: 4vw; font-size: clamp(23px, min(4.2vw, 5.6vh), 68px); font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
+  h1 { font-family: var(--display-font); font-size: 4vw; font-size: clamp(23px, min(4.2vw, 5.6vh), 68px); font-weight: 600; letter-spacing: -.015em; line-height: 1.1; }
+  h1::after { content: ''; display: inline-block; width: .44em; height: .44em; margin-left: .38em; vertical-align: .18em; background: #ffd67b; clip-path: polygon(50% 0, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0 50%, 37% 37%); }
   #date, footer { color: #ded0ec; font-size: clamp(13px, min(1.65vw, 2.4vh), 28px); }
   header { margin-bottom: 2vh; }
   #board { display: flex; justify-content: space-between; align-items: stretch; }
@@ -19,17 +22,23 @@
   section + section { background: #f5efff; color: #30194e; }
   .person { align-items: center; position: relative; overflow: hidden; padding: 1.25vh 2.25vw; color: #421729; background: #ffabc8; }
   section + section .person { color: #30194e; background: #c6b4ff; }
-  .person::before, .person::after { content: ''; position: absolute; pointer-events: none; border: .5vh solid currentColor; opacity: .16; transform: rotate(24deg); }
-  .person::before { width: 4.8vh; height: 4.8vh; border-radius: 50%; left: 46%; top: -2.4vh; }
-  .person::after { width: 2.6vh; height: 2.6vh; border-radius: 20%; left: 57%; bottom: -1vh; }
-  h2 { font-size: clamp(22px, min(4vw, 5.8vh), 75px); font-weight: 750; letter-spacing: -.025em; line-height: 1.05; }
-  .points { display: flex; align-items: center; gap: .65em; padding: .45vh .65em; border: 1px solid #ffffff75; border-radius: 10px; background: #ffffff70; font-size: clamp(12px, min(1.3vw, 2.1vh), 25px); line-height: 1.15; }
-  .points strong { font-size: 1.9em; font-variant-numeric: tabular-nums; }
+  .person::before, .person::after { content: ''; position: absolute; pointer-events: none; height: 1.1vh; border-radius: 50%; transform: rotate(-28deg); }
+  .person::before { width: 3.6vh; left: 47%; top: 23%; background: #fff2a8; box-shadow: 2.8vh 3.5vh 0 #dc5b8c; }
+  .person::after { width: 2.2vh; left: 53%; bottom: 21%; background: #fff6fb; }
+  section + section .person::before { background: #d9f7a9; box-shadow: 2.8vh 3.5vh 0 #9975db; }
+  h2 { position: relative; font-family: var(--display-font); font-size: clamp(22px, min(4vw, 5.8vh), 75px); font-weight: 600; letter-spacing: -.015em; line-height: 1.05; }
+  .points { position: relative; display: flex; align-items: center; gap: .65em; padding: .45vh .65em; border: 1px solid #ffffff75; border-radius: 10px; background: #ffffff70; font-size: clamp(12px, min(1.3vw, 2.1vh), 25px); line-height: 1.15; }
+  .points strong { font: 600 1.9em/1 var(--display-font); font-variant-numeric: tabular-nums; }
+  .points strong::after { content: ''; display: inline-block; width: .29em; height: .29em; margin-left: .28em; vertical-align: .27em; border-radius: 2px; background: currentColor; transform: rotate(45deg); }
   .groups { padding: .55vh 2.25vw 1.35vh; }
-  .group-title { margin-top: .85vh; padding: .44vh .65em; border-radius: 5px; background: #fae6b5; color: #4d3415; font-size: clamp(13px, min(1.55vw, 2.5vh), 30px); font-weight: 700; line-height: 1.2; }
+  .group-title { margin-top: .85vh; padding: .44vh .65em; border-radius: 5px; background: #fae6b5; color: #4d3415; font-family: var(--display-font); font-size: clamp(13px, min(1.55vw, 2.5vh), 30px); font-weight: 600; line-height: 1.2; }
   .group-1 { background: #dcecd7; color: #274531; }
   .group-2 { background: #e6def5; color: #43285f; }
-  .group-title span { font-weight: 400; text-align: right; }
+  .group-title span { font: 400 .86em/1.2 system-ui, sans-serif; text-align: right; }
+  .group-name { display: inline-flex; align-items: center; gap: .5em; }
+  .group-name::before { content: ''; flex: 0 0 .63em; width: .63em; height: .63em; border-radius: 50%; background: #95600c; }
+  .group-1 .group-name::before { border-radius: 2px; background: #397251; transform: rotate(-12deg); }
+  .group-2 .group-name::before { background: transparent; box-shadow: inset .22em -.12em #694797; transform: rotate(-20deg); }
   ol { padding: 0; margin: 0; list-style: none; }
   li { display: flex; align-items: center; gap: .7em; padding: .36vh .45em; font-size: 2.4vh; font-size: clamp(13px, min(1.7vw, 2.5vh), 34px); line-height: 1.24; }
   #board.morning li { padding: 1.2vh 0; font-size: clamp(16px, min(2.8vw, 5vh), 52px); }
@@ -107,7 +116,8 @@
       (morning ? [0] : [0, 1, 2]).forEach(function (index) {
         var title = index === 0 ? 'Before school' : index === 1 ? 'After school' : 'After dinner';
         var deadline = index === 0 ? 'Ready by 7:45 am' : index === 1 ? 'By 6 pm' : 'By 8 pm';
-        var groupTitle = element('h3', title, 'group-title group-' + index);
+        var groupTitle = element('h3', '', 'group-title group-' + index);
+        groupTitle.appendChild(element('b', title, 'group-name'));
         groupTitle.appendChild(element('span', deadline));
         content.appendChild(groupTitle);
         var list = element('ol');
