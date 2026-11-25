@@ -355,6 +355,15 @@ body[data-theme="olivia"] .points-hero{background:#6546dc;box-shadow:0 14px 35px
 </style>
 </head>
 <body>
+<div id="secure-entry" style="position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;background:#eee9fa;color:#252535">
+  <div style="width:min(100%,360px);background:white;border-radius:22px;padding:24px;box-shadow:0 8px 30px #20202018">
+    <h1 style="font-size:24px;margin-bottom:10px">Emmerson Routine</h1>
+    <p style="line-height:1.5;margin-bottom:16px">Use the passkey you set up on this phone to open your family’s routine.</p>
+    <button id="passkey-login" class="primary-btn" style="width:100%;font-size:16px;padding:14px" disabled>Open with Face ID</button>
+    <p id="secure-status" role="status" aria-live="polite" style="margin-top:12px;line-height:1.4">Loading secure sign-in…</p>
+    <p style="font-size:12px;color:#555;margin-top:12px">Your phone may use Touch ID or its passcode. If you need to set up access again, use the Face ID setup page.</p>
+  </div>
+</div>
 
 <!-- BACKGROUND -->
 <div class="bg-scene">
@@ -855,7 +864,7 @@ function appLoad(){
 function appPersist(){appRevision++;localStorage.setItem(APP_KEY,JSON.stringify(appData));appPush();}
 async function appSync(){
   const startRevision=appRevision;
-  try{const r=await fetch(SUPA_URL+'/rest/v1/data?select=value&order=id.desc&limit=1',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}});if(!r.ok)return;const rows=await r.json();if(!rows[0]?.value)return;const cloud=JSON.parse(rows[0].value).routineV7;if(!cloud||appRevision!==startRevision)return;appData=appEnsureData(cloud);localStorage.setItem(APP_KEY,JSON.stringify(appData));appRender();}catch(e){console.log('Routine sync unavailable',e);}
+  try{const token=await window.routineAccessToken();const r=await fetch(SUPA_URL+'/rest/v1/data?select=value&order=id.desc&limit=1',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}});if(!r.ok)throw new Error('Could not load family data');const rows=await r.json();if(!rows[0]?.value)throw new Error('Family data was not found');const cloud=JSON.parse(rows[0].value).routineV7;if(!cloud||appRevision!==startRevision)throw new Error('Family data could not be loaded');appData=appEnsureData(cloud);localStorage.setItem(APP_KEY,JSON.stringify(appData));appRender();return true;}catch(e){console.log('Routine sync unavailable',e);return false;}
 }
 async function appPush(){
   if(appSaving){appPushQueued=true;return;}
@@ -863,7 +872,8 @@ async function appPush(){
   do{
     appPushQueued=false;
     try{
-      const r=await fetch(SUPA_URL+'/rest/v1/data?on_conflict=id',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:1,value:JSON.stringify({routineV7:appData})})});
+      const token=await window.routineAccessToken();
+      const r=await fetch(SUPA_URL+'/rest/v1/data?on_conflict=id',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:1,value:JSON.stringify({routineV7:appData})})});
       if(!r.ok)throw new Error(`Save failed (${r.status})`);
     }catch(e){console.log('Routine save unavailable',e);showToast('Saved on this device — online sync will retry next time');}
   }while(appPushQueued);
@@ -950,18 +960,38 @@ function openWallet(g){appGirl=g;appShow('wallet');}
 function renderWallet(){const g=appSession==='parent'?(appGirl||'abby'):appSession,a=appAccount(g),w=appWallet(g),rewards=[{id:'dessert',emoji:'🍨',name:'Dessert',desc:'Spend points for a dessert whenever you choose.',cost:50},{id:'cash5',emoji:'💵',name:'$5 to bank',desc:'Small cash transfer.',cost:150},{id:'cash10',emoji:'💰',name:'$10 to bank',desc:'Save 25 points compared with two $5 transfers.',cost:275},{id:'cash20',emoji:'🌟',name:'$20 to bank',desc:'Best value — save 100 points.',cost:500}];const entries=w.ledger.slice(0,12).map(e=>`<div class="ledger-row"><div>${e.type}<small>${e.note||new Date(e.at).toLocaleDateString('en-AU')}</small></div><div class="ledger-amount" style="color:${e.points<0?'#c23b55':'#1a8a3a'}">${e.points>0?'+':''}${e.points||0} pts</div></div>`).join('')||'<div class="hub-sub">Your bonus and spending history will appear here.</div>';const rows=rewards.map(r=>{const parentOnly=r.id!=='dessert',disabled=a.available<r.cost||(parentOnly&&appSession!=='parent');return`<div class="reward-row"><div class="reward-emoji">${r.emoji}</div><div style="flex:1"><div class="reward-name">${r.name} <span class="cost">${r.cost} pts</span></div><div class="reward-desc">${r.desc}</div></div><button onclick="redeemPoints('${g}','${r.id}',${r.cost})" ${disabled?'disabled':''}>${parentOnly&&appSession!=='parent'?'Parent':'Spend'}</button></div>`}).join('');document.getElementById('wallet-content').innerHTML=`<div class="kid-top"><div><h2>${appName(g)}’s points</h2><div class="hub-sub" style="color:rgba(255,255,255,.65)">Save to earn a 5% bonus each month</div></div><button class="wallet-mini" onclick="appShow('${g}')">Back<strong>Routine</strong></button></div><div class="points-hero"><div class="points-label">Available to spend</div><div class="points-number">${a.available}</div><div class="wallet-stats"><div class="wallet-stat"><strong>${a.earned}</strong><span>Earned</span></div><div class="wallet-stat"><strong>${a.spent}</strong><span>Spent</span></div><div class="wallet-stat"><strong>+${a.bonus}</strong><span>Bonuses</span></div></div></div><div class="hub-card"><div class="hub-title">Rewards</div><div class="hub-sub">Desserts are instant. Cash redemptions are recorded by a parent before transfer.</div>${rows}</div><div class="hub-card"><div class="hub-title">Points history</div><div class="ledger">${entries}</div></div>`;}
 function redeemPoints(g,id,cost){const a=appAccount(g);if(a.available<cost){showToast(`You need ${cost-a.available} more points`);return;}if(id!=='dessert'&&appSession!=='parent'){showToast('Ask a parent to make a bank transfer');return;}const labels={dessert:'Dessert redeemed',cash5:'$5 bank transfer',cash10:'$10 bank transfer',cash20:'$20 bank transfer'};appLedger(g,{type:'reward redemption',points:-cost,note:labels[id]});appPersist();showToast(id==='dessert'?'Dessert redeemed — enjoy!':'Bank transfer recorded');renderWallet();}
 
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){appApplySavingsBonus();appRender();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&appSession){appApplySavingsBonus();appRender();}});
 function appUpdateDateDisplay(){document.getElementById('dateDisplayBtn').textContent=appDate.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});}
 window.changeDay=d=>{appDate.setDate(appDate.getDate()+d);currentDate=new Date(appDate);appUpdateDateDisplay();appRender();};
 window.goToday=()=>{appDate=new Date();appDate.setHours(0,0,0,0);currentDate=new Date(appDate);appUpdateDateDisplay();appRender();};
 window.openCal=()=>{currentDate=new Date(appDate);calViewDate=new Date(appDate);renderCalGrid();document.getElementById('calOverlay').classList.add('open');};
 window.selectCalDay=(y,m,d)=>{appDate=new Date(y,m,d);appDate.setHours(0,0,0,0);currentDate=new Date(appDate);appUpdateDateDisplay();document.getElementById('calOverlay').classList.remove('open');appRender();};
-function appBootstrap(){
+async function appBootstrap(){
   appLoad();
+  if(!await appInitialSync){appData=null;throw new Error('Could not load the shared points. Check your connection and try again.');}
+  appStartPoints();appApplySavingsBonus();
   exitParent();
-  Promise.resolve(appInitialSync).finally(()=>{appStartPoints();appApplySavingsBonus();appRender();});
 }
-appBootstrap();
+</script>
+<script type="module">
+const status=document.getElementById('secure-status'),button=document.getElementById('passkey-login');
+try {
+  const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.0/+esm');
+  const client=createClient('https://lfwxbxrsureqdlxjlfgf.supabase.co','sb_publishable_UVxQWE2KErQpNx_V1TYxbw_MsxaohKA',{auth:{experimental:{passkey:true},storageKey:'emmRoutineAuth'}});
+  window.routineAccessToken=async()=>{const {data,error}=await client.auth.getSession();if(error||!data.session)throw new Error('Sign in again to sync');return data.session.access_token;};
+  button.disabled=false;status.textContent='Ready to sign in.';
+  button.addEventListener('click',async()=>{
+    button.disabled=true;status.textContent='Follow your phone’s passkey prompt…';
+    try{
+      const {data,error}=await client.auth.signInWithPasskey();
+      if(error)throw error;
+      if(data.user?.id!=='a693c062-863d-4399-bb5a-db6ff40b4e3f')throw new Error('Please choose the family account passkey.');
+      status.textContent='Loading your family’s points…';
+      await appBootstrap();
+      document.getElementById('secure-entry').remove();
+    }catch(error){status.textContent=error.message||'Sign-in did not finish. Please try again.';button.disabled=false;}
+  });
+}catch(error){status.textContent='Secure sign-in could not load. Check your connection and reopen the app.';}
 </script>
 </body>
 </html>
