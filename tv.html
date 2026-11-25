@@ -52,7 +52,7 @@
   #board.morning li { padding-block: .85vh; font-size: clamp(15px, min(2.45vw, 4.2vh), 45px); }
   #board.later li { padding-block: .26vh; font-size: clamp(12px, min(1.45vw, 2.1vh), 30px); }
   .bonus-list { display:flex; flex-wrap:wrap; }
-  #board.later .bonus-list li { width: 33.33%; padding-inline: .4em; gap: .4em; font-size: clamp(11px, min(1.15vw, 1.8vh), 24px); }
+  #board .bonus-list li { width: 33.33%; padding: .32vh .4em; gap: .4em; font-size: clamp(11px, min(1.15vw, 1.8vh), 24px); }
   .label { min-width: 0; overflow-wrap: break-word; overflow-wrap: anywhere; }
   .mark { width: .65em; height: .65em; flex: 0 0 .65em; border: 1px solid currentColor; border-radius: 3px; }
   .done .mark { background: #256343; border-color: #256343; }
@@ -157,7 +157,7 @@
       heading.appendChild(points);
       panel.appendChild(heading);
       var content = element('div', '', 'groups');
-      (morning ? ['morning'] : periods).forEach(function (period) {
+      (morning ? ['morning', 'bonus'] : periods).forEach(function (period) {
         var assigned = catalogue.filter(function (task) {
           return task.group === period && (morning || !task.morningOnly) && RoutineTasks.assigned(task, girl, dow);
         });
