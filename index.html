@@ -374,6 +374,10 @@ body[data-theme="olivia"] .points-hero{background:#6546dc;box-shadow:0 14px 35px
   .routine-tick{min-height:34px;min-width:40px;display:flex;align-items:center;justify-content:flex-end;gap:8px;cursor:pointer}
   .routine-tick input{width:20px;height:20px;accent-color:#623a83}
   .routine-lock,.routine-character{padding:8px 12px;margin-bottom:10px;background:#f5eef9;color:#412b55;border-radius:9px}
+  .routine-character{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-block:4px;font-size:14px;font-weight:700}
+  .routine-character-actions{display:flex;align-items:center;gap:5px}
+  .routine-character-actions output{min-width:2.3em;text-align:center;font-variant-numeric:tabular-nums}
+  .routine-character-actions button{min-width:44px;min-height:44px;border:1px solid #c6b8ce;border-radius:8px;background:#fff;color:#412b55;font:700 21px/1 system-ui;cursor:pointer}
   .task-editor-launch{margin:0 0 12px;min-height:40px}
   #task-editor{box-sizing:border-box;position:fixed;inset:0;margin:auto;width:min(540px,calc(100vw - 24px));max-height:86vh;overflow:auto;padding:16px;border:0;border-radius:14px;background:#fffafd;color:#302237}
   #task-editor::backdrop{background:#21132dbd}
@@ -1001,8 +1005,7 @@ function appAccount(g,asOf){
 }
 function appTogetherPoints(){return appAccount('abby').available+appAccount('olivia').available;}
 function appCharacterPoints(g){return appDay().char?.[g]||0;}
-function appChangeCharacter(g,delta){const day=appDay();day.char||={};day.char[g]=(day.char[g]||0)+delta;appSyncRoutineLedger(g);appPersist();appRender();showToast(delta>0?'Character point awarded':'Character point deducted');}
-function appResetCharacter(g){const day=appDay();day.char||={};day.char[g]=0;appSyncRoutineLedger(g);appPersist();appRender();showToast('Character points reset');}
+function appChangeCharacter(g,delta){const before=appDayScore(g),day=appDay();day.char||={};day.char[g]=(day.char[g]||0)+delta;appSyncRoutineLedger(g,appDateKey(),before);appPersist();appRender();showToast(delta>0?'Character point awarded':'Character point deducted');}
 function appStartPoints(){
   /* One-time migration: a real account is a ledger, never a daily recalculation. */
   if(appLoad().settings.pointsLedgerV4)return;
@@ -1071,10 +1074,10 @@ function renderKid(g){
       <div><h2>${appName(g)}’s jobs</h2><p class="hub-sub">${appDayScore(g)} points for this day</p></div>
       <div class="routine-top-actions"><button class="wallet-mini" onclick="openWallet('${g}')">Balance <strong>${account.available}</strong></button><button class="wallet-mini" onclick="openParent()">Parent</button></div>
     </div>
+    ${appCharacterCard(g)}
     ${notice?`<div class="savings-pop"><button onclick="dismissNotice('${g}')">Got it</button><strong>Savings bonus · +${notice.points} points</strong></div>`:''}
     ${locked?`<p class="routine-lock">Point entry closes at ${CHILD_CUTOFF.label}. Parents can edit past entries.</p>`:''}
     ${sections||'<p>No jobs assigned for this day.</p>'}
-    <details class="routine-character"><summary>Character points</summary>${appCharacterCard(g)}</details>
   `;
 }
 function appSaveTaskScore(g,id,score,reviewed){
@@ -1108,7 +1111,17 @@ function submitTask(g,id,score){
 function dismissNotice(g){delete appWallet(g).notice;appPersist();renderKid(g);}
 
 function renderParent(){const items=['abby','olivia'].flatMap(g=>appPending(g).map(t=>({g,t,bonus:false}))),pins=appLoad().settings.pins;const reviews=items.length?`<div class="section-label big"><div class="sl-text">Waiting for review</div></div>`+items.map(x=>{const proposed=x.t.btns.find(b=>b.key===appRecord(x.g,x.t.id)?.score)?.label||appRecord(x.g,x.t.id)?.score||'No score';return`<div class="review-card"><h3>${appName(x.g)} · ${appEscape(x.t.name)}</h3><div class="review-meta">She chose ${appEscape(proposed)}</div><div class="review-actions">${x.t.btns.map(b=>`<button class="${b.pts>1?'good':b.pts<0?'bad':'warn'}" onclick="reviewTask('${x.g}','${x.t.id}','${b.key}')">${appEscape(b.label)}<br>${b.pts>=0?'+':''}${b.pts}</button>`).join('')}</div></div>`}).join(''):`<div class="review-summary"><span class="review-dot"></span>Nothing waiting for review</div>`;const girlCards=['abby','olivia'].map(g=>{const a=appAccount(g);return`<section class="parent-girl-card ${g}"><div class="parent-girl-top"><div class="parent-girl-name">${appName(g)}</div><div class="parent-girl-points">${a.available} pts</div></div><div class="parent-girl-sub">${a.earned} earned · ${a.spent} spent</div><div class="parent-card-actions"><button onclick="appShow('${g}')">Edit routine</button><button onclick="openWallet('${g}')">Rewards & cash</button><button onclick="adjustBalance('${g}')">Adjust points</button></div></section>`}).join('');document.getElementById('parent-content').innerHTML=`<div class="parent-head"><h2>Parent dashboard</h2><button class="primary-btn" onclick="exitParent()">Done</button></div><div class="parent-intro">Correct scores, check points, or record a reward.</div>${girlCards}${reviews}<details class="parent-settings"><summary>Settings & savings</summary><div class="settle-note">5% of each unspent balance is added the first time the app opens in a new month (up to 100 points).</div><div class="settle-note">Parent PIN</div><div class="review-actions"><input id="set-parent-pin" aria-label="Parent PIN" inputmode="numeric" maxlength="4" value="${pins.parent}"><button class="primary-btn" onclick="savePins()">Save PIN</button></div></details>`;}
-function appCharacterCard(g){const total=appCharacterPoints(g),state=total>0?'pos':total<0?'neg':'zero';return`<div class="char-card"><div class="char-top"><div><div class="char-title">Character Points</div><div class="char-sub">Kindness · Courage · Generosity · Attitude</div></div><div class="char-total ${state}">${total>=0?'+':''}${total}</div></div><div class="char-btns"><button class="char-btn plus" onclick="appChangeCharacter('${g}',1)"><div class="char-btn-sym">+</div><div class="char-btn-lbl">Award Point</div></button><button class="char-btn minus" onclick="appChangeCharacter('${g}',-1)"><div class="char-btn-sym">−</div><div class="char-btn-lbl">Deduct Point</div></button></div><button class="char-reset" onclick="appResetCharacter('${g}')">Reset to 0</button></div>`;}
+function appCharacterCard(g){
+  const total=appCharacterPoints(g);
+  return `<div class="routine-character">
+    <span>Character points</span>
+    <div class="routine-character-actions">
+      <button type="button" aria-label="Deduct one character point for ${appName(g)}" onclick="appChangeCharacter('${g}',-1)">−</button>
+      <output aria-label="Character points today">${total>0?'+':''}${total}</output>
+      <button type="button" aria-label="Award one character point for ${appName(g)}" onclick="appChangeCharacter('${g}',1)">+</button>
+    </div>
+  </div>`;
+}
 function appParentCharacterCard(){return`<section class="parent-character"><h3>Character points</h3>${['abby','olivia'].map(g=>{const total=appCharacterPoints(g);return`<div class="parent-character-row"><span class="parent-character-name">${appName(g)}</span><button class="minus" onclick="appChangeCharacter('${g}',-1)">−</button><span class="parent-character-total">${total>=0?'+':''}${total}</span><button class="plus" onclick="appChangeCharacter('${g}',1)">+</button></div>`}).join('')}</section>`;}
 const appBaseRenderParent=renderParent;
 renderParent=function(){
