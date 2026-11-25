@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Emmerson Routine · TV board</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400&amp;family=Fredoka:wght@600&amp;display=swap">
 <style>
   * { box-sizing: border-box; }
   :root { --display-font: "Fredoka", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif; }
-  body { margin: 0; background: #20192c; color: #faf6ff; font: 400 18px/1.35 system-ui, sans-serif; }
+  :root { --task-font: "DM Sans", system-ui, sans-serif; }
+  body { margin: 0; background: #20192c; color: #faf6ff; font: 400 18px/1.35 var(--task-font); }
   main { max-width: 1920px; margin: auto; padding: 2.4vh 4.5vw 1.5vh; }
   header, .person, .group-title { display: flex; justify-content: space-between; align-items: baseline; gap: .7rem; }
   h1, h2, h3, p { margin: 0; }
@@ -34,7 +35,7 @@
   .group-title { margin-top: .85vh; padding: .44vh .65em; border-radius: 5px; background: #fae6b5; color: #4d3415; font-family: var(--display-font); font-size: clamp(13px, min(1.55vw, 2.5vh), 30px); font-weight: 600; line-height: 1.2; }
   .group-1 { background: #dcecd7; color: #274531; }
   .group-2 { background: #e6def5; color: #43285f; }
-  .group-title span { font: 400 .86em/1.2 system-ui, sans-serif; text-align: right; }
+  .group-title span { font: 400 .86em/1.2 var(--task-font); text-align: right; }
   .group-name { display: inline-flex; align-items: center; gap: .5em; }
   .group-name::before { content: ''; flex: 0 0 .63em; width: .63em; height: .63em; border-radius: 50%; background: #95600c; }
   .group-1 .group-name::before { border-radius: 2px; background: #397251; transform: rotate(-12deg); }
