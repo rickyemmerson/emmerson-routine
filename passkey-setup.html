@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Emmerson Routine — Face ID setup</title>
+  <style>
+    body{font:16px/1.5 system-ui,sans-serif;background:#f7f3ea;color:#24252b;max-width:31rem;margin:auto;padding:2rem 1.25rem}
+    main{background:#fff;border-radius:20px;padding:1.5rem;box-shadow:0 8px 30px #20202018}
+    h1{font-size:1.7rem;line-height:1.2} label{display:block;font-weight:600;margin-top:1rem}
+    input,button{box-sizing:border-box;width:100%;font:inherit;padding:.8rem;border-radius:10px;margin-top:.4rem}
+    input{border:1px solid #888}button{border:0;background:#6c33a3;color:#fff;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.5}#message{min-height:3rem} .note{color:#555;font-size:.9rem}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Set up Face ID</h1>
+  <p>On each phone, sign in once and create a passkey for Emmerson Routine. Your phone may use Face ID, Touch ID or its passcode.</p>
+  <form id="login">
+    <label>Email<input id="email" type="email" autocomplete="username" required></label>
+    <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+    <button id="sign-in" type="submit">Sign in</button>
+  </form>
+  <button id="register" type="button" hidden>Create passkey</button>
+  <p id="message" role="status" aria-live="polite">Loading secure sign-in…</p>
+  <p class="note">Keep your account password somewhere safe as a recovery option. This page only registers a passkey; the app’s secure sign-in will be enabled after setup is verified.</p>
+</main>
+<script type="module">
+  const status = document.querySelector('#message');
+  const form = document.querySelector('#login');
+  const register = document.querySelector('#register');
+  try {
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.0/+esm');
+    const client = createClient('https://lfwxbxrsureqdlxjlfgf.supabase.co', 'sb_publishable_UVxQWE2KErQpNx_V1TYxbw_MsxaohKA', { auth: { experimental: { passkey: true }, storageKey: 'emmRoutineAuth' } });
+    status.textContent = 'Sign in with your family account to begin.';
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = document.querySelector('#sign-in');
+      button.disabled = true;
+      status.textContent = 'Signing in…';
+      try {
+        const { error } = await client.auth.signInWithPassword({ email: document.querySelector('#email').value.trim(), password: document.querySelector('#password').value });
+        document.querySelector('#password').value = '';
+        if (error) throw error;
+        form.hidden = true;
+        register.hidden = false;
+        status.textContent = 'Signed in. Tap Create passkey and follow your phone’s prompts.';
+      } catch (error) { status.textContent = `Could not sign in: ${error.message}`; }
+      finally { button.disabled = false; }
+    });
+    register.addEventListener('click', async () => {
+      register.disabled = true;
+      status.textContent = 'Follow your phone’s passkey prompt…';
+      try {
+        const { error } = await client.auth.registerPasskey();
+        if (error) throw error;
+        register.hidden = true;
+        status.textContent = 'Passkey created on this phone. Tell Codex when both phones are set up.';
+      } catch (error) { status.textContent = `Could not create passkey: ${error.message}`; }
+      finally { register.disabled = false; }
+    });
+  } catch (error) { status.textContent = `Secure sign-in could not load: ${error.message}`; }
+</script>
+</body>
+</html>
