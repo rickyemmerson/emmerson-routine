@@ -35,16 +35,21 @@
   .group-title { margin-top: .85vh; padding: .44vh .65em; border-radius: 5px; background: #fae6b5; color: #4d3415; font-family: var(--display-font); font-size: clamp(13px, min(1.55vw, 2.5vh), 30px); font-weight: 600; line-height: 1.2; }
   .group-1 { background: #dcecd7; color: #274531; }
   .group-2 { background: #e6def5; color: #43285f; }
+  .group-3 { background: #f5dce9; color: #632e51; }
   .group-title span { font: 400 .86em/1.2 var(--task-font); text-align: right; }
   .group-name { display: inline-flex; align-items: center; gap: .5em; }
   .group-name::before { content: ''; flex: 0 0 .63em; width: .63em; height: .63em; border-radius: 50%; background: #95600c; }
   .group-1 .group-name::before { border-radius: 2px; background: #397251; transform: rotate(-12deg); }
   .group-2 .group-name::before { background: transparent; box-shadow: inset .22em -.12em #694797; transform: rotate(-20deg); }
+  .group-3 .group-name::before { border-radius: 2px; background: #94416a; transform: rotate(45deg); }
   ol { padding: 0; margin: 0; list-style: none; }
   li { display: flex; align-items: center; gap: .7em; padding: .42vh .65em; font-size: 2.2vh; font-size: clamp(12px, min(1.55vw, 2.28vh), 31px); line-height: 1.3; }
   li:nth-child(odd) { background: #fffdfd; }
   section + section li:nth-child(odd) { background: #fcfaff; }
   #board.morning li { padding-block: .85vh; font-size: clamp(15px, min(2.45vw, 4.2vh), 45px); }
+  #board.later li { padding-block: .26vh; font-size: clamp(12px, min(1.45vw, 2.1vh), 30px); }
+  .bonus-list { display:flex; flex-wrap:wrap; }
+  #board.later .bonus-list li { width: 33.33%; padding-inline: .4em; gap: .4em; font-size: clamp(11px, min(1.15vw, 1.8vh), 24px); }
   .mark { width: .65em; height: .65em; flex: 0 0 .65em; border: 1px solid currentColor; border-radius: 3px; }
   .done .mark { background: #256343; border-color: #256343; }
   .done .mark::after { content: ''; display: block; width: .24em; height: .4em; margin: -.03em auto 0; border: solid white; border-width: 0 .08em .08em 0; transform: rotate(45deg); }
@@ -67,19 +72,19 @@
   <footer id="status" role="status">Connecting to the jobs board…</footer>
   <noscript>The TV browser needs JavaScript enabled to show the jobs board.</noscript>
 </main>
+<script src="routine-tasks.js?v=jobs1"></script>
 <script>
 (function () {
   'use strict';
-  var groups = [[["m_breakfast","Breakfast Eaten","","9:00 am"],["m_teeth","Teeth Brushed","","9:00 am"],["m_dogfed","Dog Fed","dog","9:00 am"],["m_bed","Bed Made","","9:00 am"]],[["as_homework","Homework","","6:00 pm"],["as_music","Music Practice","","6:00 pm"],["as_bedroom","Bedroom Clean","","6:00 pm"],["as_dogwalk","Dog Walk","dog","6:00 pm"],["as_poopatrol","Poo Patrol","dog","6:00 pm"],["as_dogfed","Dog Fed","dog","6:00 pm"],["as_washing","Clean Washing Away","","6:00 pm"]],[["ad_lunch","School Lunch Packed","school","8:00 pm"],["ad_kitchen","Kitchen Duty","kitchen","8:00 pm"],["ad_shower","Shower","","8:00 pm"],["ad_clothes","Dirty Clothes Away","","8:00 pm"],["ad_bag","School Bag Packed","school","8:00 pm"],["ad_teeth","Teeth Brushed","","8:00 pm"],["ad_bed","In Bed, Lights Off","","8:45 pm"]]];
-  var dog = ['abby','abby','olivia','abby','olivia','abby','olivia'];
-  var kitchen = [null,'olivia','abby','olivia','abby','olivia','abby'];
+  var periods = ['morning', 'school', 'dinner', 'bonus'];
+  var dueTimes = {morning:'07:45',school:'18:00',dinner:'20:00'};
   var weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   var snapshot = null;
   var lastRender = '';
   var connection = 'Connecting to the jobs board…';
   var refreshTimer;
   var requestInFlight = false;
-  var endpoint = 'https://lfwxbxrsureqdlxjlfgf.supabase.co/rest/v1/routine_tv_today?select=day,board';
+  var endpoint = 'https://lfwxbxrsureqdlxjlfgf.supabase.co/rest/v1/routine_tv?select=day,board,jobs';
   function brisbane() {
     return new Date(Date.now() + 10 * 60 * 60 * 1000);
   }
@@ -94,7 +99,8 @@
     var morning = now.getUTCHours() < 12;
     var data = snapshot && snapshot.day === day ? snapshot.board : {};
     var ready = connection === 'Updates automatically' || Boolean(snapshot && snapshot.day === day);
-    var key = JSON.stringify([day, morning, data, ready]);
+    var overrides = snapshot ? snapshot.jobs : {};
+    var key = JSON.stringify([day, morning, data, ready, overrides]);
     var status = document.getElementById('status');
     if (status.textContent !== connection) status.textContent = connection;
     if (key === lastRender) return;
@@ -104,6 +110,7 @@
     var board = document.getElementById('board');
     board.className = morning ? 'morning' : 'later';
     board.textContent = '';
+    var catalogue = RoutineTasks.list(overrides);
     ['abby', 'olivia'].forEach(function (girl) {
       var person = data[girl] || {}, states = person.tasks || {};
       var panel = element('section');
@@ -116,26 +123,29 @@
       heading.appendChild(points);
       panel.appendChild(heading);
       var content = element('div', '', 'groups');
-      (morning ? [0] : [0, 1, 2]).forEach(function (index) {
-        var title = index === 0 ? 'Before school' : index === 1 ? 'After school' : 'After dinner';
-        var deadline = index === 0 ? 'Ready by 7:45 am' : index === 1 ? 'By 6 pm' : 'By 8 pm';
+      (morning ? ['morning'] : periods).forEach(function (period) {
+        var assigned = catalogue.filter(function (task) {
+          return task.group === period && (morning || !task.morningOnly) && RoutineTasks.assigned(task, girl, dow);
+        });
+        if (!assigned.length) return;
+        var index = periods.indexOf(period);
+        var title = RoutineTasks.groups[period];
+        var defaultDue = dueTimes[period];
+        var deadline = assigned.some(function (task) { return task.due && task.due === defaultDue; }) ? RoutineTasks.time(defaultDue) : '';
         var groupTitle = element('h3', '', 'group-title group-' + index);
         groupTitle.appendChild(element('b', title, 'group-name'));
-        groupTitle.appendChild(element('span', deadline));
+        if (deadline) groupTitle.appendChild(element('span', 'By ' + deadline));
         content.appendChild(groupTitle);
-        var list = element('ol');
-        groups[index].forEach(function (task) {
-          if ((task[2] === 'dog' && dog[dow] !== girl) ||
-              (task[2] === 'kitchen' && kitchen[dow] !== girl) ||
-              (task[2] === 'school' && (dow === 5 || dow === 6))) return;
-          var state = states[task[0]], done = state === 'done';
+        var list = element('ol', '', period === 'bonus' ? 'bonus-list' : '');
+        assigned.forEach(function (task) {
+          var done = states[task.id] === 'done';
           var row = element('li', '', done ? 'done' : '');
           var mark = element('span', '', 'mark');
           mark.setAttribute('aria-hidden', 'true');
           row.appendChild(mark);
-          row.appendChild(element('span', task[1], 'label'));
+          row.appendChild(element('span', task.name, 'label'));
           row.appendChild(element('span', done ? ' (completed)' : ' (unchecked)', 'sr-only'));
-          if (task[0] === 'ad_bed') row.appendChild(element('span', task[3], 'task-time'));
+          if (task.due && task.due !== defaultDue) row.appendChild(element('span', RoutineTasks.time(task.due), 'task-time'));
           list.appendChild(row);
         });
         content.appendChild(list);

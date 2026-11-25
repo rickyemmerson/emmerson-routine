@@ -14,8 +14,10 @@
       }
       return Object.values(latest).sort((a, b) => String(b.at).localeCompare(String(a.at)));
     }
-    // A score selection is indivisible: keep its score and review metadata together.
-    if (object(local) && !(path[0] === 'daily' && path.length >= 4 && ('score' in local || 'state' in local))) {
+    // Score entries and job definitions are edited as whole records.
+    const score = path[0] === 'daily' && path.length >= 4 && object(local) && ('score' in local || 'state' in local);
+    const job = path.length === 3 && path[0] === 'settings' && path[1] === 'taskOverrides';
+    if (object(local) && !score && !job) {
       const result = { ...remote };
       for (const key of new Set([...Object.keys(base || {}), ...Object.keys(local)])) {
         const value = merge(base?.[key], local[key], remote?.[key], [...path, key]);
@@ -33,13 +35,16 @@
     for (const girl of ['abby', 'olivia']) {
       const wallet = result.wallets?.[girl];
       if (!wallet?.ledger) continue;
+      const remoteEntries = new Map((remote.wallets?.[girl]?.ledger || []).map(entry => [entry.reference, entry]));
       // A day can contain changes from both phones. Its ledger entry must reflect both.
       result.wallets = { ...result.wallets, [girl]: {
         ...wallet,
         ledger: wallet.ledger.map(entry => {
           const key = /^routine:(\d{4}-\d{2}-\d{2})$/.exec(entry.reference || '')?.[1];
           if (!key || equal(base.daily?.[key], local.daily?.[key])) return entry;
-          return { ...entry, points: dayScore(result, girl, key) };
+          const current = remoteEntries.get(entry.reference);
+          const points = dayScore(result, girl, key);
+          return { ...entry, points: current ? current.points + points - dayScore(remote, girl, key) : points };
         })
       } };
     }
