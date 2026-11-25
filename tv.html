@@ -58,7 +58,15 @@
   .done .mark { background: #256343; border-color: #256343; }
   .done .mark::after { content: ''; display: block; width: .24em; height: .4em; margin: -.03em auto 0; border: solid white; border-width: 0 .08em .08em 0; transform: rotate(45deg); }
   .done .label { text-decoration: line-through; }
-  .task-time { margin-left: auto; padding-left: .3em; text-align: right; font-size: .76em; }
+  .task-time { color: #62445c; text-align: right; font-size: .76em; white-space: nowrap; }
+  .choices { display: flex; flex: 0 0 auto; gap: .38em; margin-left: auto; align-items: center; font-size: .76em; }
+  .choice { position: relative; display: inline-flex; align-items: baseline; justify-content: center; gap: .28em; min-width: 3.5em; padding: .11em .46em; border: 1px solid #d9cddd; border-radius: 4px; background: #ffffff98; white-space: nowrap; }
+  .choice-points, .bonus-points { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .choice.selected { font-weight: 700; }
+  .choice .ink { position: absolute; inset: -14% -5%; width: 110%; height: 128%; color: #217647; pointer-events: none; }
+  .choice.selected.no { padding-left: 1.43em; color: #8e2737; }
+  .choice.no .ink { inset: 15% auto 15% .3em; width: .9em; height: 70%; color: #b42841; }
+  .bonus-points { margin-left: auto; font-size: .76em; color: #632e51; white-space: nowrap; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
   footer { margin-top: 1.4vh; }
   @media (orientation: portrait) and (max-width: 590px) {
@@ -97,6 +105,70 @@
     if (text) node.textContent = text;
     if (className) node.className = className;
     return node;
+  }
+  function pointsLabel(points) {
+    return (points > 0 ? '+' : '') + points;
+  }
+  function crayon(cross) {
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('class', 'ink');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('viewBox', cross ? '0 0 16 16' : '0 0 100 32');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    var strokes = cross
+      ? ['M2 2L13 14 M14 2L3 14', 'M3 1L14 14 M13 2L2 13']
+      : ['M72 3C94 3 99 9 97 17C94 26 75 30 48 30C19 30 3 26 2 17C1 8 20 3 46 2C60 1 74 2 84 5', 'M84 5C63 0 28 2 13 8C-3 14 3 24 23 28C46 33 81 28 92 22C102 15 97 8 87 5'];
+    strokes.forEach(function (d, index) {
+      var path = document.createElementNS(ns, 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'currentColor');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-width', index ? '1' : '2.5');
+      path.setAttribute('opacity', index ? '.56' : '.9');
+      svg.appendChild(path);
+    });
+    return svg;
+  }
+  function taskRow(task, person, defaultDue) {
+    var options = task.btns || [];
+    var previous = (person.tasks || {})[task.id];
+    var selected = (person.choices || {})[task.id];
+    var tick = task.kind === 'tick' || !options.length;
+    // Older bonus entries are stored as a simple completion mark.
+    if (tick && previous === 'done' && !selected) selected = 'complete';
+    var done = tick && selected === 'complete';
+    var row = element('li', '', done ? 'done' : '');
+    if (tick) {
+      var mark = element('span', '', 'mark');
+      mark.setAttribute('aria-hidden', 'true');
+      row.appendChild(mark);
+    }
+    row.appendChild(element('span', task.name, 'label'));
+    if (task.due && task.due !== defaultDue && !options.some(function (option) {
+      return option.label === RoutineTasks.time(task.due);
+    })) row.appendChild(element('span', RoutineTasks.time(task.due), 'task-time'));
+    if (tick) {
+      row.appendChild(element('span', done ? ' (completed)' : ' (unchecked)', 'sr-only'));
+      if (options[0] && options[0].pts) row.appendChild(element('span', pointsLabel(options[0].pts), 'bonus-points'));
+    } else {
+      var choices = element('div', '', 'choices');
+      options.forEach(function (option) {
+        var active = option.key === selected;
+        var cross = option.key === 'no' || option.key === 'failed' || option.pts < 0;
+        var choice = element('span', '', 'choice' + (active ? ' selected' : '') + (cross ? ' no' : ''));
+        choice.appendChild(element('span', option.label));
+        choice.appendChild(element('span', pointsLabel(option.pts), 'choice-points'));
+        if (active) {
+          choice.appendChild(crayon(cross));
+          choice.appendChild(element('span', ' (selected)', 'sr-only'));
+        }
+        choices.appendChild(choice);
+      });
+      row.appendChild(choices);
+    }
+    return row;
   }
   function fitBoard() {
     var frame = document.getElementById('board-frame');
@@ -146,7 +218,7 @@
     board.textContent = '';
     var catalogue = RoutineTasks.list(overrides);
     ['abby', 'olivia'].forEach(function (girl) {
-      var person = data[girl] || {}, states = person.tasks || {};
+      var person = data[girl] || {};
       var panel = element('section');
       var heading = element('div', '', 'person');
       heading.appendChild(element('h2', girl === 'abby' ? 'Abby' : 'Olivia'));
@@ -172,15 +244,7 @@
         content.appendChild(groupTitle);
         var list = element('ol', '', period === 'bonus' ? 'bonus-list' : '');
         assigned.forEach(function (task) {
-          var done = states[task.id] === 'done';
-          var row = element('li', '', done ? 'done' : '');
-          var mark = element('span', '', 'mark');
-          mark.setAttribute('aria-hidden', 'true');
-          row.appendChild(mark);
-          row.appendChild(element('span', task.name, 'label'));
-          row.appendChild(element('span', done ? ' (completed)' : ' (unchecked)', 'sr-only'));
-          if (task.due && task.due !== defaultDue) row.appendChild(element('span', RoutineTasks.time(task.due), 'task-time'));
-          list.appendChild(row);
+          list.appendChild(taskRow(task, person, defaultDue));
         });
         content.appendChild(list);
       });

@@ -1174,22 +1174,90 @@ async function appBootstrap(){
 <script src="routine-task-editor.js?v=jobs1"></script>
 <script type="module">
 const status=document.getElementById('secure-status'),button=document.getElementById('passkey-login');
+const familyId='a693c062-863d-4399-bb5a-db6ff40b4e3f';
+const unlockKey='emmRoutineUnlockV1', unlockWindow=2*60*60*1000;
+let unlock=null;
+
+function sessionId(session){
+  if(session?.user?.id!==familyId)return null;
+  try{
+    const claims=JSON.parse(atob(session.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return claims.session_id||null;
+  }catch{return null;}
+}
+function unlockIsCurrent(){
+  const age=Date.now()-unlock?.at;
+  return age>=0&&age<unlockWindow;
+}
+function relockIfDue(){
+  if(!unlock||unlockIsCurrent())return;
+  unlock=null;
+  try{localStorage.removeItem(unlockKey);}catch{}
+  window.location.reload();
+}
 try {
   const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.0/+esm');
   const client=createClient('https://lfwxbxrsureqdlxjlfgf.supabase.co','sb_publishable_UVxQWE2KErQpNx_V1TYxbw_MsxaohKA',{auth:{experimental:{passkey:true},storageKey:'emmRoutineAuth'}});
-  window.routineAccessToken=async()=>{const {data,error}=await client.auth.getSession();if(error||!data.session)throw new Error('Sign in again to sync');return data.session.access_token;};
-  button.disabled=false;status.textContent='Ready to sign in.';
+  async function currentSession(){
+    const {data,error}=await client.auth.getSession();
+    if(error)throw error;
+    return data.session;
+  }
+  window.routineAccessToken=async()=>{
+    const session=await currentSession();
+    if(!unlockIsCurrent()||!unlock.id||sessionId(session)!==unlock.id)throw new Error('Sign in again to sync');
+    return session.access_token;
+  };
+  async function openRoutine(){
+    status.textContent='Loading your family’s points…';
+    await appBootstrap();
+    if(!unlockIsCurrent()){
+      relockIfDue();
+      return;
+    }
+    document.getElementById('secure-entry').remove();
+    setTimeout(relockIfDue,Math.max(0,unlock.at+unlockWindow-Date.now()));
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)relockIfDue();});
+    window.addEventListener('pageshow',relockIfDue);
+    window.addEventListener('focus',relockIfDue);
+  }
+  function showRetry(error){
+    status.textContent=error.message||'Sign-in did not finish. Please try again.';
+    button.textContent=unlockIsCurrent()?'Retry connection':'Open with Face ID';
+    button.disabled=false;
+  }
   button.addEventListener('click',async()=>{
-    button.disabled=true;status.textContent='Follow your phone’s passkey prompt…';
+    button.disabled=true;
     try{
-      const {data,error}=await client.auth.signInWithPasskey();
-      if(error)throw error;
-      if(data.user?.id!=='a693c062-863d-4399-bb5a-db6ff40b4e3f')throw new Error('Please choose the family account passkey.');
-      status.textContent='Loading your family’s points…';
-      await appBootstrap();
-      document.getElementById('secure-entry').remove();
-    }catch(error){status.textContent=error.message||'Sign-in did not finish. Please try again.';button.disabled=false;}
+      const retry=button.textContent==='Retry connection'&&unlockIsCurrent()&&sessionId(await currentSession())===unlock.id;
+      if(!retry){
+        status.textContent='Follow your phone’s passkey prompt…';
+        const {data,error}=await client.auth.signInWithPasskey();
+        if(error)throw error;
+        const id=sessionId(data.session);
+        if(!id)throw new Error('Please choose the family account passkey.');
+        unlock={id,at:Date.now()};
+        try{localStorage.setItem(unlockKey,JSON.stringify(unlock));}catch{}
+      }
+      await openRoutine();
+    }catch(error){showRetry(error);}
   });
+  try{unlock=JSON.parse(localStorage.getItem(unlockKey)||'null');}catch{}
+  if(unlockIsCurrent()&&unlock.id){
+    try{
+      if(sessionId(await currentSession())===unlock.id){
+        await openRoutine();
+      }else{
+        unlock=null;
+        button.disabled=false;
+        status.textContent='Ready to sign in.';
+      }
+    }catch(error){showRetry(error);}
+  }else{
+    unlock=null;
+    button.disabled=false;
+    status.textContent='Ready to sign in.';
+  }
 }catch(error){status.textContent='Secure sign-in could not load. Check your connection and reopen the app.';}
 </script>
 </body>
