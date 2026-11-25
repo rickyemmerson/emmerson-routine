@@ -8,30 +8,37 @@
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: #20192c; color: #faf6ff; font: 600 18px/1.35 system-ui, sans-serif; }
-  main { max-width: 1920px; margin: auto; padding: 3vh 4vw; }
+  main { max-width: 1920px; margin: auto; padding: 3vh 4vw 2vh; }
   header, .person, .group-title { display: flex; justify-content: space-between; align-items: baseline; gap: .7rem; }
   h1, h2, h3, p { margin: 0; }
-  h1 { font-size: clamp(30px, 5vw, 88px); letter-spacing: -.035em; }
-  #date, footer { color: #ded0ec; font-size: clamp(15px, 1.65vw, 28px); }
+  h1 { font-size: 5vw; font-size: clamp(24px, min(5vw, 7vh), 80px); letter-spacing: -.035em; line-height: 1.1; }
+  #date, footer { color: #ded0ec; font-size: clamp(13px, min(1.65vw, 2.4vh), 28px); }
   header { margin-bottom: 2vh; }
-  #board { display: flex; gap: 2vw; align-items: flex-start; }
+  #board { display: flex; justify-content: space-between; align-items: stretch; }
   section { width: 49%; min-width: 0; border-radius: 14px; background: #fff5f7; color: #421729; overflow: hidden; }
   section + section { background: #f5efff; color: #30194e; }
-  .person { padding: 1vh 2vw; color: white; background: #932747; }
+  .person { padding: 1.2vh 2vw; color: white; background: #932747; }
   section + section .person { background: #59338b; }
-  h2 { font-size: clamp(24px, 3vw, 52px); }
-  .points { font-size: clamp(15px, 2vw, 36px); font-variant-numeric: tabular-nums; text-align: right; }
-  .groups { padding: .5vh 2vw 1.2vh; }
-  .group-title { margin-top: .8vh; padding: .3vh 0; font-size: clamp(14px, 1.6vw, 29px); }
+  h2 { font-size: clamp(22px, min(3vw, 4.5vh), 62px); line-height: 1.15; }
+  .points { font-size: clamp(14px, min(2vw, 3vh), 38px); font-variant-numeric: tabular-nums; text-align: right; }
+  .groups { padding: .8vh 2vw 1.3vh; }
+  .group-title { margin-top: 1.2vh; padding-bottom: .6vh; font-size: clamp(14px, min(1.7vw, 2.7vh), 32px); line-height: 1.2; }
+  .group-title span { font-weight: 500; text-align: right; }
   ol { padding: 0; margin: 0; list-style: none; }
-  li { display: flex; align-items: baseline; gap: .65em; padding: .25vh 0; border-top: 1px solid #22112b30; font-size: clamp(16px, 1.95vw, 34px); }
+  li { display: flex; align-items: center; gap: .65em; padding: .42vh 0; border-top: 1px solid #22112b30; font-size: 2.8vh; font-size: clamp(13px, min(2.1vw, 3.25vh), 40px); line-height: 1.25; }
+  #board.morning li { padding: 1.2vh 0; font-size: clamp(16px, min(2.8vw, 5vh), 52px); }
   .mark { width: .65em; height: .65em; flex: 0 0 .65em; border: 2px solid currentColor; border-radius: 3px; }
   .done .mark { background: #256343; border-color: #256343; }
   .done .mark::after { content: ''; display: block; width: .24em; height: .4em; margin: -.03em auto 0; border: solid white; border-width: 0 .08em .08em 0; transform: rotate(45deg); }
   .done .label { text-decoration: line-through; }
-  .state { margin-left: auto; white-space: nowrap; font-size: .7em; }
+  .state { margin-left: auto; padding-left: .3em; text-align: right; font-size: .72em; }
   footer { margin-top: 1.4vh; }
-  @media (max-width: 590px) { #board { display: block; } section { width: 100%; margin-bottom: 1rem; } header { display: block; } }
+  @media (orientation: portrait) and (max-width: 590px) {
+    #board { display: block; }
+    section { width: 100%; margin-bottom: 1rem; }
+    header { display: block; }
+    li { font-size: 16px; }
+  }
 </style>
 </head>
 <body>
@@ -51,6 +58,8 @@
   var snapshot = null;
   var lastRender = '';
   var connection = 'Connecting to the jobs board…';
+  var refreshTimer;
+  var requestInFlight = false;
   var endpoint = 'https://lfwxbxrsureqdlxjlfgf.supabase.co/rest/v1/routine_tv_today?select=day,board';
   function brisbane() {
     return new Date(Date.now() + 10 * 60 * 60 * 1000);
@@ -63,16 +72,18 @@
   }
   function render() {
     var now = brisbane(), day = now.toISOString().slice(0, 10), dow = now.getUTCDay();
-    var morning = now.getUTCHours() < 15;
+    var morning = now.getUTCHours() < 12;
     var data = snapshot && snapshot.day === day ? snapshot.board : {};
     var ready = connection === 'Updates automatically' || Boolean(snapshot && snapshot.day === day);
     var key = JSON.stringify([day, morning, data, ready]);
-    document.getElementById('status').textContent = connection;
+    var status = document.getElementById('status');
+    if (status.textContent !== connection) status.textContent = connection;
     if (key === lastRender) return;
     lastRender = key;
     document.getElementById('title').textContent = morning ? 'Morning jobs' : 'Afternoon & evening';
     document.getElementById('date').textContent = weekdays[dow] + ' · ' + now.getUTCDate() + '/' + (now.getUTCMonth() + 1);
     var board = document.getElementById('board');
+    board.className = morning ? 'morning' : 'later';
     board.textContent = '';
     ['abby', 'olivia'].forEach(function (girl) {
       var person = data[girl] || {}, states = person.tasks || {};
@@ -83,8 +94,11 @@
       panel.appendChild(heading);
       var content = element('div', '', 'groups');
       (morning ? [0] : [1, 2]).forEach(function (index) {
-        var title = index === 0 ? 'Ready by 7:45 am' : index === 1 ? 'After school · by 6 pm' : 'After dinner · by 8 pm';
-        content.appendChild(element('h3', title, 'group-title'));
+        var title = index === 0 ? 'Before school' : index === 1 ? 'After school' : 'After dinner';
+        var deadline = index === 0 ? 'Ready by 7:45 am' : index === 1 ? 'By 6 pm' : 'By 8 pm';
+        var groupTitle = element('h3', title, 'group-title');
+        groupTitle.appendChild(element('span', deadline));
+        content.appendChild(groupTitle);
         var list = element('ol');
         groups[index].forEach(function (task) {
           if ((task[2] === 'dog' && dog[dow] !== girl) ||
@@ -108,13 +122,21 @@
     });
   }
   function refresh() {
+    clearTimeout(refreshTimer);
+    if (requestInFlight || document.hidden) return;
+    requestInFlight = true;
     var request = new XMLHttpRequest();
     request.open('GET', endpoint, true);
     request.setRequestHeader('apikey', 'sb_publishable_UVxQWE2KErQpNx_V1TYxbw_MsxaohKA');
     request.timeout = 10000;
+    function finish(delay) {
+      requestInFlight = false;
+      render();
+      refreshTimer = setTimeout(refresh, delay);
+    }
     function unavailable() {
       connection = 'Connection interrupted · Retrying shortly';
-      render();
+      finish(5000);
     }
     request.onload = function () {
       try {
@@ -122,7 +144,7 @@
         var rows = JSON.parse(request.responseText);
         snapshot = rows[0] || null;
         connection = 'Updates automatically';
-        render();
+        finish(2000);
       } catch (error) { unavailable(); }
     };
     request.onerror = request.ontimeout = unavailable;
@@ -130,8 +152,12 @@
   }
   render();
   refresh();
-  setInterval(refresh, 15000);
-  setInterval(render, 10000);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) clearTimeout(refreshTimer);
+    else { render(); refresh(); }
+  });
+  window.addEventListener('online', refresh);
+  setInterval(render, 1000);
 })();
 </script>
 </body>
