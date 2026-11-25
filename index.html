@@ -394,6 +394,7 @@ body[data-theme="olivia"] .points-hero{background:#6546dc;box-shadow:0 14px 35px
 
 <!-- NAV BAR -->
 <nav class="nav-bar">
+  <button class="nav-tab" onclick="appSync()" aria-label="Sync points"><span class="nav-label" id="routine-sync-status" aria-live="polite">Connecting…</span></button>
   <button class="nav-tab" id="nav-abby" onclick="openKid('abby')"><div class="nav-icon">🩷</div><div class="nav-label">Abby</div></button>
   <button class="nav-tab" id="nav-olivia" onclick="openKid('olivia')"><div class="nav-icon">💜</div><div class="nav-label">Olivia</div></button>
 </nav>
@@ -833,7 +834,7 @@ const ROUTINE_AFTER_DINNER=[
   {id:'ad_teeth',name:'Teeth Brushed',desc:'Night brush',btns:YES_REM,due:'8:00 pm'},
   {id:'ad_bed',name:'In Bed, Lights Off',desc:'Points based on time',due:'8:45 pm',btns:[{key:'8pm',label:'8:00 pm',pts:3},{key:'815',label:'8:15 pm',pts:2},{key:'830',label:'8:30 pm',pts:1},{key:'845',label:'8:45 pm',pts:0},{key:'after845',label:'After 8:45',pts:-1}]},
 ];
-let appData=null, appSession=null, appGirl=null, pinRole=null, appRevision=0, appInitialSync=null, appSaving=false, appPushQueued=false;
+let appData=null, appSession=null, appGirl=null, pinRole=null, appBase=null, appSaved=null, appSyncJob=null;
 let appDate=new Date();appDate.setHours(0,0,0,0);
 const appDateKey=(d=appDate)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const appMonday=(d=appDate)=>{const x=new Date(d),day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));x.setHours(0,0,0,0);return x;};
@@ -851,33 +852,70 @@ function appEnsureData(data){
   return data;
 }
 function appLoad(){
-  if(appData)return appData;
-  try{appData=JSON.parse(localStorage.getItem(APP_KEY)||'null')}catch(e){}
-  if(!appData){
-    appData=appDefault();
-    /* Bring existing recorded scores forward so history is not lost. */
-    try{const old=JSON.parse(localStorage.getItem('emmHQv6')||'{}');if(Object.keys(old).length)appData.daily=old;}catch(e){}
-  }
-  appData=appEnsureData(appData);
-  appInitialSync=appSync();return appData;
+  return appData;
 }
-function appPersist(){appRevision++;localStorage.setItem(APP_KEY,JSON.stringify(appData));appPush();}
-async function appSync(){
-  const startRevision=appRevision;
-  try{const token=await window.routineAccessToken();const r=await fetch(SUPA_URL+'/rest/v1/data?select=value&order=id.desc&limit=1',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}});if(!r.ok)throw new Error('Could not load family data');const rows=await r.json();if(!rows[0]?.value)throw new Error('Family data was not found');const cloud=JSON.parse(rows[0].value).routineV7;if(!cloud||appRevision!==startRevision)throw new Error('Family data could not be loaded');appData=appEnsureData(cloud);localStorage.setItem(APP_KEY,JSON.stringify(appData));appRender();return true;}catch(e){console.log('Routine sync unavailable',e);return false;}
+const SYNC_KEY=APP_KEY+'-pending-v1';
+const appCopy=value=>JSON.parse(JSON.stringify(value));
+const appHasPending=()=>appBase&&!routineMerge.equal(appBase,appSaved);
+function appStorePending(){
+  if(appHasPending())localStorage.setItem(SYNC_KEY,JSON.stringify({base:appBase,local:appSaved}));
+  else localStorage.removeItem(SYNC_KEY);
 }
-async function appPush(){
-  if(appSaving){appPushQueued=true;return;}
-  appSaving=true;
-  do{
-    appPushQueued=false;
+function appSyncStatus(message){
+  document.getElementById('routine-sync-status').textContent=message;
+}
+function appPersist(){
+  appSaved=appCopy(appData);
+  appStorePending();
+  appSyncStatus('Saving…');
+  appSync();
+}
+function appSync(){
+  if(appSyncJob)return appSyncJob;
+  appSyncJob=(async()=>{
     try{
       const token=await window.routineAccessToken();
-      const r=await fetch(SUPA_URL+'/rest/v1/data?on_conflict=id',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:1,value:JSON.stringify({routineV7:appData})})});
-      if(!r.ok)throw new Error(`Save failed (${r.status})`);
-    }catch(e){console.log('Routine save unavailable',e);showToast('Saved on this device — online sync will retry next time');}
-  }while(appPushQueued);
-  appSaving=false;
+      const endpoint=SUPA_URL+'/rest/v1/data?id=eq.1';
+      const headers={apikey:SUPA_KEY,Authorization:'Bearer '+token};
+      for(let attempt=0;attempt<6;attempt++){
+        const response=await fetch(endpoint+'&select=value,sync_version',{headers,cache:'no-store',signal:AbortSignal.timeout(12000)});
+        if(!response.ok)throw new Error(`Load failed (${response.status})`);
+        const [row]=await response.json();
+        const documentData=JSON.parse(row?.value||'null');
+        if(!documentData?.routineV7)throw new Error('Family data was not found');
+        const remote=appEnsureData(documentData.routineV7);
+        const sent=appSaved;
+        let merged=appHasPending()?routineMerge.reconcile(appBase,sent,remote,appScoreForKey):remote;
+        if(!routineMerge.equal(merged,remote)){
+          const saved=await fetch(endpoint+'&sync_version=eq.'+row.sync_version,{
+            method:'PATCH',headers:{...headers,'Content-Type':'application/json',Prefer:'return=representation'},
+            body:JSON.stringify({sync_version:row.sync_version+1,value:JSON.stringify({...documentData,routineV7:merged})}),
+            signal:AbortSignal.timeout(12000)
+          });
+          if(!saved.ok)throw new Error(`Save failed (${saved.status})`);
+          if(!(await saved.json()).length)continue;
+        }
+        const editedWhileSaving=sent!==appSaved;
+        const next=editedWhileSaving?routineMerge.reconcile(sent,appSaved,merged,appScoreForKey):merged;
+        const changed=!routineMerge.equal(appSaved,next);
+        appBase=appCopy(merged);
+        appSaved=appCopy(next);
+        if(changed||!appData)appData=appCopy(next);
+        appStorePending();
+        if(changed&&appSession)appRender();
+        if(!appHasPending()){
+          appSyncStatus('Up to date');
+          return true;
+        }
+      }
+      throw new Error('Another device is saving');
+    }catch(error){
+      console.warn('Routine sync unavailable',error);
+      appSyncStatus(appHasPending()?'Waiting to sync · Tap to retry':'Sync unavailable · Tap to retry');
+      return false;
+    }
+  })().finally(()=>{appSyncJob=null;});
+  return appSyncJob;
 }
 function appDay(){const key=appDateKey();return appLoad().daily[key]||(appLoad().daily[key]={});}
 function appGirlDay(g){const day=appDay();return day[g]||(day[g]={});}
@@ -885,12 +923,13 @@ function appRecord(g,id){return appGirlDay(g)[id];}
 function appIsAssigned(g,t){const dow=appDate.getDay();if(t.dogwalk&&DOG_WALK[dow]!==appName(g))return false;if(t.kitchen&&KITCHEN_ROSTER[dow]!==g)return false;if((t.noLunch||t.noBag)&&NO_LB_DAYS.includes(dow))return false;return true;}
 function appAllTasks(){return[...ROUTINE_MORNING,...ROUTINE_AFTER_SCHOOL,...ROUTINE_AFTER_DINNER];}
 function appScoreValue(t,record){const score=typeof record==='string'?record:record?.score;if(!score||score==='na')return 0;return t.btns.find(b=>b.key===score)?.pts||0;}
-function appDayScore(g,d=new Date(appDate)){
-  const key=appDateKey(d),day=appLoad().daily[key]||{},scores=day[g]||{},bon=day.bonus?.[g]||{};let total=day.char?.[g]||0;
+function appScoreForKey(data,g,key){
+  const d=new Date(key+'T12:00:00'),day=data.daily[key]||{},scores=day[g]||{},bon={...day.bonus?.[g],...scores.bonus};let total=day.char?.[g]||0;
   for(const t of appAllTasks()){if(t.dogwalk&&DOG_WALK[d.getDay()]!==appName(g))continue;if(t.kitchen&&KITCHEN_ROSTER[d.getDay()]!==g)continue;if((t.noLunch||t.noBag)&&NO_LB_DAYS.includes(d.getDay()))continue;total+=appScoreValue(t,scores[t.id]);}
   for(const b of BONUS)if(bon[b.id]===true||bon[b.id]?.score==='complete')total+=b.pts;
   return total;
 }
+function appDayScore(g,d=new Date(appDate)){return appScoreForKey(appLoad(),g,appDateKey(d));}
 function appWeekScore(g,mon=appMonday()){let n=0;for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);n+=appDayScore(g,d);}return n;}
 function appMoney(cents){return new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD'}).format(cents/100);}
 function appWallet(g){return appLoad().wallets[g]||(appLoad().wallets[g]={ledger:[],savingsStart:appMonthKey()});}
@@ -960,19 +999,25 @@ function openWallet(g){appGirl=g;appShow('wallet');}
 function renderWallet(){const g=appSession==='parent'?(appGirl||'abby'):appSession,a=appAccount(g),w=appWallet(g),rewards=[{id:'dessert',emoji:'🍨',name:'Dessert',desc:'Spend points for a dessert whenever you choose.',cost:50},{id:'cash5',emoji:'💵',name:'$5 to bank',desc:'Small cash transfer.',cost:150},{id:'cash10',emoji:'💰',name:'$10 to bank',desc:'Save 25 points compared with two $5 transfers.',cost:275},{id:'cash20',emoji:'🌟',name:'$20 to bank',desc:'Best value — save 100 points.',cost:500}];const entries=w.ledger.slice(0,12).map(e=>`<div class="ledger-row"><div>${e.type}<small>${e.note||new Date(e.at).toLocaleDateString('en-AU')}</small></div><div class="ledger-amount" style="color:${e.points<0?'#c23b55':'#1a8a3a'}">${e.points>0?'+':''}${e.points||0} pts</div></div>`).join('')||'<div class="hub-sub">Your bonus and spending history will appear here.</div>';const rows=rewards.map(r=>{const parentOnly=r.id!=='dessert',disabled=a.available<r.cost||(parentOnly&&appSession!=='parent');return`<div class="reward-row"><div class="reward-emoji">${r.emoji}</div><div style="flex:1"><div class="reward-name">${r.name} <span class="cost">${r.cost} pts</span></div><div class="reward-desc">${r.desc}</div></div><button onclick="redeemPoints('${g}','${r.id}',${r.cost})" ${disabled?'disabled':''}>${parentOnly&&appSession!=='parent'?'Parent':'Spend'}</button></div>`}).join('');document.getElementById('wallet-content').innerHTML=`<div class="kid-top"><div><h2>${appName(g)}’s points</h2><div class="hub-sub" style="color:rgba(255,255,255,.65)">Save to earn a 5% bonus each month</div></div><button class="wallet-mini" onclick="appShow('${g}')">Back<strong>Routine</strong></button></div><div class="points-hero"><div class="points-label">Available to spend</div><div class="points-number">${a.available}</div><div class="wallet-stats"><div class="wallet-stat"><strong>${a.earned}</strong><span>Earned</span></div><div class="wallet-stat"><strong>${a.spent}</strong><span>Spent</span></div><div class="wallet-stat"><strong>+${a.bonus}</strong><span>Bonuses</span></div></div></div><div class="hub-card"><div class="hub-title">Rewards</div><div class="hub-sub">Desserts are instant. Cash redemptions are recorded by a parent before transfer.</div>${rows}</div><div class="hub-card"><div class="hub-title">Points history</div><div class="ledger">${entries}</div></div>`;}
 function redeemPoints(g,id,cost){const a=appAccount(g);if(a.available<cost){showToast(`You need ${cost-a.available} more points`);return;}if(id!=='dessert'&&appSession!=='parent'){showToast('Ask a parent to make a bank transfer');return;}const labels={dessert:'Dessert redeemed',cash5:'$5 bank transfer',cash10:'$10 bank transfer',cash20:'$20 bank transfer'};appLedger(g,{type:'reward redemption',points:-cost,note:labels[id]});appPersist();showToast(id==='dessert'?'Dessert redeemed — enjoy!':'Bank transfer recorded');renderWallet();}
 
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&appSession){appApplySavingsBonus();appRender();}});
+document.addEventListener('visibilitychange',async()=>{if(!document.hidden&&appSession&&await appSync())appApplySavingsBonus();});
+window.addEventListener('online',()=>{if(appSession)appSync();});
+setInterval(()=>{if(!document.hidden&&appSession)appSync();},15000);
 function appUpdateDateDisplay(){document.getElementById('dateDisplayBtn').textContent=appDate.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});}
 window.changeDay=d=>{appDate.setDate(appDate.getDate()+d);currentDate=new Date(appDate);appUpdateDateDisplay();appRender();};
 window.goToday=()=>{appDate=new Date();appDate.setHours(0,0,0,0);currentDate=new Date(appDate);appUpdateDateDisplay();appRender();};
 window.openCal=()=>{currentDate=new Date(appDate);calViewDate=new Date(appDate);renderCalGrid();document.getElementById('calOverlay').classList.add('open');};
 window.selectCalDay=(y,m,d)=>{appDate=new Date(y,m,d);appDate.setHours(0,0,0,0);currentDate=new Date(appDate);appUpdateDateDisplay();document.getElementById('calOverlay').classList.remove('open');appRender();};
 async function appBootstrap(){
-  appLoad();
-  if(!await appInitialSync){appData=null;throw new Error('Could not load the shared points. Check your connection and try again.');}
+  try{
+    const pending=JSON.parse(localStorage.getItem(SYNC_KEY)||'null');
+    if(pending?.base&&pending?.local){appBase=pending.base;appSaved=pending.local;}
+  }catch(error){console.warn('Could not read pending routine changes',error);}
+  if(!await appSync())throw new Error('Could not load the shared points. Check your connection and try again.');
   appStartPoints();appApplySavingsBonus();
   exitParent();
 }
 </script>
+<script src="routine-sync.js"></script>
 <script type="module">
 const status=document.getElementById('secure-status'),button=document.getElementById('passkey-login');
 try {

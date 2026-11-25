@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Emmerson Routine · TV board</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #20192c; color: #faf6ff; font: 600 18px/1.35 system-ui, sans-serif; }
+  main { max-width: 1920px; margin: auto; padding: 3vh 4vw; }
+  header, .person, .group-title { display: flex; justify-content: space-between; align-items: baseline; gap: .7rem; }
+  h1, h2, h3, p { margin: 0; }
+  h1 { font-size: clamp(30px, 5vw, 88px); letter-spacing: -.035em; }
+  #date, footer { color: #ded0ec; font-size: clamp(15px, 1.65vw, 28px); }
+  header { margin-bottom: 2vh; }
+  #board { display: flex; gap: 2vw; align-items: flex-start; }
+  section { width: 49%; min-width: 0; border-radius: 14px; background: #fff5f7; color: #421729; overflow: hidden; }
+  section + section { background: #f5efff; color: #30194e; }
+  .person { padding: 1vh 2vw; color: white; background: #932747; }
+  section + section .person { background: #59338b; }
+  h2 { font-size: clamp(24px, 3vw, 52px); }
+  .points { font-size: clamp(15px, 2vw, 36px); font-variant-numeric: tabular-nums; text-align: right; }
+  .groups { padding: .5vh 2vw 1.2vh; }
+  .group-title { margin-top: .8vh; padding: .3vh 0; font-size: clamp(14px, 1.6vw, 29px); }
+  ol { padding: 0; margin: 0; list-style: none; }
+  li { display: flex; align-items: baseline; gap: .65em; padding: .25vh 0; border-top: 1px solid #22112b30; font-size: clamp(16px, 1.95vw, 34px); }
+  .mark { width: .65em; height: .65em; flex: 0 0 .65em; border: 2px solid currentColor; border-radius: 3px; }
+  .done .mark { background: #256343; border-color: #256343; }
+  .done .mark::after { content: ''; display: block; width: .24em; height: .4em; margin: -.03em auto 0; border: solid white; border-width: 0 .08em .08em 0; transform: rotate(45deg); }
+  .done .label { text-decoration: line-through; }
+  .state { margin-left: auto; white-space: nowrap; font-size: .7em; }
+  footer { margin-top: 1.4vh; }
+  @media (max-width: 590px) { #board { display: block; } section { width: 100%; margin-bottom: 1rem; } header { display: block; } }
+</style>
+</head>
+<body>
+<main>
+  <header><h1 id="title">Today’s jobs</h1><p id="date"></p></header>
+  <div id="board"></div>
+  <footer id="status" role="status">Connecting to the jobs board…</footer>
+  <noscript>The TV browser needs JavaScript enabled to show the jobs board.</noscript>
+</main>
+<script>
+(function () {
+  'use strict';
+  var groups = [[["m_breakfast","Breakfast Eaten","","9:00 am"],["m_teeth","Teeth Brushed","","9:00 am"],["m_dogfed","Dog Fed","dog","9:00 am"],["m_bed","Bed Made","","9:00 am"]],[["as_homework","Homework","","6:00 pm"],["as_music","Music Practice","","6:00 pm"],["as_bedroom","Bedroom Clean","","6:00 pm"],["as_dogwalk","Dog Walk","dog","6:00 pm"],["as_poopatrol","Poo Patrol","dog","6:00 pm"],["as_dogfed","Dog Fed","dog","6:00 pm"],["as_washing","Clean Washing Away","","6:00 pm"]],[["ad_lunch","School Lunch Packed","school","8:00 pm"],["ad_kitchen","Kitchen Duty","kitchen","8:00 pm"],["ad_shower","Shower","","8:00 pm"],["ad_clothes","Dirty Clothes Away","","8:00 pm"],["ad_bag","School Bag Packed","school","8:00 pm"],["ad_teeth","Teeth Brushed","","8:00 pm"],["ad_bed","In Bed, Lights Off","","8:45 pm"]]];
+  var dog = ['abby','abby','olivia','abby','olivia','abby','olivia'];
+  var kitchen = [null,'olivia','abby','olivia','abby','olivia','abby'];
+  var weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var snapshot = null;
+  var lastRender = '';
+  var connection = 'Connecting to the jobs board…';
+  var endpoint = 'https://lfwxbxrsureqdlxjlfgf.supabase.co/rest/v1/routine_tv_today?select=day,board';
+  function brisbane() {
+    return new Date(Date.now() + 10 * 60 * 60 * 1000);
+  }
+  function element(tag, text, className) {
+    var node = document.createElement(tag);
+    if (text) node.textContent = text;
+    if (className) node.className = className;
+    return node;
+  }
+  function render() {
+    var now = brisbane(), day = now.toISOString().slice(0, 10), dow = now.getUTCDay();
+    var morning = now.getUTCHours() < 15;
+    var data = snapshot && snapshot.day === day ? snapshot.board : {};
+    var ready = connection === 'Updates automatically' || Boolean(snapshot && snapshot.day === day);
+    var key = JSON.stringify([day, morning, data, ready]);
+    document.getElementById('status').textContent = connection;
+    if (key === lastRender) return;
+    lastRender = key;
+    document.getElementById('title').textContent = morning ? 'Morning jobs' : 'Afternoon & evening';
+    document.getElementById('date').textContent = weekdays[dow] + ' · ' + now.getUTCDate() + '/' + (now.getUTCMonth() + 1);
+    var board = document.getElementById('board');
+    board.textContent = '';
+    ['abby', 'olivia'].forEach(function (girl) {
+      var person = data[girl] || {}, states = person.tasks || {};
+      var panel = element('section');
+      var heading = element('div', '', 'person');
+      heading.appendChild(element('h2', girl === 'abby' ? 'Abby' : 'Olivia'));
+      heading.appendChild(element('p', (ready ? (typeof person.points === 'number' ? person.points : 0) : '—') + ' points today', 'points'));
+      panel.appendChild(heading);
+      var content = element('div', '', 'groups');
+      (morning ? [0] : [1, 2]).forEach(function (index) {
+        var title = index === 0 ? 'Ready by 7:45 am' : index === 1 ? 'After school · by 6 pm' : 'After dinner · by 8 pm';
+        content.appendChild(element('h3', title, 'group-title'));
+        var list = element('ol');
+        groups[index].forEach(function (task) {
+          if ((task[2] === 'dog' && dog[dow] !== girl) ||
+              (task[2] === 'kitchen' && kitchen[dow] !== girl) ||
+              (task[2] === 'school' && (dow === 5 || dow === 6))) return;
+          var state = states[task[0]], done = state === 'done';
+          var row = element('li', '', done ? 'done' : '');
+          var mark = element('span', '', 'mark');
+          mark.setAttribute('aria-hidden', 'true');
+          row.appendChild(mark);
+          row.appendChild(element('span', task[1], 'label'));
+          var suffix = done ? 'Done' : state === 'missed' ? 'Not done' : '';
+          if (task[0] === 'ad_bed' && !done) suffix = suffix ? suffix + ' · 8:45 pm' : '8:45 pm';
+          if (suffix) row.appendChild(element('span', suffix, 'state'));
+          list.appendChild(row);
+        });
+        content.appendChild(list);
+      });
+      panel.appendChild(content);
+      board.appendChild(panel);
+    });
+  }
+  function refresh() {
+    var request = new XMLHttpRequest();
+    request.open('GET', endpoint, true);
+    request.setRequestHeader('apikey', 'sb_publishable_UVxQWE2KErQpNx_V1TYxbw_MsxaohKA');
+    request.timeout = 10000;
+    function unavailable() {
+      connection = 'Connection interrupted · Retrying shortly';
+      render();
+    }
+    request.onload = function () {
+      try {
+        if (request.status !== 200) return unavailable();
+        var rows = JSON.parse(request.responseText);
+        snapshot = rows[0] || null;
+        connection = 'Updates automatically';
+        render();
+      } catch (error) { unavailable(); }
+    };
+    request.onerror = request.ontimeout = unavailable;
+    request.send();
+  }
+  render();
+  refresh();
+  setInterval(refresh, 15000);
+  setInterval(render, 10000);
+})();
+</script>
+</body>
+</html>
